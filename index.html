@@ -100,9 +100,9 @@
       font-size: 2rem;
       text-align: center;
     }
-    .ml11 {
+    .loading-text {
       font-weight: 700;
-      font-size: 3.5em;
+      font-size: 3em;
     }
     .progress-bar {
       width: 300px;
@@ -112,6 +112,7 @@
       overflow: hidden;
       margin-top: 20px;
       position: relative;
+      background: rgba(255,255,255,0.3);
     }
     .progress-fill {
       height: 100%;
@@ -130,6 +131,12 @@
       font-weight: bold;
       line-height: 20px;
     }
+    #cakeEmoji {
+      position: absolute;
+      top: -30px;
+      font-size: 24px;
+      transition: left 0.1s linear;
+    }
     #continueText {
       display: none;
       margin-top: 15px;
@@ -140,14 +147,11 @@
 <body>
 
 <div id="loadingScreen">
-  <div class="ml11">
-    <span class="text-wrapper">
-      <span class="letters">Preparing your surprise...</span>
-    </span>
-  </div>
+  <div class="loading-text" id="loadingMessage">Preparing your surprise<span id="dots">...</span></div>
   <div class="progress-bar">
     <div class="progress-fill" id="progressFill"></div>
     <div id="progressText">0%</div>
+    <div id="cakeEmoji">🎂</div>
   </div>
   <div id="continueText">Press ENTER or Tap to continue</div>
 </div>
@@ -173,41 +177,24 @@
 <script>
   // 🎉 Confetti effect
   (function confettiLoop() {
-    confetti({
-      particleCount: 3,
-      angle: 60,
-      spread: 55,
-      origin: { x: 0 }
-    });
-    confetti({
-      particleCount: 3,
-      angle: 120,
-      spread: 55,
-      origin: { x: 1 }
-    });
+    confetti({ particleCount: 3, angle: 60, spread: 55, origin: { x: 0 } });
+    confetti({ particleCount: 3, angle: 120, spread: 55, origin: { x: 1 } });
     requestAnimationFrame(confettiLoop);
   })();
 
-  // Loading animation
-  anime.timeline({loop: true})
-    .add({
-      targets: '.ml11 .letters',
-      scale: [0.2, 1],
-      opacity: [0, 1],
-      easing: "easeOutExpo",
-      duration: 800
-    }).add({
-      targets: '.ml11 .letters',
-      opacity: 0,
-      duration: 800,
-      easing: "easeOutExpo",
-      delay: 800
-    });
+  // Animated dots after "Preparing your surprise"
+  const dots = document.getElementById("dots");
+  let dotCount = 0;
+  setInterval(() => {
+    dotCount = (dotCount + 1) % 4;
+    dots.textContent = '.'.repeat(dotCount);
+  }, 500);
 
   // Progress bar simulation
   let progress = 0;
   const fill = document.getElementById('progressFill');
   const progressText = document.getElementById('progressText');
+  const cakeEmoji = document.getElementById('cakeEmoji');
   const continueText = document.getElementById('continueText');
   const loadingScreen = document.getElementById('loadingScreen');
   const progressInterval = setInterval(() => {
@@ -215,6 +202,7 @@
       progress++;
       fill.style.width = progress + '%';
       progressText.textContent = progress + '%';
+      cakeEmoji.style.left = `calc(${progress}% - 12px)`;
     } else {
       clearInterval(progressInterval);
       continueText.style.display = 'block';
@@ -231,7 +219,7 @@
   document.addEventListener('keydown', (e) => { if(e.key === 'Enter') dismissLoading(); });
   document.addEventListener('click', dismissLoading);
 
-  // Globe setup
+  // --- Globe Setup ---
   const elem = document.getElementById('globeViz');
   const infoCard = document.getElementById('infoCard');
   const infoImage = document.getElementById('infoImage');
@@ -290,7 +278,7 @@
 
     const { lat, lng } = tourStops[index];
 
-    // Smooth travel effect to each country
+    // Smooth travel effect
     await animateTo(lat, lng, 2.0, 1000);
     await animateTo(lat, lng, 1.2, 1500);
     await animateTo(lat, lng, 0.5, 2000);
