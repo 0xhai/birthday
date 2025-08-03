@@ -43,6 +43,7 @@
       border-radius: 15px;
       overflow: hidden;
       position: relative;
+      margin-top: 15px;
     }
     #loading-bar {
       width: 0%;
@@ -54,8 +55,8 @@
     }
     #cake-emoji {
       position: absolute;
-      top: -35px;
-      font-size: 1.8em;
+      top: -45px; /* ✅ moved higher */
+      font-size: 2em;
       z-index: 9999;
       transition: left 0.3s;
     }
@@ -77,6 +78,9 @@
     }
 
     /* MAIN PAGE */
+    body.main-page {
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc) !important; /* ✅ same as loading */
+    }
     #globeViz {
       width: 100vw;
       height: 100vh;
@@ -189,6 +193,7 @@
 
     function startMainPage() {
       document.getElementById('loading-screen').style.display = 'none';
+      document.body.classList.add('main-page'); // ✅ apply gradient
       launchConfetti();
     }
 
