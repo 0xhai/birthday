@@ -61,16 +61,21 @@
       font-size: 16px;
       transition: opacity 0.5s;
     }
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+    }
     #globeViz { 
-  width: 100vw; 
-  height: 100vh; 
-  position: relative;
-  z-index: 2; /* raised above confetti */
-}
-.title, .subtitle, .card, .popup {
-  z-index: 3; /* raised above confetti */
-  position: relative;
-}
+      width: 100vw; 
+      height: 100vh; 
+      position: relative;
+      z-index: 1;
+    }
     .popup {
       position: absolute;
       top: 20px;
@@ -82,6 +87,7 @@
       font-size: 18px;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      z-index: 2;
     }
     .title {
       position: absolute;
@@ -91,7 +97,8 @@
       font-size: 40px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
+      z-index: 3;
+      pointer-events: none;
     }
     .subtitle {
       position: absolute;
@@ -101,7 +108,8 @@
       font-size: 24px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
+      z-index: 3;
+      pointer-events: none;
     }
     .card {
       position: absolute;
@@ -113,7 +121,7 @@
       border-radius: 10px;
       text-align: center;
       width: 250px;
-      z-index: 5;
+      z-index: 3;
       display: none;
     }
     .nav-buttons {
@@ -137,7 +145,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -146,6 +154,9 @@
     <div class="loading-percentage" id="loadingPercentage">0%</div>
     <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
   </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
 
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
@@ -190,32 +201,32 @@
       }
     }, 30);
 
-    // Function to start confetti behind globe
-    function startConfetti() {
-  const canvas = document.createElement('canvas');
-  canvas.style.position = 'fixed';
-  canvas.style.top = '0';
-  canvas.style.left = '0';
-  canvas.style.width = '100vw';
-  canvas.style.height = '100vh';
-  canvas.style.zIndex = '1'; // now below globe/text but above background
-  canvas.style.pointerEvents = 'none';
-  document.body.appendChild(canvas);
-  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
-  setInterval(() => {
-    myConfetti({ particleCount: 50, spread: 100, origin: { y: 0.6 } });
-  }, 1500);
-}
+    // Hide loading screen on enter/tap
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+    });
+    document.addEventListener('click', () => {
+      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+    });
 
-    // Hide loading screen on enter/tap and start confetti
-    function hideLoading() {
-      if (load >= 100) {
-        document.getElementById('loadingScreen').style.display = 'none';
-        startConfetti();
-      }
+    // Confetti effect on full screen (after loading)
+    const confettiCanvas = document.getElementById('confetti-canvas');
+    const myConfetti = confetti.create(confettiCanvas, { resize: true, useWorker: true });
+
+    function launchConfetti() {
+      myConfetti({
+        particleCount: 60,
+        spread: 140,
+        origin: { x: Math.random(), y: Math.random() * 0.6 },
+        ticks: 200
+      });
     }
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') hideLoading(); });
-    document.addEventListener('click', hideLoading);
+
+    setInterval(() => {
+      if (document.getElementById('loadingScreen').style.display === 'none') {
+        launchConfetti();
+      }
+    }, 800);
 
     // Globe setup
     const elem = document.getElementById('globeViz');
