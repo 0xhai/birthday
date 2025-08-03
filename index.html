@@ -3,21 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Happy Birthday name 🎉</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+    html, body { 
+      margin: 0; 
+      height: 100%; 
+      overflow: hidden; 
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
       font-family: 'Pacifico', cursive;
     }
 
-    /* ================= LOADING SCREEN ================= */
     #loading-screen {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
@@ -25,175 +22,196 @@
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      z-index: 1000;
+      justify-content: center;
+      z-index: 100;
       color: #fff;
+    }
+
+    .ml11 {
+      font-weight: 700;
+      font-size: 2em;
       text-align: center;
     }
-    .ml3 {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-    #loading-bar-container {
+
+    #loading-container {
+      margin-top: 30px;
+      text-align: center;
+      position: relative;
       width: 80%;
-      height: 25px;
+      max-width: 400px;
+    }
+
+    #loading-bar-container {
+      position: relative;
+      width: 100%;
+      height: 30px;
       background: #fff;
       border-radius: 15px;
       overflow: hidden;
-      position: relative;
-      margin-top: 15px;
-    }
-    #loading-bar {
-      width: 0%;
-      height: 100%;
-      background: #ff66b2;
-      transition: width 0.3s;
-      position: relative;
-      z-index: 1;
-    }
-    #cake-emoji {
-      position: absolute;
-      top: -55px;  /* ✅ Moved higher to be fully visible */
-      font-size: 2.2em;
-      z-index: 10000;
-      left: 0%;
-      transition: left 0.3s;
-      pointer-events: none;
-    }
-    #loading-percentage {
-      position: absolute;
-      width: 100%;
-      text-align: center;
-      top: 2px;
-      font-weight: bold;
-      color: #ff66b2;
-      z-index: 2;
-    }
-    #continue-text {
       margin-top: 20px;
-      display: none;
-      font-size: 1.2em;
     }
 
-    /* ================= MAIN PAGE ================= */
-    body.main-page {
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc) !important;
+    #loading-bar {
+      height: 100%;
+      width: 0;
+      background: #ff66a3;
+      transition: width 0.3s;
     }
-    #globeViz {
-      width: 100vw;
-      height: 100vh;
+
+    #cake {
+      position: absolute;
+      top: -30px; 
+      left: 0;
+      font-size: 24px;
+      transition: left 0.3s ease;
     }
+
+    #loading-text {
+      margin-top: 10px;
+      font-size: 20px;
+    }
+
+    #continue-text {
+      margin-top: 15px;
+      font-size: 18px;
+      opacity: 0;
+      transition: opacity 0.5s ease-in;
+    }
+
+    #globeViz { 
+      width: 100vw; 
+      height: 100vh; 
+    }
+
+    #globeViz canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .popup {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-family: 'Arial', sans-serif;
+      font-size: 18px;
+      display: none;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      z-index: 10;
+    }
+
     .title {
       position: absolute;
       top: 20px;
       width: 100%;
       text-align: center;
+      font-family: 'Pacifico', cursive;
       font-size: 40px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
+
     .subtitle {
       position: absolute;
       bottom: 20px;
       width: 100%;
       text-align: center;
+      font-family: 'Pacifico', cursive;
       font-size: 24px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-    #popup-card {
-      position: absolute;
-      background: rgba(255, 255, 255, 0.95);
-      padding: 15px;
-      border-radius: 10px;
-      text-align: center;
-      top: 20%;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 10;
-      width: 250px;
-      display: none;
-    }
-    #popup-card img {
-      width: 100%;
-      border-radius: 10px;
-    }
-    .nav-buttons {
-      margin-top: 10px;
-    }
-    .nav-buttons button {
-      margin: 5px;
-      padding: 8px 12px;
-      border: none;
-      background-color: #ff66b2;
-      color: white;
-      border-radius: 5px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
-    }
-    .nav-buttons button:disabled {
-      background-color: #ccc;
-      cursor: not-allowed;
-    }
   </style>
 </head>
 <body>
-  <!-- LOADING SCREEN -->
+  <!-- Loading Screen -->
   <div id="loading-screen">
-    <h1 class="ml3">Preparing your surprise<span id="dots">...</span></h1>
-    <div id="loading-bar-container">
-      <div id="loading-bar"></div>
-      <div id="loading-percentage">0%</div>
-      <div id="cake-emoji">🎂</div>
+    <h1 class="ml11">Preparing your surprise<span class="dots">...</span></h1>
+    <div id="loading-container">
+      <div id="loading-bar-container">
+        <div id="loading-bar"></div>
+        <div id="cake">🎂</div>
+      </div>
+      <div id="loading-text">0%</div>
+      <div id="continue-text">Press ENTER or Tap to continue</div>
     </div>
-    <div id="continue-text">Press ENTER or Tap to continue</div>
   </div>
 
-  <!-- MAIN PAGE -->
+  <!-- Main Page -->
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
-  <div id="popup-card"></div>
+  <div id="popup" class="popup"></div>
   <div class="subtitle">From country1 to country5... and beyond ❤️</div>
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script>
-    /* ========== LOADING SCREEN ========== */
-    const dots = document.getElementById('dots');
-    setInterval(() => {
-      dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '.';
-    }, 500);
-
+    const loadingBar = document.getElementById("loading-bar");
+    const loadingText = document.getElementById("loading-text");
+    const continueText = document.getElementById("continue-text");
+    const cake = document.getElementById("cake");
     let progress = 0;
-    const cakeEmoji = document.getElementById('cake-emoji');
-    const loadingBar = document.getElementById('loading-bar');
-    const loadingPercentage = document.getElementById('loading-percentage');
 
-    const progressInterval = setInterval(() => {
+    let progressInterval = setInterval(() => {
       if (progress < 100) {
-        progress++;
-        loadingBar.style.width = progress + '%';
-        loadingPercentage.textContent = progress + '%';
-        cakeEmoji.style.left = `calc(${progress}% - 15px)`;
-      }
-      if (progress >= 100) {
+        progress += 1;
+        loadingBar.style.width = progress + "%";
+        loadingText.textContent = progress + "%";
+        cake.style.left = (progress * 0.8) + "%";
+      } else {
         clearInterval(progressInterval);
-        document.getElementById('continue-text').style.display = 'block';
+        continueText.style.opacity = 1;
       }
-    }, 40);
+    }, 50);
 
-    function startMainPage() {
-      document.getElementById('loading-screen').style.display = 'none';
-      document.body.classList.add('main-page'); // ✅ pink gradient applied
-    }
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter' && progress >= 100) startMainPage();
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && progress >= 100) {
+        document.getElementById("loading-screen").style.display = "none";
+      }
     });
-    document.addEventListener('click', () => {
-      if (progress >= 100) startMainPage();
+
+    document.addEventListener("click", () => {
+      if (progress >= 100) {
+        document.getElementById("loading-screen").style.display = "none";
+      }
     });
+
+    // Initialize Globe
+    const elem = document.getElementById('globeViz');
+    const popup = document.getElementById('popup');
+
+    const places = [
+      { lat: 39.9208, lng: 32.8541, name: "Turkey", message: "Draft text for Turkey" },
+      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Draft text for Azerbaijan" },
+      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Draft text for Greece" },
+      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "Draft text for Sweden" },
+      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Draft text for Iceland" }
+    ];
+
+    Globe()(elem)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundColor('rgba(0,0,0,0)')
+      .pointOfView({ lat: 20, lng: 0, altitude: 2 })
+      .labelsData(places)
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.name)
+      .labelSize(1.5)
+      .labelDotRadius(0.7)
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
+      .onLabelClick(d => {
+        popup.textContent = d.message;
+        popup.style.display = 'block';
+        setTimeout(() => popup.style.display = 'none', 3000);
+      });
   </script>
 </body>
 </html>
