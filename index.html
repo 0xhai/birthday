@@ -1,71 +1,86 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Birthday Globe</title>
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap">
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; overflow: hidden; background-color: black; }
-    canvas { display: block; }
-    #title {
+    html, body {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+    }
+    #globeViz {
       position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-family: 'Dancing Script', cursive;
-      font-size: 3rem;
-      color: white;
+      width: 100%;
+      height: 100%;
     }
   </style>
 </head>
 <body>
-  <div id="title">Happy Birthday!</div>
+  <div id="globeViz"></div>
 
+  <!-- Three.js (ES module) -->
   <script type="module">
     import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.179.0/build/three.module.js';
     import { OrbitControls } from 'https://cdn.jsdelivr.net/npm/three@0.179.0/examples/jsm/controls/OrbitControls.js';
-    import ThreeGlobe from 'https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js';
-    import gsap from 'https://cdn.jsdelivr.net/npm/gsap@3.12.2/index.js';
 
-    // Scene setup
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    // Attach THREE globally so three-globe UMD can access it
+    window.THREE = THREE;
 
-    // Lighting
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(ambientLight);
+    // Dynamically load three-globe (UMD)
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js';
+    script.onload = init;
+    document.head.appendChild(script);
 
-    // Globe
-    const globe = new ThreeGlobe();
-    scene.add(globe);
+    function init() {
+      const globeContainer = document.getElementById('globeViz');
 
-    // Camera
-    camera.position.z = 250;
-
-    // Controls
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableDamping = true;
-    controls.dampingFactor = 0.05;
-    controls.rotateSpeed = 0.5;
-
-    // Animate
-    function animate() {
-      requestAnimationFrame(animate);
-      controls.update();
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    // Resize handler
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+      // Scene setup
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+      const renderer = new THREE.WebGLRenderer({ antialias: true });
       renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+      globeContainer.appendChild(renderer.domElement);
+
+      // Lights
+      const ambientLight = new THREE.AmbientLight(0xbbbbbb);
+      scene.add(ambientLight);
+
+      const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+      directionalLight.position.set(1, 1, 1);
+      scene.add(directionalLight);
+
+      // Globe
+      const Globe = new ThreeGlobe()
+        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg');
+
+      scene.add(Globe);
+      camera.position.z = 350;
+
+      // Controls
+      const controls = new OrbitControls(camera, renderer.domElement);
+      controls.enableZoom = true;
+
+      // Animate
+      function animate() {
+        requestAnimationFrame(animate);
+        Globe.rotation.y += 0.001;
+        renderer.render(scene, camera);
+      }
+      animate();
+
+      window.addEventListener('resize', () => {
+        camera.aspect = window.innerWidth / window.innerHeight;
+        camera.updateProjectionMatrix();
+        renderer.setSize(window.innerWidth, window.innerHeight);
+      });
+    }
   </script>
 </body>
 </html>
