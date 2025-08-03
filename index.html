@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Three.js Starter</title>
+  <title>Happy Birthday 3D</title>
   <style>
     html, body {
       margin: 0;
@@ -21,40 +21,65 @@
 <body>
   <canvas id="bg"></canvas>
 
-  <!-- Load Three.js from reliable CDN -->
+  <!-- Load Three.js and font loader -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/examples/js/loaders/FontLoader.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r152/examples/js/geometries/TextGeometry.js"></script>
 
   <script>
-    // Create scene, camera, renderer
+    // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg') });
+    const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('bg'), antialias: true });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.position.z = 5;
+    camera.position.z = 30;
 
-    // Add a cube
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshBasicMaterial({ color: 0x00ff00, wireframe: true });
-    const cube = new THREE.Mesh(geometry, material);
-    scene.add(cube);
+    // Lighting
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(ambientLight);
 
-    // Resize handling
+    const pointLight = new THREE.PointLight(0xffffff, 1);
+    pointLight.position.set(10, 10, 10);
+    scene.add(pointLight);
+
+    // Load font and create 3D text
+    const loader = new THREE.FontLoader();
+    loader.load('https://threejs.org/examples/fonts/helvetiker_regular.typeface.json', function (font) {
+      const textGeometry = new THREE.TextGeometry('🎉 Happy Birthday! 🎉', {
+        font: font,
+        size: 3,
+        height: 1,
+        curveSegments: 12,
+        bevelEnabled: true,
+        bevelThickness: 0.2,
+        bevelSize: 0.1,
+        bevelSegments: 5
+      });
+
+      const textMaterial = new THREE.MeshPhongMaterial({ color: 0xff69b4, shininess: 100 });
+      const textMesh = new THREE.Mesh(textGeometry, textMaterial);
+
+      textGeometry.center(); // center the text
+      scene.add(textMesh);
+
+      // Animation loop
+      function animate() {
+        requestAnimationFrame(animate);
+        textMesh.rotation.y += 0.01;
+        textMesh.rotation.x = Math.sin(Date.now() * 0.001) * 0.1;
+        renderer.render(scene, camera);
+      }
+
+      animate();
+    });
+
+    // Handle window resizing
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
     });
-
-    // Animation loop
-    function animate() {
-      requestAnimationFrame(animate);
-      cube.rotation.x += 0.01;
-      cube.rotation.y += 0.01;
-      renderer.render(scene, camera);
-    }
-
-    animate();
   </script>
 </body>
 </html>
