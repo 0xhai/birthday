@@ -133,8 +133,8 @@
     }
     #cakeEmoji {
       position: absolute;
-      top: -30px;
-      font-size: 24px;
+      top: -35px;
+      font-size: 26px;
       transition: left 0.1s linear;
     }
     #continueText {
@@ -278,7 +278,7 @@
 
     const { lat, lng } = tourStops[index];
 
-    // Smooth travel effect
+    // Smooth travel effect to correct location
     await animateTo(lat, lng, 2.0, 1000);
     await animateTo(lat, lng, 1.2, 1500);
     await animateTo(lat, lng, 0.5, 2000);
