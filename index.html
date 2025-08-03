@@ -3,14 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <title>Happy Birthday name 🎉</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Arial&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    html, body { 
-      margin: 0; 
-      height: 100%; 
-      overflow: hidden; 
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
-      font-family: 'Pacifico', cursive;
+    html, body {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      font-family: 'Arial', sans-serif;
     }
 
     #loading-screen {
@@ -22,88 +25,58 @@
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      z-index: 100;
-      color: #fff;
+      align-items: center;
+      z-index: 1000;
+      text-align: center;
     }
 
     .ml11 {
-      font-weight: 700;
-      font-size: 2em;
-      text-align: center;
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      color: #d63384;
+      margin-bottom: 20px;
     }
 
-    #loading-container {
-      margin-top: 30px;
-      text-align: center;
-      position: relative;
+    #progress-container {
       width: 80%;
-      max-width: 400px;
-    }
-
-    #loading-bar-container {
-      position: relative;
-      width: 100%;
-      height: 30px;
+      height: 20px;
       background: #fff;
-      border-radius: 15px;
+      border-radius: 10px;
       overflow: hidden;
-      margin-top: 20px;
+      margin-top: 10px;
+      position: relative;
     }
 
-    #loading-bar {
+    #progress-bar {
       height: 100%;
       width: 0;
-      background: #ff66a3;
-      transition: width 0.3s;
+      background: #ff69b4;
+      transition: width 0.3s ease;
     }
 
-    #cake {
-      position: absolute;
-      top: -30px; 
-      left: 0;
-      font-size: 24px;
-      transition: left 0.3s ease;
-    }
-
-    #loading-text {
+    #progress-text {
       margin-top: 10px;
-      font-size: 20px;
+      font-weight: bold;
+      font-size: 16px;
+      color: #d63384;
+    }
+
+    /* ✅ Cake above bar */
+    #cake-emoji {
+      position: absolute;
+      top: -35px; 
+      transform: translateX(-50%);
+      font-size: 30px;
+      transition: left 0.3s ease;
+      z-index: 2;
     }
 
     #continue-text {
-      margin-top: 15px;
-      font-size: 18px;
-      opacity: 0;
-      transition: opacity 0.5s ease-in;
-    }
-
-    #globeViz { 
-      width: 100vw; 
-      height: 100vh; 
-    }
-
-    #globeViz canvas {
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 1;
-    }
-
-    .popup {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-family: 'Arial', sans-serif;
-      font-size: 18px;
       display: none;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      z-index: 10;
+      margin-top: 20px;
+      font-size: 18px;
+      color: #d63384;
     }
 
     .title {
@@ -129,89 +102,118 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
+
+    #globeViz {
+      position: absolute;
+      width: 100vw;
+      height: 100vh;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    /* Card styling unchanged */
+    .card {
+      position: absolute;
+      top: 30%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 20px;
+      border-radius: 10px;
+      max-width: 300px;
+      text-align: center;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      z-index: 10;
+    }
+
+    .nav-buttons {
+      margin-top: 15px;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .nav-buttons button {
+      padding: 8px 12px;
+      background: #ff69b4;
+      color: #fff;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .nav-buttons button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
   <div id="loading-screen">
-    <h1 class="ml11">Preparing your surprise<span class="dots">...</span></h1>
-    <div id="loading-container">
-      <div id="loading-bar-container">
-        <div id="loading-bar"></div>
-        <div id="cake">🎂</div>
-      </div>
-      <div id="loading-text">0%</div>
-      <div id="continue-text">Press ENTER or Tap to continue</div>
+    <h1 class="ml11">Preparing your surprise<span id="dots">...</span></h1>
+    <div id="progress-container">
+      <span id="cake-emoji">🎂</span>
+      <div id="progress-bar"></div>
+    </div>
+    <div id="progress-text">0%</div>
+    <div id="continue-text">Press ENTER or Tap to continue</div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="title">🎂 Happy Birthday name 🎂</div>
+  <div id="globeViz"></div>
+  <div class="subtitle">From country1 to country5... and beyond ❤️</div>
+
+  <!-- Navigation Cards -->
+  <div id="card-container" class="card" style="display:none;">
+    <h3 id="card-title">Let's start our journey</h3>
+    <img id="card-image" src="" alt="" style="max-width:100%;border-radius:8px;display:none;">
+    <p id="card-text">Ready to explore?</p>
+    <div class="nav-buttons">
+      <button id="prev-btn" style="display:none;">Previous</button>
+      <button id="next-btn">Start</button>
     </div>
   </div>
 
-  <!-- Main Page -->
-  <div class="title">🎂 Happy Birthday name 🎂</div>
-  <div id="globeViz"></div>
-  <div id="popup" class="popup"></div>
-  <div class="subtitle">From country1 to country5... and beyond ❤️</div>
-
-  <script src="https://unpkg.com/globe.gl"></script>
   <script>
-    const loadingBar = document.getElementById("loading-bar");
-    const loadingText = document.getElementById("loading-text");
-    const continueText = document.getElementById("continue-text");
-    const cake = document.getElementById("cake");
     let progress = 0;
+    const progressBar = document.getElementById('progress-bar');
+    const progressText = document.getElementById('progress-text');
+    const cakeEmoji = document.getElementById('cake-emoji');
+    const continueText = document.getElementById('continue-text');
 
-    let progressInterval = setInterval(() => {
+    const progressInterval = setInterval(() => {
       if (progress < 100) {
         progress += 1;
-        loadingBar.style.width = progress + "%";
-        loadingText.textContent = progress + "%";
-        cake.style.left = (progress * 0.8) + "%";
-      } else {
+        progressBar.style.width = progress + '%';
+        progressText.textContent = progress + '%';
+        cakeEmoji.style.left = progress + '%';
+      }
+      if (progress === 100) {
         clearInterval(progressInterval);
-        continueText.style.opacity = 1;
+        continueText.style.display = 'block';
       }
     }, 50);
 
-    document.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && progress >= 100) {
-        document.getElementById("loading-screen").style.display = "none";
+    // Simulate dots animation
+    setInterval(() => {
+      const dots = document.getElementById("dots");
+      dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '';
+    }, 500);
+
+    // Wait for user to press Enter or Tap
+    document.addEventListener('keydown', (e) => {
+      if (progress === 100 && (e.key === 'Enter')) {
+        document.getElementById('loading-screen').style.display = 'none';
       }
     });
 
-    document.addEventListener("click", () => {
-      if (progress >= 100) {
-        document.getElementById("loading-screen").style.display = "none";
+    document.addEventListener('click', () => {
+      if (progress === 100) {
+        document.getElementById('loading-screen').style.display = 'none';
       }
     });
-
-    // Initialize Globe
-    const elem = document.getElementById('globeViz');
-    const popup = document.getElementById('popup');
-
-    const places = [
-      { lat: 39.9208, lng: 32.8541, name: "Turkey", message: "Draft text for Turkey" },
-      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Draft text for Azerbaijan" },
-      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Draft text for Greece" },
-      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "Draft text for Sweden" },
-      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Draft text for Iceland" }
-    ];
-
-    Globe()(elem)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 20, lng: 0, altitude: 2 })
-      .labelsData(places)
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
-      .onLabelClick(d => {
-        popup.textContent = d.message;
-        popup.style.display = 'block';
-        setTimeout(() => popup.style.display = 'none', 3000);
-      });
   </script>
 </body>
 </html>
