@@ -10,6 +10,7 @@
       margin: 0; 
       height: 100%; 
       overflow: hidden; 
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
     }
     #loadingScreen {
       position: fixed;
@@ -52,6 +53,8 @@
       width: 100vw; 
       height: 100vh; 
       display: none;
+      position: relative;
+      z-index: 1;
     }
     .popup {
       position: absolute;
@@ -160,11 +163,10 @@
       { lat: 64.9, lng: -19.0, name: "country5", message: "Message 5 🌋" }
     ];
 
-    // Initialize globe
     const globeContainer = document.getElementById('globeViz');
     const world = Globe()(globeContainer)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
       .pointOfView({ lat: 20, lng: 0, altitude: 2 })
       .labelsData(places)
@@ -181,14 +183,23 @@
         setTimeout(() => popup.style.display = 'none', 3000);
       });
 
-    // Simulate globe loading completion
-    setTimeout(() => {
+    // ✅ Real load detection
+    const texture = new Image();
+    texture.src = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
+    texture.onload = () => {
       loadingAnimation.pause();
       document.getElementById('loadingScreen').style.display = 'none';
       document.getElementById('globeViz').style.display = 'block';
       document.querySelector('.title').style.display = 'block';
       document.querySelector('.subtitle').style.display = 'block';
-    }, 4000); // Adjust timing or use globe loading event if available
+    };
+    texture.onerror = () => {
+      // Fallback if texture fails to load (mobile)
+      loadingAnimation.pause();
+      document.getElementById('loadingScreen').style.display = 'none';
+      document.querySelector('.title').style.display = 'block';
+      document.querySelector('.subtitle').style.display = 'block';
+    };
   </script>
 </body>
 </html>
