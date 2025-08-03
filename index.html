@@ -62,20 +62,20 @@
       background-color: #ff69b4;
       border-radius: 15px;
       transition: width 0.2s ease;
-    }
-
-    #loadingText {
-      margin-top: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       color: white;
+      font-weight: bold;
       font-family: Arial, sans-serif;
-      font-size: 16px;
     }
 
     #cakeEmoji {
       position: absolute;
-      top: -40px;  /* ✅ FIXED POSITION */
+      top: -40px;  /* ✅ FLOATS ABOVE BAR */
       font-size: 28px;
-      transition: left 0.2s;
+      left: 0;
+      transition: left 0.2s ease;
     }
 
     #globeViz { 
@@ -155,9 +155,8 @@
     <div class="ml12">Preparing your surprise<span class="dots"></span></div>
     <div class="loading-container">
       <div id="cakeEmoji">🎂</div>
-      <div id="loadingBar" class="loading-bar"></div>
+      <div id="loadingBar" class="loading-bar">0%</div>
     </div>
-    <div id="loadingText">0%</div>
     <div id="continueText" style="display:none;color:white;margin-top:15px;font-family:Arial,sans-serif;">
       Press ENTER or Tap to continue
     </div>
@@ -186,7 +185,7 @@
       if (progress < 100) {
         progress++;
         document.getElementById("loadingBar").style.width = progress + "%";
-        document.getElementById("loadingText").textContent = progress + "%";
+        document.getElementById("loadingBar").textContent = progress + "%";
         document.getElementById("cakeEmoji").style.left = (progress * 2.6) + "px";
       }
       if (progress === 100) {
