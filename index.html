@@ -12,6 +12,8 @@
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
       font-family: 'Pacifico', cursive;
     }
+
+    /* ---------------- LOADING SCREEN ---------------- */
     #loadingScreen {
       position: absolute;
       top: 0; left: 0;
@@ -61,6 +63,8 @@
       font-size: 16px;
       transition: opacity 0.5s;
     }
+
+    /* ---------------- MAIN PAGE ---------------- */
     #globeViz { 
       width: 100vw; 
       height: 100vh; 
@@ -91,7 +95,7 @@
     }
     .subtitle {
       position: absolute;
-      bottom: 30px;
+      bottom: 60px;
       width: 100%;
       text-align: center;
       font-size: 24px;
@@ -113,29 +117,22 @@
       display: none;
     }
     .nav-buttons {
-      position: fixed;
-      bottom: 80px; /* above subtitle */
-      left: 50%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 20px;
+      position: absolute;
+      bottom: 15px;
+      width: 100%;
+      text-align: center;
       z-index: 6;
     }
     .nav-buttons button {
-      padding: 14px 28px;
-      font-size: 22px;
+      padding: 10px 20px;
+      margin: 0 10px;
+      font-size: 18px;
       cursor: pointer;
       border: none;
       background: #ff69b4;
       color: white;
-      border-radius: 8px;
-      min-width: 140px;
-      opacity: 0.95;
+      border-radius: 5px;
       font-family: 'Pacifico', cursive;
-    }
-    .nav-buttons button:disabled {
-      background: #ccc;
-      cursor: not-allowed;
     }
   </style>
 </head>
@@ -143,7 +140,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -165,22 +162,23 @@
   </div>
 
   <!-- Navigation Buttons -->
-  <div class="nav-buttons" id="navButtons" style="display:none;">
+  <div class="nav-buttons">
     <button id="prevBtn" style="display:none;">⬅ Previous</button>
-    <button id="nextBtn">Next ➡</button>
+    <button id="nextBtn" style="display:none;">Next ➡</button>
     <button id="endBtn" style="display:none;">End 🎉</button>
+    <button id="startBtn">Start</button>
   </div>
 
+  <script src="https://unpkg.com/three@0.140.2/build/three.min.js"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    // Loading screen dots
+    /* ---------------- LOADING SCREEN ---------------- */
     setInterval(() => {
       const dots = document.getElementById('dots');
       dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
     }, 500);
 
-    // Loading bar simulation
     let load = 0;
     const bar = document.getElementById('loadingBar');
     const perc = document.getElementById('loadingPercentage');
@@ -198,18 +196,19 @@
       }
     }, 30);
 
-    function hideLoading() {
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+    });
+    document.addEventListener('click', () => {
       if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
-    }
-    document.addEventListener('keydown', e => { if (e.key === 'Enter') hideLoading(); });
-    document.addEventListener('click', hideLoading);
+    });
 
-    // Confetti behind the globe
+    /* ---------------- CONFETTI ---------------- */
     setInterval(() => {
-      confetti({ particleCount: 40, spread: 90, origin: { y: 0.7 }, zIndex: 0 });
+      confetti({ particleCount: 80, spread: 100, origin: { y: 0.6 }, zIndex: 0 });
     }, 2000);
 
-    // Globe setup
+    /* ---------------- GLOBE SETUP ---------------- */
     const elem = document.getElementById('globeViz');
     const card = document.getElementById('infoCard');
     const cardImg = document.getElementById('cardImage');
@@ -217,7 +216,7 @@
     const nextBtn = document.getElementById('nextBtn');
     const prevBtn = document.getElementById('prevBtn');
     const endBtn = document.getElementById('endBtn');
-    const navBtns = document.getElementById('navButtons');
+    const startBtn = document.getElementById('startBtn');
 
     const places = [
       { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "A beautiful journey starts here!", img: "https://placehold.co/250x150?text=Turkey" },
@@ -227,73 +226,87 @@
       { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "https://placehold.co/250x150?text=Iceland" }
     ];
 
-    let currentIndex = -1; 
-    let animationInProgress = false;
-
-    const world = Globe()(elem)
+    let currentIndex = 0;
+    const world = Globe({ animateIn: false })(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: Math.random()*90, lng: Math.random()*180, altitude: 2.2 }, 0)
-      .labelsData([])
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+      .pointOfView({ lat: 20, lng: 0, altitude: 2.2 }, 0);
 
+    /* ---------------- AIRPLANE MODEL ---------------- */
+    const loader = new THREE.TextureLoader();
+    const planeTexture = loader.load('https://i.ibb.co/Mc2Qt2w/plane-icon.png'); 
+    const planeMaterial = new THREE.SpriteMaterial({ map: planeTexture });
+    const plane = new THREE.Sprite(planeMaterial);
+    plane.scale.set(15, 15, 1);
+    world.scene().add(plane);
+    plane.visible = false;
+
+    function flyPlane(from, to, callback) {
+      plane.visible = true;
+      let progress = 0;
+      function animate() {
+        progress += 0.01;
+        if (progress >= 1) {
+          plane.visible = false;
+          callback && callback();
+          return;
+        }
+        const lat = from.lat + (to.lat - from.lat) * progress;
+        const lng = from.lng + (to.lng - from.lng) * progress;
+        const { x, y, z } = world.getCoords(lat, lng, 1.01);
+        plane.position.set(x, y, z);
+        requestAnimationFrame(animate);
+      }
+      animate();
+    }
+
+    /* ---------------- CARD UPDATE ---------------- */
     function updateCard(index) {
       const place = places[index];
       cardImg.src = place.img;
       cardText.textContent = place.message;
       card.style.display = 'block';
-
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      animationInProgress = true;
-      navBtns.querySelectorAll("button").forEach(b => b.disabled = true);
-      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.0 }, 2000);
-      setTimeout(() => {
-        animationInProgress = false;
-        navBtns.querySelectorAll("button").forEach(b => b.disabled = false);
-      }, 2200);
+      const from = places[currentIndex];
+      const to = place;
+
+      flyPlane(from, to, () => {
+        world.pointOfView({ lat: to.lat, lng: to.lng, altitude: 1.2 }, 2000);
+      });
     }
 
-    // Navigation buttons
-    function goNext() { if (!animationInProgress && currentIndex < places.length - 1) updateCard(++currentIndex); }
-    function goPrev() { if (!animationInProgress && currentIndex > 0) updateCard(--currentIndex); }
-
-    nextBtn.addEventListener('click', goNext);
-    prevBtn.addEventListener('click', goPrev);
-
-    endBtn.addEventListener('click', () => {
-      cardImg.src = "https://placehold.co/250x150?text=Happy+Birthday!";
-      cardText.textContent = "🎉 Wishing you all the happiness in the world! 🎂";
-      prevBtn.style.display = 'none';
-      nextBtn.style.display = 'none';
-      endBtn.style.display = 'none';
-      setTimeout(() => confetti({ particleCount: 200, spread: 160, origin: { y: 0.6 } }), 500);
+    /* ---------------- BUTTONS ---------------- */
+    startBtn.addEventListener('click', () => {
+      startBtn.style.display = 'none';
+      updateCard(0);
     });
 
-    // Show welcome card
-    function showWelcome() {
-      card.style.display = 'block';
-      cardImg.src = "https://placehold.co/250x150?text=Welcome";
-      cardText.textContent = "Let's start our journey!";
-      navBtns.style.display = "flex";
-      prevBtn.style.display = 'none';
-      nextBtn.textContent = "Start ▶";
-      endBtn.style.display = 'none';
-
-      nextBtn.onclick = () => {
-        currentIndex = 0;
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < places.length - 1) {
+        const prevIndex = currentIndex;
+        currentIndex++;
         updateCard(currentIndex);
-        nextBtn.textContent = "Next ▶";
-        nextBtn.onclick = goNext; // restore normal function
-      };
-    }
+      }
+    });
 
-    setTimeout(showWelcome, 1200);
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        const prevIndex = currentIndex;
+        currentIndex--;
+        updateCard(currentIndex);
+      }
+    });
+
+    endBtn.addEventListener('click', () => {
+      cardText.textContent = "🎉 Happy Birthday! 🎉";
+      nextBtn.style.display = 'none';
+      prevBtn.style.display = 'none';
+      endBtn.style.display = 'none';
+    });
   </script>
 </body>
 </html>
