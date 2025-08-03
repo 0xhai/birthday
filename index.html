@@ -6,169 +6,317 @@
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     html, body { 
-      margin: 0; height: 100%; overflow: hidden;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      margin: 0; 
+      height: 100%; 
+      overflow: hidden; 
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
       font-family: 'Pacifico', cursive;
     }
-    #loadingScreen{ position:absolute; top:0;left:0;
-      width:100%;height:100%;
-      background:linear-gradient(to bottom right,#ffcccc,#ff99cc);
-      display:flex;flex-direction:column;
-      align-items:center;justify-content:center;
-      z-index:10;color:#fff;
+    #loadingScreen {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      color: #fff;
     }
-    .ml11{ font-weight:700; font-size:2.5em; white-space:nowrap; overflow:hidden;}
-    .loading-bar-container{ width:300px;height:20px;background:#fff;
-      border-radius:10px; overflow:hidden; margin-top:20px; position:relative;}
-    .loading-bar{ height:100%; width:0%; background:#ff69b4; transition:width 0.2s;}
-    .loading-percentage{ margin-top:5px; font-size:16px;}
-    .cake-emoji{ position:absolute; top:-35px; font-size:24px; transition:left 0.2s;}
-    .continue-text{ opacity:0; margin-top:15px; font-size:16px; transition:opacity .5s;}
-    #globeViz{ width:100vw; height:100vh; position:relative; z-index:1;}
-    .title{ position:absolute; top:20px; width:100%; text-align:center;
-      font-size:40px; color:#fff; text-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:5;}
-    .subtitle{ position:absolute; bottom:15px; width:100%; text-align:center;
-      font-size:24px; color:#fff; text-shadow:2px 2px 5px rgba(0,0,0,0.4); z-index:4;}
-    .popup{ position:absolute; top:20px; left:50%; transform:translateX(-50%);
-      background:rgba(255,255,255,0.9); padding:15px 20px; border-radius:10px;
-      font-size:18px; display:none; box-shadow:0px 4px 8px rgba(0,0,0,0.2);}
-    .card{ position:absolute; top:40%; left:50%; transform:translate(-50%,-50%);
-      background:rgba(255,255,255,0.95); padding:20px; border-radius:10px;
-      text-align:center; width:250px; z-index:5; display:none;}
-    .nav-buttons{ position:absolute; bottom:80px; width:100%; text-align:center; z-index:6;}
-    .nav-buttons button{ padding:14px 28px; margin:0 12px; font-size:22px;
-      cursor:pointer; border:none; background:#ff69b4; color:white;
-      border-radius:8px; font-family:'Pacifico', cursive; transition:opacity .3s;}
-    .nav-buttons button.disabled{ opacity:0.5; pointer-events:none;}
-    .airplane{ position:fixed; width:50px; height:50px; z-index:9999 !important;
-      transition:transform 2.5s ease-in-out; pointer-events:none; display:none;}
+    .ml11 {
+      font-weight: 700;
+      font-size: 2.5em;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .loading-bar-container {
+      width: 300px;
+      height: 20px;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+      position: relative;
+    }
+    .loading-bar {
+      height: 100%;
+      width: 0%;
+      background: #ff69b4;
+      transition: width 0.2s;
+    }
+    .loading-percentage {
+      margin-top: 5px;
+      font-size: 16px;
+    }
+    .cake-emoji {
+      position: absolute;
+      top: -35px;
+      font-size: 24px;
+      transition: left 0.2s;
+    }
+    .continue-text {
+      opacity: 0;
+      margin-top: 15px;
+      font-size: 16px;
+      transition: opacity 0.5s;
+    }
+    #globeViz { 
+      width: 100vw; 
+      height: 100vh; 
+      position: relative;
+      z-index: 1;
+    }
+    .popup {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      display: none;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    }
+    .title {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 40px;
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+      z-index: 5;
+    }
+    .subtitle {
+      position: absolute;
+      bottom: 20px;
+      width: 100%;
+      text-align: center;
+      font-size: 24px;
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+      z-index: 5;
+    }
+    .card {
+      position: absolute;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.95);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      width: 250px;
+      z-index: 5;
+      display: none;
+    }
+    .nav-buttons {
+      position: absolute;
+      bottom: 70px;
+      width: 100%;
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      z-index: 5;
+    }
+    .nav-buttons button {
+      padding: 12px 25px;
+      font-size: 18px;
+      cursor: pointer;
+      border: none;
+      background: #ff69b4;
+      color: white;
+      border-radius: 8px;
+      font-family: 'Pacifico', cursive;
+      opacity: 1;
+      transition: background 0.3s, opacity 0.3s;
+    }
+    .nav-buttons button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+    /* Airplane */
+    #airplane {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      z-index: 9999;
+      display: none;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
-<div id="loadingScreen">
-  <div class="ml11"><span class="letters">Preparing your surprise9<span id="dots">...</span></span></div>
-  <div class="loading-bar-container">
-    <div class="loading-bar" id="loadingBar"></div>
-    <div class="cake-emoji" id="cakeEmoji">🎂</div>
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <div class="ml11">
+      <span class="letters">Preparing your surprise10<span id="dots">...</span></span>
+    </div>
+    <div class="loading-bar-container">
+      <div class="loading-bar" id="loadingBar"></div>
+      <div class="cake-emoji" id="cakeEmoji">🎂</div>
+    </div>
+    <div class="loading-percentage" id="loadingPercentage">0%</div>
+    <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
   </div>
-  <div class="loading-percentage" id="loadingPercentage">0%</div>
-  <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
-</div>
 
-<div class="title">🎂 Happy Birthday name 🎂</div>
-<div id="globeViz"></div>
-<div id="popup" class="popup"></div>
+  <div class="title">🎂 Happy Birthday name 🎂</div>
+  <div id="globeViz"></div>
+  <div id="popup" class="popup"></div>
+  <div class="nav-buttons">
+    <button id="startBtn">Start</button>
+    <button id="prevBtn" style="display:none;">⬅ Previous</button>
+    <button id="nextBtn" style="display:none;">Next ➡</button>
+    <button id="endBtn" style="display:none;">End 🎉</button>
+  </div>
+  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
+  <div id="infoCard" class="card">
+    <img id="cardImage" src="" alt="Country Image" style="width:100%; border-radius:5px;">
+    <p id="cardText"></p>
+  </div>
+  <img id="airplane" src="https://upload.wikimedia.org/wikipedia/commons/thumb/1/12/Airplane_silhouette.svg/1200px-Airplane_silhouette.svg.png" alt="plane">
 
-<div class="nav-buttons">
-  <button id="prevBtn" style="display:none;">⬅ Previous</button>
-  <button id="nextBtn" style="display:none;">Next ➡</button>
-  <button id="endBtn" style="display:none;">End 🎉</button>
-  <button id="startBtn">Start</button>
-</div>
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script>
+    // Loading dots
+    setInterval(() => {
+      const dots = document.getElementById('dots');
+      dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
+    }, 500);
 
-<div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
+    // Simulate loading
+    let load = 0;
+    const bar = document.getElementById('loadingBar');
+    const perc = document.getElementById('loadingPercentage');
+    const cake = document.getElementById('cakeEmoji');
+    const contText = document.getElementById('continueText');
+    const interval = setInterval(() => {
+      if (load < 100) {
+        load++;
+        bar.style.width = load + '%';
+        perc.textContent = load + '%';
+        cake.style.left = `calc(${load}% - 12px)`;
+      } else {
+        clearInterval(interval);
+        contText.style.opacity = 1;
+      }
+    }, 30);
 
-<div id="infoCard" class="card">
-  <img id="cardImage" src="" alt="Country Image" style="width:100%; border-radius:5px;">
-  <p id="cardText"></p>
-</div>
-
-<img id="airplane" class="airplane" src="https://i.ibb.co/zQRg3xs/airplane-icon.png" />
-
-<script src="https://unpkg.com/three@0.140.2/build/three.min.js"></script>
-<script src="https://unpkg.com/globe.gl"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script>
-  setInterval(()=>{ const dots=document.getElementById('dots');
-    dots.textContent = dots.textContent.length>=3 ? '' : dots.textContent + '.'; },500);
-  let load=0, bar=document.getElementById('loadingBar'),
-      perc=document.getElementById('loadingPercentage'),
-      cake=document.getElementById('cakeEmoji'),
-      contText=document.getElementById('continueText'),
-      interval=setInterval(()=>{
-    if(load<100){ load++; bar.style.width=load+'%';
-      perc.textContent=load+'%'; cake.style.left=`calc(${load}% - 12px)`;}
-    else { clearInterval(interval); contText.style.opacity=1;}
-  },30);
-  document.addEventListener('keydown',e=>{ if(e.key==='Enter' && load>=100)
-    document.getElementById('loadingScreen').style.display='none';});
-  document.addEventListener('click',()=>{ if(load>=100)
-    document.getElementById('loadingScreen').style.display='none';});
-  setInterval(()=>{ confetti({particleCount:80,spread:100,origin:{y:0.6},zIndex:0}); },2000);
-
-  const elem=document.getElementById('globeViz'),
-        card=document.getElementById('infoCard'),
-        cardImg=document.getElementById('cardImage'),
-        cardText=document.getElementById('cardText'),
-        nextBtn=document.getElementById('nextBtn'),
-        prevBtn=document.getElementById('prevBtn'),
-        endBtn=document.getElementById('endBtn'),
-        startBtn=document.getElementById('startBtn'),
-        airplane=document.getElementById('airplane');
-
-  const places=[
-    {lat:39.9334,lng:32.8597,name:"Turkey",message:"A beautiful journey starts here!",img:"https://placehold.co/250x150?text=Turkey"},
-    {lat:40.4093,lng:49.8671,name:"Azerbaijan",message:"Memories from our second stop!",img:"https://placehold.co/250x150?text=Azerbaijan"},
-    {lat:37.9838,lng:23.7275,name:"Greece",message:"Sunny days and happy smiles!",img:"https://placehold.co/250x150?text=Greece"},
-    {lat:59.3293,lng:18.0686,name:"Sweden",message:"A place of dreams and love!",img:"https://placehold.co/250x150?text=Sweden"},
-    {lat:64.9631,lng:-19.0208,name:"Iceland",message:"An unforgettable adventure awaits!",img:"https://placehold.co/250x150?text=Iceland"}
-  ];
-
-  let currentIndex=0, isAnimating=false;
-  const world=Globe({animateIn:false})(elem)
-    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-    .backgroundColor('rgba(0,0,0,0)')
-    .pointOfView({lat:20,lng:0,altitude:2.2},0);
-
-  function flyPlane(callback){
-    airplane.style.display='block';
-    const fromLeft=Math.random()>0.5, startX=fromLeft?'-100px':'110vw';
-    airplane.style.transform=`translate(${startX},50vh)`;
-    setTimeout(()=>{
-      airplane.style.transform='translate(50vw,50vh)';
-      setTimeout(()=>{
-        airplane.style.display='none';
-        callback&&callback();
-      },2500);
-    },50);
-  }
-
-  function updateCard(index){
-    isAnimating=true; toggleButtons(true);
-    const place=places[index];
-    cardImg.src=place.img; cardText.textContent=place.message;
-    card.style.display='block';
-    prevBtn.style.display=index>0?'inline-block':'none';
-    nextBtn.style.display=index<places.length-1?'inline-block':'none';
-    endBtn.style.display=index===places.length-1?'inline-block':'none';
-
-    flyPlane(()=>{
-      world.pointOfView({lat:place.lat,lng:place.lng,altitude:1.2},2000);
-      setTimeout(()=>{ isAnimating=false; toggleButtons(false);},2000);
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
-  }
+    document.addEventListener('click', () => {
+      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+    });
 
-  function toggleButtons(dis){[nextBtn,prevBtn,endBtn,startBtn].forEach(b=>{
-    if(b) b.classList.toggle('disabled',dis);});}
+    // Confetti on main page
+    setInterval(() => {
+      confetti({ particleCount: 30, spread: 80, origin: { y: 0.6 } });
+    }, 1500);
 
-  startBtn.addEventListener('click',()=>{
-    startBtn.style.display='none'; updateCard(0);
-  });
-  nextBtn.addEventListener('click',()=>{
-    if(!isAnimating && currentIndex<places.length-1){
-      currentIndex++; updateCard(currentIndex);
+    // Globe setup
+    const elem = document.getElementById('globeViz');
+    const card = document.getElementById('infoCard');
+    const cardImg = document.getElementById('cardImage');
+    const cardText = document.getElementById('cardText');
+    const startBtn = document.getElementById('startBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const endBtn = document.getElementById('endBtn');
+    const airplane = document.getElementById('airplane');
+
+    const places = [
+      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "A beautiful journey starts here!", img: "https://placehold.co/250x150?text=Turkey" },
+      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "https://placehold.co/250x150?text=Azerbaijan" },
+      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "https://placehold.co/250x150?text=Greece" },
+      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "https://placehold.co/250x150?text=Sweden" },
+      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "https://placehold.co/250x150?text=Iceland" }
+    ];
+
+    let currentIndex = -1;
+    const world = Globe()(elem)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundColor('rgba(0,0,0,0)')
+      .pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0)
+      .labelsData([])
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.name)
+      .labelSize(1.5)
+      .labelDotRadius(0.7)
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+
+    function animatePlane(destinationLat, destinationLng, callback) {
+      airplane.style.display = "block";
+      airplane.style.left = "-100px";
+      airplane.style.top = "50%";
+      airplane.style.transition = "transform 2s linear, left 2s linear, top 2s linear";
+      setTimeout(() => {
+        airplane.style.left = window.innerWidth / 2 + "px";
+        airplane.style.top = window.innerHeight / 2 + "px";
+      }, 50);
+      setTimeout(() => {
+        airplane.style.display = "none";
+        if (callback) callback();
+      }, 2100);
     }
-  });
-  prevBtn.addEventListener('click',()=>{
-    if(!isAnimating && currentIndex>0){
-      currentIndex--; updateCard(currentIndex);
+
+    function updateCard(index) {
+      const place = places[index];
+      cardImg.src = place.img;
+      cardText.textContent = place.message;
+      card.style.display = 'block';
+      prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
+      nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
+      endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
+      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.2 }, 2000);
     }
-  });
-  endBtn.addEventListener('click',()=>{
-    cardText.textContent="🎉 Happy Birthday! 🎉";
-    nextBtn.style.display='none'; prevBtn.style.display='none'; endBtn.style.display='none';
-  });
-</script>
+
+    startBtn.addEventListener('click', () => {
+      startBtn.disabled = true;
+      animatePlane(places[0].lat, places[0].lng, () => {
+        currentIndex = 0;
+        world.labelsData(places);
+        updateCard(0);
+        startBtn.style.display = "none";
+        nextBtn.style.display = "inline-block";
+      });
+    });
+
+    nextBtn.addEventListener('click', () => {
+      nextBtn.disabled = true;
+      if (currentIndex < places.length - 1) {
+        animatePlane(places[currentIndex + 1].lat, places[currentIndex + 1].lng, () => {
+          currentIndex++;
+          updateCard(currentIndex);
+          nextBtn.disabled = false;
+        });
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      prevBtn.disabled = true;
+      if (currentIndex > 0) {
+        animatePlane(places[currentIndex - 1].lat, places[currentIndex - 1].lng, () => {
+          currentIndex--;
+          updateCard(currentIndex);
+          prevBtn.disabled = false;
+        });
+      }
+    });
+
+    endBtn.addEventListener('click', () => {
+      card.style.display = 'none';
+      nextBtn.style.display = "none";
+      prevBtn.style.display = "none";
+      endBtn.style.display = "none";
+      alert("🎉 Happy Birthday! 🎉");
+    });
+  </script>
 </body>
 </html>
