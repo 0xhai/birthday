@@ -1,94 +1,139 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌍 Our Journey Around the World</title>
-  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+  <meta charset="UTF-8">
+  <title>Happy Birthday Love ❤️🌍</title>
   <style>
-    body {
+    html, body {
       margin: 0;
-      background-color: #ffc0cb;
+      padding: 0;
       overflow: hidden;
-      font-family: 'Dancing Script', cursive;
+      background: black;
       color: white;
-      text-align: center;
+      font-family: 'Dancing Script', cursive;
     }
-
-    h1 {
-      position: absolute;
-      width: 100%;
-      top: 20px;
-      font-size: 2.5em;
-      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
-      z-index: 10;
+    canvas {
+      display: block;
     }
-
-    #globeViz {
+    .label {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
+      color: #ff69b4;
+      font-size: 1.5em;
+      text-shadow: 0 0 10px #ff69b4, 0 0 20px #fff;
+      white-space: nowrap;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
     }
   </style>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
 </head>
 <body>
-  <h1>✨ Our Journey Around the World ✨</h1>
-  <div id="globeViz"></div>
+  <div id="labels-container"></div>
 
-  <!-- ✅ Stable CDNs -->
+  <!-- Three.js -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.min.js"></script>
+  <!-- OrbitControls FIXED -->
+  <script src="https://unpkg.com/three@0.152.2/examples/js/controls/OrbitControls.js"></script>
+  <!-- Three Globe -->
   <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
+  <!-- GSAP Animation -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
   <script>
     // Scene setup
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({antialias: true});
     renderer.setSize(window.innerWidth, window.innerHeight);
-    document.getElementById('globeViz').appendChild(renderer.domElement);
-
-    // Lights
-    scene.add(new THREE.AmbientLight(0xffffff, 1));
+    document.body.appendChild(renderer.domElement);
 
     // Globe
-    const GlobeObj = new ThreeGlobe()
-      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
-      .pointsData([
-        { lat: 40.7128, lng: -74.0060, size: 0.3, color: 'red' },
-        { lat: 48.8566, lng: 2.3522, size: 0.3, color: 'blue' },
-        { lat: 35.6895, lng: 139.6917, size: 0.3, color: 'green' }
-      ])
-      .pointAltitude('size')
-      .pointColor('color');
+    const Globe = new ThreeGlobe()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
+    scene.add(Globe);
 
-    scene.add(GlobeObj);
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight.position.set(5, 3, 5);
+    scene.add(directionalLight);
 
     // Camera
     camera.position.z = 250;
 
-    // ✅ OrbitControls now works
+    // Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = false;
-    controls.autoRotate = true;
-    controls.autoRotateSpeed = 1;
+    controls.enableDamping = true;
+    controls.enablePan = false;
+    controls.minDistance = 150;
+    controls.maxDistance = 400;
 
-    // Animation loop
+    // City labels
+    const cities = [
+      { name: "Paris 💕", lat: 48.8566, lng: 2.3522 },
+      { name: "New York 🗽", lat: 40.7128, lng: -74.006 },
+      { name: "Tokyo 🌸", lat: 35.6895, lng: 139.6917 },
+      { name: "Athens ❤️", lat: 37.9838, lng: 23.7275 }
+    ];
+
+    const labelsContainer = document.getElementById('labels-container');
+    const labels = [];
+
+    cities.forEach(city => {
+      const div = document.createElement('div');
+      div.className = 'label';
+      div.textContent = city.name;
+      labelsContainer.appendChild(div);
+      labels.push({ element: div, ...city });
+    });
+
+    function latLngToVector3(lat, lng, radius=100) {
+      const phi = (90 - lat) * (Math.PI / 180);
+      const theta = (lng + 180) * (Math.PI / 180);
+      return new THREE.Vector3(
+        -radius * Math.sin(phi) * Math.cos(theta),
+         radius * Math.cos(phi),
+         radius * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    function animateLabels() {
+      labels.forEach(label => {
+        const pos = latLngToVector3(label.lat, label.lng, 100);
+        pos.project(camera);
+        const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
+        const y = (-pos.y * 0.5 + 0.5) * window.innerHeight;
+        label.element.style.transform = `translate(-50%, -50%) translate(${x}px, ${y}px)`;
+        label.element.style.opacity = pos.z < 1 ? 1 : 0.2;
+      });
+    }
+
+    // Rotation
     function animate() {
       requestAnimationFrame(animate);
+      Globe.rotation.y += 0.001;
       controls.update();
       renderer.render(scene, camera);
+      animateLabels();
     }
     animate();
 
-    // Handle window resize
+    // Responsive
     window.addEventListener('resize', () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // Floating labels animation
+    gsap.to(".label", {
+      y: "-=10",
+      repeat: -1,
+      yoyo: true,
+      ease: "sine.inOut",
+      duration: 2
     });
   </script>
 </body>
