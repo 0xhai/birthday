@@ -95,13 +95,13 @@
     }
     .subtitle {
       position: absolute;
-      bottom: 60px;
+      bottom: 15px;
       width: 100%;
       text-align: center;
       font-size: 24px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
+      z-index: 4;
     }
     .card {
       position: absolute;
@@ -118,7 +118,7 @@
     }
     .nav-buttons {
       position: absolute;
-      bottom: 15px;
+      bottom: 60px;
       width: 100%;
       text-align: center;
       z-index: 6;
@@ -134,13 +134,21 @@
       border-radius: 5px;
       font-family: 'Pacifico', cursive;
     }
+    .airplane {
+      position: absolute;
+      width: 40px;
+      height: 40px;
+      transition: transform 2s linear;
+      z-index: 3;
+      pointer-events: none;
+    }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -153,6 +161,15 @@
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
+
+  <!-- Buttons ABOVE subtitle -->
+  <div class="nav-buttons">
+    <button id="prevBtn" style="display:none;">⬅ Previous</button>
+    <button id="nextBtn" style="display:none;">Next ➡</button>
+    <button id="endBtn" style="display:none;">End 🎉</button>
+    <button id="startBtn">Start</button>
+  </div>
+
   <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
 
   <!-- Cards -->
@@ -161,13 +178,8 @@
     <p id="cardText"></p>
   </div>
 
-  <!-- Navigation Buttons -->
-  <div class="nav-buttons">
-    <button id="prevBtn" style="display:none;">⬅ Previous</button>
-    <button id="nextBtn" style="display:none;">Next ➡</button>
-    <button id="endBtn" style="display:none;">End 🎉</button>
-    <button id="startBtn">Start</button>
-  </div>
+  <!-- Airplane -->
+  <img id="airplane" class="airplane" src="https://i.ibb.co/zQRg3xs/airplane-icon.png" style="display:none;" />
 
   <script src="https://unpkg.com/three@0.140.2/build/three.min.js"></script>
   <script src="https://unpkg.com/globe.gl"></script>
@@ -217,6 +229,7 @@
     const prevBtn = document.getElementById('prevBtn');
     const endBtn = document.getElementById('endBtn');
     const startBtn = document.getElementById('startBtn');
+    const airplane = document.getElementById('airplane');
 
     const places = [
       { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "A beautiful journey starts here!", img: "https://placehold.co/250x150?text=Turkey" },
@@ -233,32 +246,17 @@
       .backgroundColor('rgba(0,0,0,0)')
       .pointOfView({ lat: 20, lng: 0, altitude: 2.2 }, 0);
 
-    /* ---------------- AIRPLANE MODEL ---------------- */
-    const loader = new THREE.TextureLoader();
-    const planeTexture = loader.load('https://i.ibb.co/Mc2Qt2w/plane-icon.png'); 
-    const planeMaterial = new THREE.SpriteMaterial({ map: planeTexture });
-    const plane = new THREE.Sprite(planeMaterial);
-    plane.scale.set(15, 15, 1);
-    world.scene().add(plane);
-    plane.visible = false;
-
+    /* ---------------- AIRPLANE SIMPLE ANIMATION ---------------- */
     function flyPlane(from, to, callback) {
-      plane.visible = true;
-      let progress = 0;
-      function animate() {
-        progress += 0.01;
-        if (progress >= 1) {
-          plane.visible = false;
+      airplane.style.display = 'block';
+      airplane.style.transform = 'translate(-100px, 100vh)';
+      setTimeout(() => {
+        airplane.style.transform = 'translate(50vw, 50vh)';
+        setTimeout(() => {
+          airplane.style.display = 'none';
           callback && callback();
-          return;
-        }
-        const lat = from.lat + (to.lat - from.lat) * progress;
-        const lng = from.lng + (to.lng - from.lng) * progress;
-        const { x, y, z } = world.getCoords(lat, lng, 1.01);
-        plane.position.set(x, y, z);
-        requestAnimationFrame(animate);
-      }
-      animate();
+        }, 2000);
+      }, 50);
     }
 
     /* ---------------- CARD UPDATE ---------------- */
@@ -287,7 +285,6 @@
 
     nextBtn.addEventListener('click', () => {
       if (currentIndex < places.length - 1) {
-        const prevIndex = currentIndex;
         currentIndex++;
         updateCard(currentIndex);
       }
@@ -295,7 +292,6 @@
 
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
-        const prevIndex = currentIndex;
         currentIndex--;
         updateCard(currentIndex);
       }
