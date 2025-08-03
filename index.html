@@ -14,22 +14,12 @@
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
     }
     body::before {
-      /* Gradient always visible */
       content: "";
       position: fixed;
       top: 0; left: 0;
       width: 100%; height: 100%;
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       z-index: -3;
-    }
-    #confettiCanvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      pointer-events: none;
-      z-index: -2;
     }
     #loadingScreen {
       position: fixed;
@@ -77,6 +67,16 @@
       z-index: 1;
       transition: opacity 1.5s ease;
     }
+    #confettiCanvas, #sparkleCanvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+    }
+    #confettiCanvas { z-index: 2; }
+    #sparkleCanvas { z-index: 1; }
     .popup {
       position: absolute;
       top: 20px;
@@ -121,9 +121,6 @@
   </style>
 </head>
 <body>
-  <!-- Confetti Canvas -->
-  <canvas id="confettiCanvas"></canvas>
-
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <h1 class="ml11">
@@ -134,8 +131,12 @@
     </h1>
   </div>
 
+  <div id="globeViz">
+    <canvas id="sparkleCanvas"></canvas>
+    <canvas id="confettiCanvas"></canvas>
+  </div>
+  
   <div class="title">🎂 Happy Birthday name 🎂</div>
-  <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
   <div class="subtitle">From country1 to country2, to country3, to country4... and beyond ❤️</div>
 
@@ -179,13 +180,11 @@
           easing: "easeOutExpo"
         });
     }
-
     let loadingAnimation = startAnimation();
 
-    // 🎉 Confetti function
+    // 🎉 Confetti
     const confettiCanvas = document.getElementById('confettiCanvas');
     const confettiSettings = confetti.create(confettiCanvas, { resize: true, useWorker: true });
-
     function launchConfetti() {
       confettiSettings({
         particleCount: 3,
@@ -195,7 +194,33 @@
       });
       requestAnimationFrame(launchConfetti);
     }
-    launchConfetti();
+
+    // ✨ Sparkle effect
+    const sparkleCanvas = document.getElementById('sparkleCanvas');
+    const ctx = sparkleCanvas.getContext('2d');
+    let stars = Array.from({length: 80}).map(() => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      radius: Math.random() * 2,
+      alpha: Math.random()
+    }));
+
+    function drawSparkles() {
+      ctx.clearRect(0, 0, sparkleCanvas.width, sparkleCanvas.height);
+      stars.forEach(s => {
+        ctx.beginPath();
+        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+        ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
+        ctx.fill();
+        s.alpha += (Math.random() - 0.5) * 0.05;
+        if (s.alpha < 0) s.alpha = 0;
+        if (s.alpha > 1) s.alpha = 1;
+      });
+      requestAnimationFrame(drawSparkles);
+    }
+    sparkleCanvas.width = window.innerWidth;
+    sparkleCanvas.height = window.innerHeight;
+    drawSparkles();
 
     const places = [
       { lat: 40.0, lng: 49.0, name: "country1", message: "Message 1 ❤️" },
@@ -225,7 +250,7 @@
         setTimeout(() => popup.style.display = 'none', 3000);
       });
 
-    // Show page after textures load
+    // Show page after globe loads
     const texture = new Image();
     texture.src = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
     texture.onload = () => {
@@ -235,6 +260,8 @@
       globeContainer.style.display = 'block';
       document.querySelector('.title').style.display = 'block';
       document.querySelector('.subtitle').style.display = 'block';
+
+      launchConfetti();
 
       setTimeout(() => {
         globeContainer.style.opacity = 1;
