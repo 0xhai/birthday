@@ -177,7 +177,7 @@
     function showMainPage(){
       if (progress === 100) {
         document.getElementById('loadingScreen').style.display = 'none';
-        launchConfetti();
+        startConfetti();
       }
     }
 
@@ -189,29 +189,22 @@
       showMainPage();
     });
 
-    // Confetti effect
-    function launchConfetti() {
-      const duration = 5 * 1000;
-      const end = Date.now() + duration;
-
-      (function frame() {
+    // Continuous confetti effect
+    function startConfetti() {
+      setInterval(() => {
         confetti({
-          particleCount: 5,
+          particleCount: 3,
           angle: 60,
           spread: 55,
           origin: { x: 0 }
         });
         confetti({
-          particleCount: 5,
+          particleCount: 3,
           angle: 120,
           spread: 55,
           origin: { x: 1 }
         });
-
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      })();
+      }, 300); // Launch every 0.3s for continuous effect
     }
 
     // Globe setup
