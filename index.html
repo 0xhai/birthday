@@ -1,75 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Happy Birthday Narminaki 🎉</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Special Story 🌍</title>
+
+  <!-- Google Font -->
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
   <style>
-    body {
+    html, body {
       margin: 0;
+      height: 100%;
       overflow: hidden;
-      background: #ffccdc;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       font-family: 'Dancing Script', cursive;
     }
-    #title {
+
+    #globeViz {
+      width: 100vw;
+      height: 100vh;
+    }
+
+    .popup {
       position: absolute;
       top: 20px;
-      width: 100%;
-      text-align: center;
-      font-size: 2.5em;
-      color: white;
-      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
-      z-index: 1;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-family: 'Dancing Script', cursive;
+      font-size: 20px;
+      display: none;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
     }
-    canvas {
-      display: block;
+
+    .intro-text {
+      position: absolute;
+      top: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 36px;
+      color: #fff;
+      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+      z-index: 10;
+      text-align: center;
     }
   </style>
 </head>
 <body>
-  <div id="title">Happy Birthday Narminaki 🎉</div>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
+  <div class="intro-text">✨ Our Journey Around the World ✨</div>
+  <div id="globeViz"></div>
+  <div id="popup" class="popup"></div>
+
+  <!-- Libraries -->
+  <script src="libs/three.min.js"></script>
+  <script src="libs/OrbitControls.min.js"></script>
+  <script src="libs/three-globe.min.js"></script>
+  <script src="libs/gsap.min.js"></script>
 
   <script>
-    // === SETUP SCENE ===
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    const elem = document.getElementById('globeViz');
+    const popup = document.getElementById('popup');
 
-    const controls = new THREE.OrbitControls(camera, renderer.domElement);
-    camera.position.z = 250;
-    controls.enableZoom = true;
+    // Placeholder locations and messages
+    const places = [
+      { lat: 41.0, lng: 28.9, name: "PLACE 1", message: "This is where it all began ❤️" },
+      { lat: 40.4, lng: 49.8, name: "PLACE 2", message: "A special chapter of the story 🌸" },
+      { lat: 37.9, lng: 23.7, name: "PLACE 3", message: "An unforgettable moment 🌟" },
+      { lat: 59.3, lng: 18.0, name: "PLACE 4", message: "Dreaming of the future 🏡" },
+      { lat: 64.9, lng: -19.0, name: "PLACE 5", message: "A future adventure awaits ✈️" }
+    ];
 
-    // === ADD GLOBE ===
-    const Globe = new ThreeGlobe()
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
-
-    scene.add(Globe);
-
-    // Add ambient light
-    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
-    scene.add(ambientLight);
-
-    // === ANIMATION LOOP ===
-    function animate() {
-      requestAnimationFrame(animate);
-      Globe.rotation.y += 0.0015; // slow rotation
-      renderer.render(scene, camera);
-    }
-    animate();
-
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    // Initialize globe
+    const world = Globe()(elem)
+      .globeImageUrl('libs/earth-night.jpg')
+      .bumpImageUrl('libs/earth-topology.png')
+      .backgroundColor('rgba(0,0,0,0)')
+      .pointOfView({ lat: 20, lng: 0, altitude: 2 })
+      .labelsData(places)
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.name)
+      .labelSize(1.5)
+      .labelDotRadius(0.7)
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
+      .onLabelClick(d => {
+        popup.textContent = d.message;
+        popup.style.display = 'block';
+        setTimeout(() => popup.style.display = 'none', 3000);
+      });
   </script>
 </body>
 </html>
