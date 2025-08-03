@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <title>Happy Birthday name 🎉</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Arial&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
@@ -13,9 +13,10 @@
       height: 100%;
       overflow: hidden;
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      font-family: 'Arial', sans-serif;
+      font-family: 'Pacifico', cursive;
     }
 
+    /* ===== LOADING SCREEN ===== */
     #loading-screen {
       position: absolute;
       top: 0;
@@ -32,7 +33,6 @@
     }
 
     .ml11 {
-      font-family: 'Pacifico', cursive;
       font-size: 2rem;
       color: #d63384;
       margin-bottom: 20px;
@@ -44,7 +44,7 @@
       background: #fff;
       border-radius: 10px;
       overflow: hidden;
-      margin-top: 10px;
+      margin-top: 20px;
       position: relative;
     }
 
@@ -62,14 +62,15 @@
       color: #d63384;
     }
 
-    /* ✅ Cake above bar */
+    /* ✅ FIX: Cake ABOVE bar */
     #cake-emoji {
       position: absolute;
-      top: -35px; 
+      top: -35px;
+      left: 0;
       transform: translateX(-50%);
-      font-size: 30px;
+      font-size: 28px;
       transition: left 0.3s ease;
-      z-index: 2;
+      z-index: 5;
     }
 
     #continue-text {
@@ -79,12 +80,12 @@
       color: #d63384;
     }
 
+    /* ===== MAIN PAGE ===== */
     .title {
       position: absolute;
       top: 20px;
       width: 100%;
       text-align: center;
-      font-family: 'Pacifico', cursive;
       font-size: 40px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
@@ -96,7 +97,6 @@
       bottom: 20px;
       width: 100%;
       text-align: center;
-      font-family: 'Pacifico', cursive;
       font-size: 24px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
@@ -112,7 +112,7 @@
       z-index: 0;
     }
 
-    /* Card styling unchanged */
+    /* Card styling */
     .card {
       position: absolute;
       top: 30%;
@@ -149,7 +149,7 @@
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
+  <!-- LOADING SCREEN -->
   <div id="loading-screen">
     <h1 class="ml11">Preparing your surprise<span id="dots">...</span></h1>
     <div id="progress-container">
@@ -160,12 +160,12 @@
     <div id="continue-text">Press ENTER or Tap to continue</div>
   </div>
 
-  <!-- Main Content -->
+  <!-- MAIN PAGE -->
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
   <div class="subtitle">From country1 to country5... and beyond ❤️</div>
 
-  <!-- Navigation Cards -->
+  <!-- Cards -->
   <div id="card-container" class="card" style="display:none;">
     <h3 id="card-title">Let's start our journey</h3>
     <img id="card-image" src="" alt="" style="max-width:100%;border-radius:8px;display:none;">
@@ -183,6 +183,7 @@
     const cakeEmoji = document.getElementById('cake-emoji');
     const continueText = document.getElementById('continue-text');
 
+    // ✅ Loading bar simulation
     const progressInterval = setInterval(() => {
       if (progress < 100) {
         progress += 1;
@@ -196,24 +197,39 @@
       }
     }, 50);
 
-    // Simulate dots animation
+    // Animated dots
     setInterval(() => {
       const dots = document.getElementById("dots");
       dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '';
     }, 500);
 
-    // Wait for user to press Enter or Tap
+    // Show main page
+    function showMainPage() {
+      document.getElementById('loading-screen').style.display = 'none';
+      document.getElementById('globeViz').style.display = 'block';
+      document.getElementById('card-container').style.display = 'block';
+      initGlobe();
+    }
+
     document.addEventListener('keydown', (e) => {
-      if (progress === 100 && (e.key === 'Enter')) {
-        document.getElementById('loading-screen').style.display = 'none';
+      if (progress === 100 && e.key === 'Enter') {
+        showMainPage();
       }
     });
 
     document.addEventListener('click', () => {
       if (progress === 100) {
-        document.getElementById('loading-screen').style.display = 'none';
+        showMainPage();
       }
     });
+
+    // ✅ Restore globe as in Draft1
+    function initGlobe() {
+      const globeElement = document.getElementById('globeViz');
+      const world = Globe()(globeElement)
+        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+        .backgroundColor('rgba(0,0,0,0)');
+    }
   </script>
 </body>
 </html>
