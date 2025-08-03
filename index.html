@@ -6,59 +6,70 @@
   <title>Happy Birthday Narminaki 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; overflow: hidden; font-family: 'Dancing Script', cursive; background: #ff99cc; }
-    #globeViz { width: 100vw; height: 100vh; }
-    .popup {
+    body {
+      margin: 0;
+      overflow: hidden;
+      background: #ffccdc;
+      font-family: 'Dancing Script', cursive;
+    }
+    #title {
       position: absolute;
       top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-size: 24px;
-      display: none;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      width: 100%;
+      text-align: center;
+      font-size: 2.5em;
+      color: white;
+      text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.3);
+      z-index: 1;
+    }
+    canvas {
+      display: block;
     }
   </style>
 </head>
 <body>
-  <div id="globeViz"></div>
-  <div id="popup" class="popup"></div>
+  <div id="title">Happy Birthday Narminaki 🎉</div>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
-  <script src="libs/three.min.js"></script>
-  <script src="libs/OrbitControls.min.js"></script>
-  <script src="libs/three-globe.min.js"></script>
-  <script src="libs/gsap.min.js"></script>
   <script>
-    const elem = document.getElementById('globeViz');
-    const popup = document.getElementById('popup');
+    // === SETUP SCENE ===
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    const places = [
-      { lat: 41.0082, lng: 28.9784, name: "Istanbul, Turkey", message: "Where it all began ❤️" },
-      { lat: 40.4093, lng: 49.8671, name: "Baku, Azerbaijan", message: "Separated but close in heart 🌸" },
-      { lat: 37.9838, lng: 23.7275, name: "Athens, Greece", message: "Vacation memories 🌴" },
-      { lat: 59.3293, lng: 18.0686, name: "Stockholm, Sweden", message: "Our future home 🏡" },
-      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Dream vacation gift 🌋" }
-    ];
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.z = 250;
+    controls.enableZoom = true;
 
-    const world = new Globe()
-      .globeImageUrl('libs/earth-night.jpg')
-      .bumpImageUrl('libs/earth-topology.png')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 20, lng: 0, altitude: 2 })
-      .labelsData(places)
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
-      .onLabelClick(d => {
-        popup.textContent = d.message;
-        popup.style.display = 'block';
-        setTimeout(() => popup.style.display = 'none', 3000);
-      })(elem);
+    // === ADD GLOBE ===
+    const Globe = new ThreeGlobe()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-dark.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
+
+    scene.add(Globe);
+
+    // Add ambient light
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1);
+    scene.add(ambientLight);
+
+    // === ANIMATION LOOP ===
+    function animate() {
+      requestAnimationFrame(animate);
+      Globe.rotation.y += 0.0015; // slow rotation
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
