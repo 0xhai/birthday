@@ -7,87 +7,91 @@
   <style>
     html, body {
       margin: 0;
+      padding: 0;
       height: 100%;
       overflow: hidden;
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
     }
-    #loadingScreen {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
+
+    /* Loading Screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      z-index: 10;
+      justify-content: center;
+      z-index: 9999;
       font-family: 'Pacifico', cursive;
       color: #fff;
+      text-align: center;
+    }
+    .ml12 {
       font-size: 2em;
+      letter-spacing: 0.1em;
     }
-    .ml11 .letters {
-      display: inline-block;
-      line-height: 1em;
-    }
-    #loadingBarContainer {
-      width: 60%;
-      height: 20px;
+    #loading-bar-container {
+      width: 80%;
+      height: 25px;
       background: #fff;
-      border-radius: 10px;
-      margin-top: 20px;
+      border-radius: 15px;
       overflow: hidden;
+      margin-top: 20px;
       position: relative;
     }
-    #loadingBar {
-      height: 100%;
+    #loading-bar {
       width: 0%;
+      height: 100%;
       background: #ff66b2;
-      transition: width 0.2s;
+      transition: width 0.3s;
     }
-    #loadingPercent {
+    #loading-percentage {
       position: absolute;
-      top: -30px;
+      top: 50%;
       left: 50%;
-      transform: translateX(-50%);
-      font-size: 16px;
-      color: #fff;
-      font-family: Arial, sans-serif;
+      transform: translate(-50%, -50%);
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+      font-weight: bold;
+      color: #333;
     }
-    #cakeEmoji {
+    #cake-emoji {
       position: absolute;
       top: -35px;
       transform: translateX(-50%);
-      font-size: 24px;
+      font-size: 1.5em;
     }
-    #continueText {
-      margin-top: 15px;
+    #continue-text {
+      margin-top: 20px;
       font-size: 18px;
       display: none;
-      font-family: Arial, sans-serif;
+      font-family: 'Arial', sans-serif;
     }
+
+    /* Main Page */
     #globeViz {
       width: 100vw;
       height: 100vh;
     }
     .popup-card {
       position: absolute;
-      top: 50%;
+      top: 25%;
       left: 50%;
-      transform: translate(-50%, -60%);
+      transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.9);
       padding: 15px 20px;
       border-radius: 10px;
       font-family: 'Arial', sans-serif;
       font-size: 18px;
+      display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      max-width: 300px;
       text-align: center;
-      z-index: 5;
-    }
-    .popup-card img {
-      width: 100%;
-      border-radius: 8px;
-      margin-bottom: 10px;
+      max-width: 300px;
+      z-index: 10;
     }
     .title {
       position: absolute;
@@ -111,109 +115,130 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-    .nav-buttons {
-      margin-top: 10px;
+    #navigation-buttons {
+      position: absolute;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      justify-content: space-between;
+      gap: 10px;
+      z-index: 11;
     }
-    .nav-buttons button {
+    .nav-btn {
       background: #ff66b2;
+      color: white;
+      padding: 10px 20px;
       border: none;
-      color: #fff;
-      padding: 8px 12px;
+      border-radius: 8px;
       cursor: pointer;
-      border-radius: 5px;
-      font-size: 14px;
-      transition: background 0.3s;
+      font-size: 16px;
+      transition: 0.3s;
     }
-    .nav-buttons button:hover {
-      background: #e05599;
+    .nav-btn:hover {
+      background: #ff3385;
+    }
+
+    @media (max-width: 600px) {
+      .title { font-size: 28px; }
+      .subtitle { font-size: 18px; }
+      .popup-card { width: 80%; }
     }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
-  <div id="loadingScreen">
-    <h1 class="ml11">
-      <span class="text-wrapper">
-        <span class="letters">Preparing your surprise...</span>
-      </span>
-    </h1>
-    <div id="loadingBarContainer">
-      <div id="loadingPercent">0%</div>
-      <div id="cakeEmoji">🎂</div>
-      <div id="loadingBar"></div>
+  <div id="loading-screen">
+    <h1 class="ml12">Preparing your surprise<span id="dots">...</span></h1>
+    <div id="loading-bar-container">
+      <div id="loading-bar"></div>
+      <div id="cake-emoji">🎂</div>
+      <div id="loading-percentage">0%</div>
     </div>
-    <div id="continueText">Press ENTER or Tap to continue</div>
+    <div id="continue-text">Press ENTER or Tap to continue</div>
   </div>
 
-  <!-- Title and subtitle (main page only) -->
+  <!-- Main Content -->
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
-  <div id="popupCard" class="popup-card" style="display:none;"></div>
+  <div id="popup-card" class="popup-card"></div>
+  <div id="navigation-buttons"></div>
   <div class="subtitle">From country1 to country5... and beyond ❤️</div>
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
   <script>
-    const loadingBar = document.getElementById("loadingBar");
-    const loadingPercent = document.getElementById("loadingPercent");
-    const cakeEmoji = document.getElementById("cakeEmoji");
+    const loadingBar = document.getElementById('loading-bar');
+    const cakeEmoji = document.getElementById('cake-emoji');
+    const loadingPercentage = document.getElementById('loading-percentage');
+    const continueText = document.getElementById('continue-text');
     let progress = 0;
-    let loadingInterval = setInterval(() => {
+    const progressInterval = setInterval(() => {
       if (progress < 100) {
-        progress++;
-        loadingBar.style.width = progress + "%";
-        loadingPercent.textContent = progress + "%";
-        cakeEmoji.style.left = progress + "%";
+        progress += 1;
+        loadingBar.style.width = progress + '%';
+        loadingPercentage.textContent = progress + '%';
+        cakeEmoji.style.left = progress + '%';
       }
-      if (progress === 100) {
-        clearInterval(loadingInterval);
-        document.getElementById("continueText").style.display = "block";
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+        continueText.style.display = 'block';
       }
     }, 40);
 
-    anime.timeline({loop: false})
-      .add({
-        targets: '.ml11 .letters',
-        opacity: [0,1],
-        easing: "easeInOutQuad",
-        duration: 1500
-      });
+    // Show dots animation
+    setInterval(() => {
+      const dots = document.getElementById('dots');
+      dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '.';
+    }, 500);
 
-    document.addEventListener("keydown", e => { if (e.key === "Enter" && progress === 100) startMainPage(); });
-    document.addEventListener("click", () => { if (progress === 100) startMainPage(); });
+    let mainPageLoaded = false;
 
-    function startMainPage(){
-      document.getElementById("loadingScreen").style.display = "none";
+    // Wait for user to press enter or tap
+    document.addEventListener('keydown', (e) => {
+      if (progress >= 100 && !mainPageLoaded && (e.key === 'Enter' || e.key === ' ')) {
+        showMainPage();
+      }
+    });
+    document.addEventListener('click', () => {
+      if (progress >= 100 && !mainPageLoaded) {
+        showMainPage();
+      }
+    });
+
+    function showMainPage() {
+      document.getElementById('loading-screen').style.display = 'none';
+      mainPageLoaded = true;
       startConfetti();
       initGlobe();
     }
 
-    function startConfetti(){
+    // Confetti (light celebration)
+    function startConfetti() {
       setInterval(() => {
-        confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-      }, 2000);
+        confetti({ particleCount: 10, angle: 60, spread: 45, origin: { x: 0 } });
+        confetti({ particleCount: 10, angle: 120, spread: 45, origin: { x: 1 } });
+      }, 1500);
     }
 
-    const places = [
-      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "First stop: Turkey 🎉", img: "https://via.placeholder.com/300x200?text=Turkey" },
-      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Exploring Azerbaijan ❤️", img: "https://via.placeholder.com/300x200?text=Azerbaijan" },
-      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Beautiful Greece awaits 🌸", img: "https://via.placeholder.com/300x200?text=Greece" },
-      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "Lovely Sweden memories 🏡", img: "https://via.placeholder.com/300x200?text=Sweden" },
-      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Icelandic adventures 🌋", img: "https://via.placeholder.com/300x200?text=Iceland" }
-    ];
-    let currentIndex = -1;
+    const elem = document.getElementById('globeViz');
+    const popup = document.getElementById('popup-card');
+    const navButtons = document.getElementById('navigation-buttons');
     let world;
+    let currentIndex = -1;
 
-    function initGlobe(){
-      const elem = document.getElementById('globeViz');
+    const places = [
+      { lat: 39.9208, lng: 32.8541, name: "Turkey", message: "Draft text for Turkey." },
+      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Draft text for Azerbaijan." },
+      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Draft text for Greece." },
+      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "Draft text for Sweden." },
+      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Draft text for Iceland." }
+    ];
+
+    function initGlobe() {
       world = Globe()(elem)
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
         .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundColor('rgba(0,0,0,0)')
-        .pointOfView({ lat: 30, lng: 0, altitude: 2 })
         .labelsData(places)
         .labelLat(d => d.lat)
         .labelLng(d => d.lng)
@@ -222,58 +247,40 @@
         .labelDotRadius(0.7)
         .labelColor(() => 'rgba(255, 105, 180, 0.9)');
 
-      showStartCard();
+      // Show start screen
+      popup.innerHTML = "<h2>Let's start our journey!</h2>";
+      popup.style.display = 'block';
+      navButtons.innerHTML = '<button class="nav-btn" id="startBtn">Start</button>';
+      document.getElementById('startBtn').onclick = () => goToPlace(0);
     }
 
-    function showStartCard(){
-      const card = document.getElementById('popupCard');
-      card.style.display = "block";
-      card.innerHTML = `
-        <p>Let's start our journey 🌍</p>
-        <div class="nav-buttons">
-          <button onclick="nextCountry()">Start</button>
-        </div>
-      `;
+    function goToPlace(index) {
+      currentIndex = index;
+      const place = places[index];
+
+      popup.innerHTML = `<h2>${place.name}</h2><p>${place.message}</p>`;
+      popup.style.display = 'block';
+
+      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.5 }, 2000);
+
+      let btns = '';
+      if (index > 0) btns += `<button class="nav-btn" id="prevBtn">Previous</button>`;
+      if (index < places.length - 1) btns += `<button class="nav-btn" id="nextBtn">Next</button>`;
+      if (index === places.length - 1) btns += `<button class="nav-btn" id="endBtn">End</button>`;
+      navButtons.innerHTML = btns;
+
+      if (document.getElementById('prevBtn'))
+        document.getElementById('prevBtn').onclick = () => goToPlace(index - 1);
+      if (document.getElementById('nextBtn'))
+        document.getElementById('nextBtn').onclick = () => goToPlace(index + 1);
+      if (document.getElementById('endBtn'))
+        document.getElementById('endBtn').onclick = () => showEnd();
     }
 
-    function showCard(index){
-      const card = document.getElementById('popupCard');
-      const data = places[index];
-      card.innerHTML = `
-        <img src="${data.img}" alt="${data.name}">
-        <p>${data.message}</p>
-        <div class="nav-buttons">
-          ${index > 0 ? `<button onclick="prevCountry()">Previous</button>` : ""}
-          ${index < places.length - 1 ? `<button onclick="nextCountry()">Next</button>` : `<button onclick="endJourney()">End</button>`}
-        </div>
-      `;
-      card.style.display = "block";
-    }
-
-    function nextCountry(){
-      if(currentIndex < places.length - 1){
-        currentIndex++;
-        flyToCountry(currentIndex);
-      }
-    }
-
-    function prevCountry(){
-      if(currentIndex > 0){
-        currentIndex--;
-        flyToCountry(currentIndex);
-      }
-    }
-
-    function endJourney(){
-      currentIndex = -1;
-      world.pointOfView({ lat: 30, lng: 0, altitude: 2 }, 2000);
-      showStartCard();
-    }
-
-    function flyToCountry(index){
-      const target = places[index];
-      world.pointOfView({ lat: target.lat, lng: target.lng, altitude: 1.2 }, 2000);
-      setTimeout(() => { showCard(index); }, 2000);
+    function showEnd() {
+      popup.style.display = 'none';
+      navButtons.innerHTML = '';
+      world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
     }
   </script>
 </body>
