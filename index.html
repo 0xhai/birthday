@@ -138,8 +138,12 @@
       position: absolute;
       width: 40px;
       height: 40px;
+      z-index: 1000;
       transition: transform 2s linear;
-      z-index: 3;
+      pointer-events: none;
+    }
+    .disabled {
+      opacity: 0.5;
       pointer-events: none;
     }
   </style>
@@ -148,7 +152,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise7<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -240,6 +244,8 @@
     ];
 
     let currentIndex = 0;
+    let isAnimating = false;
+
     const world = Globe({ animateIn: false })(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
@@ -247,7 +253,7 @@
       .pointOfView({ lat: 20, lng: 0, altitude: 2.2 }, 0);
 
     /* ---------------- AIRPLANE SIMPLE ANIMATION ---------------- */
-    function flyPlane(from, to, callback) {
+    function flyPlane(callback) {
       airplane.style.display = 'block';
       airplane.style.transform = 'translate(-100px, 100vh)';
       setTimeout(() => {
@@ -261,6 +267,9 @@
 
     /* ---------------- CARD UPDATE ---------------- */
     function updateCard(index) {
+      isAnimating = true;
+      toggleButtons(true);
+
       const place = places[index];
       cardImg.src = place.img;
       cardText.textContent = place.message;
@@ -269,11 +278,18 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      const from = places[currentIndex];
-      const to = place;
+      flyPlane(() => {
+        world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.2 }, 2000);
+        setTimeout(() => {
+          isAnimating = false;
+          toggleButtons(false);
+        }, 2000);
+      });
+    }
 
-      flyPlane(from, to, () => {
-        world.pointOfView({ lat: to.lat, lng: to.lng, altitude: 1.2 }, 2000);
+    function toggleButtons(disable) {
+      [nextBtn, prevBtn, endBtn, startBtn].forEach(btn => {
+        if (btn) btn.classList.toggle('disabled', disable);
       });
     }
 
@@ -284,14 +300,14 @@
     });
 
     nextBtn.addEventListener('click', () => {
-      if (currentIndex < places.length - 1) {
+      if (!isAnimating && currentIndex < places.length - 1) {
         currentIndex++;
         updateCard(currentIndex);
       }
     });
 
     prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
+      if (!isAnimating && currentIndex > 0) {
         currentIndex--;
         updateCard(currentIndex);
       }
