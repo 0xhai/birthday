@@ -2,59 +2,77 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Happy Birthday name 🎉</title>
+  <title>Happy Birthday Name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      width: 100%;
+    html, body { 
+      margin: 0; 
+      height: 100%; 
+      overflow: hidden; 
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
       font-family: 'Pacifico', cursive;
-      overflow: hidden;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
     }
     #loadingScreen {
       position: absolute;
-      top: 0;
-      left: 0;
       width: 100%;
       height: 100%;
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       display: flex;
       flex-direction: column;
-      align-items: center;
       justify-content: center;
-      z-index: 100;
+      align-items: center;
+      z-index: 1000;
+      color: white;
+      font-size: 28px;
+    }
+    .ml12 {
+      font-size: 2em;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .loading-container {
+      position: relative;
+      width: 80%;
+      max-width: 400px;
+      height: 30px;
+      background: #fff;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .loading-bar {
+      width: 0;
+      height: 100%;
+      background: #ff66b2;
+      transition: width 0.2s;
+    }
+    .percentage {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 4px;
+      color: #ff66b2;
+      font-size: 16px;
+      font-weight: bold;
+    }
+    .cake {
+      position: absolute;
+      top: -35px; /* ✅ Moves cake above the bar */
+      left: 0;
+      font-size: 24px;
+      transition: left 0.2s;
+    }
+    #continueText {
+      margin-top: 20px;
+      display: none;
+      font-size: 18px;
       color: #fff;
       text-align: center;
     }
-    .ml11 {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-    .loading-bar {
-      position: relative;
-      width: 80%;
-      height: 25px;
-      background: rgba(255,255,255,0.3);
-      border-radius: 15px;
-      overflow: hidden;
-    }
-    .loading-progress {
-      height: 100%;
-      width: 0;
-      background: #fff;
-      transition: width 0.2s;
-    }
-    #loadingText {
-      margin-top: 10px;
-      font-size: 1.2em;
-    }
-    #cakeEmoji {
-      position: absolute;
-      top: -35px;
-      font-size: 28px;
-      transition: left 0.2s;
+    #globeViz { 
+      width: 100vw; 
+      height: 100vh; 
     }
     .title {
       position: absolute;
@@ -76,181 +94,112 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-    #globeViz {
-      width: 100vw;
-      height: 100vh;
-    }
     .card {
       position: absolute;
-      top: 50%;
+      top: 20%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 20px;
       border-radius: 10px;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      max-width: 300px;
+      width: 280px;
       text-align: center;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      display: none;
       z-index: 10;
     }
     .nav-buttons {
-      margin-top: 15px;
-      display: flex;
-      justify-content: space-between;
+      margin-top: 10px;
     }
     .nav-buttons button {
-      background: #ff66b2;
-      color: #fff;
+      margin: 5px;
+      padding: 8px 12px;
+      font-size: 16px;
+      background-color: #ff66b2;
+      color: white;
       border: none;
-      padding: 10px 15px;
       border-radius: 5px;
       cursor: pointer;
-      font-family: 'Pacifico', cursive;
-      font-size: 16px;
-    }
-    .nav-buttons button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
     }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
   <div id="loadingScreen">
-    <div class="ml11">Preparing your surprise<span id="dots">...</span></div>
-    <div class="loading-bar">
-      <div id="cakeEmoji">🎂</div>
-      <div class="loading-progress" id="loadingProgress"></div>
+    <h1 class="ml12">Preparing your surprise<span id="dots">...</span></h1>
+    <div class="loading-container">
+      <div id="cake" class="cake">🎂</div>
+      <div id="loadingBar" class="loading-bar"></div>
+      <div id="percentage" class="percentage">0%</div>
     </div>
-    <div id="loadingText">0%</div>
-    <div id="continueText" style="display:none;margin-top:10px;">Press ENTER or Tap to continue</div>
+    <div id="continueText">Press ENTER or Tap to continue</div>
   </div>
 
-  <!-- Main Page -->
-  <div class="title">🎂 Happy Birthday name 🎂</div>
+  <div class="title">🎂 Happy Birthday Name 🎂</div>
   <div id="globeViz"></div>
+  <div id="popup" class="popup"></div>
   <div class="subtitle">From country1 to country5... and beyond ❤️</div>
-  <div id="cardContainer" class="card" style="display:none;">
-    <div id="cardContent"></div>
-    <div class="nav-buttons">
-      <button id="prevBtn">Previous</button>
-      <button id="nextBtn">Next</button>
+
+  <div id="card" class="card">
+    <div id="card-content">Let's start our journey</div>
+    <div class="nav-buttons" id="nav-buttons">
+      <button id="start-btn">Start</button>
     </div>
   </div>
 
   <script src="https://unpkg.com/globe.gl"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
   <script>
-    // Loading Screen
+    // Loading animation
     let progress = 0;
-    const loadingProgress = document.getElementById('loadingProgress');
-    const loadingText = document.getElementById('loadingText');
-    const cakeEmoji = document.getElementById('cakeEmoji');
+    const loadingBar = document.getElementById('loadingBar');
+    const percentage = document.getElementById('percentage');
+    const cake = document.getElementById('cake');
     const continueText = document.getElementById('continueText');
     const dots = document.getElementById('dots');
 
-    const loadingInterval = setInterval(() => {
-      if (progress < 100) {
-        progress++;
-        loadingProgress.style.width = progress + '%';
-        cakeEmoji.style.left = `calc(${progress}% - 12px)`;
-        loadingText.textContent = progress + '%';
-      } else {
-        clearInterval(loadingInterval);
-        continueText.style.display = 'block';
-      }
-    }, 50);
-
+    let dotsCount = 0;
     setInterval(() => {
-      dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '.';
+      dotsCount = (dotsCount + 1) % 4;
+      dots.textContent = '.'.repeat(dotsCount);
     }, 500);
 
-    function hideLoading() {
-      document.getElementById('loadingScreen').style.display = 'none';
-      startConfetti();
-    }
+    const progressInterval = setInterval(() => {
+      progress += 1;
+      if(progress <= 100){
+        loadingBar.style.width = progress + '%';
+        percentage.textContent = progress + '%';
+        cake.style.left = `calc(${progress}% - 10px)`;
+      }
+      if(progress === 100){
+        clearInterval(progressInterval);
+        continueText.style.display = 'block';
+      }
+    }, 40);
 
     document.addEventListener('keydown', (e) => {
-      if (progress === 100 && (e.key === 'Enter')) hideLoading();
+      if(e.key === 'Enter' && progress === 100){
+        document.getElementById('loadingScreen').style.display = 'none';
+        launchConfetti();
+      }
     });
+
     document.addEventListener('click', () => {
-      if (progress === 100) hideLoading();
+      if(progress === 100){
+        document.getElementById('loadingScreen').style.display = 'none';
+        launchConfetti();
+      }
     });
 
-    // Confetti
-    function startConfetti() {
+    function launchConfetti(){
       setInterval(() => {
-        confetti({ particleCount: 5, spread: 70, origin: { x: 0 } });
-        confetti({ particleCount: 5, spread: 70, origin: { x: 1 } });
-      }, 400);
+        confetti({
+          particleCount: 50,
+          spread: 60,
+          origin: { x: Math.random(), y: Math.random() - 0.2 }
+        });
+      }, 2000);
     }
-
-    // Globe
-    const elem = document.getElementById('globeViz');
-    const world = Globe()(elem)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 39, lng: 35, altitude: 2 })
-      .labelsData([
-        { lat: 39.9334, lng: 32.8597, name: "Turkey" },
-        { lat: 40.4093, lng: 49.8671, name: "Azerbaijan" },
-        { lat: 37.9838, lng: 23.7275, name: "Greece" },
-        { lat: 59.3293, lng: 18.0686, name: "Sweden" },
-        { lat: 64.9631, lng: -19.0208, name: "Iceland" }
-      ])
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
-
-    const cards = [
-      { text: "Let's start our journey!", start: true },
-      { text: "First stop: Beautiful Turkey 🇹🇷", lat: 39.9334, lng: 32.8597 },
-      { text: "Next is lovely Azerbaijan 🇦🇿", lat: 40.4093, lng: 49.8671 },
-      { text: "Dreaming in Greece 🇬🇷", lat: 37.9838, lng: 23.7275 },
-      { text: "Exploring Sweden 🇸🇪", lat: 59.3293, lng: 18.0686 },
-      { text: "Ending in magical Iceland 🇮🇸", lat: 64.9631, lng: -19.0208 }
-    ];
-
-    let currentIndex = 0;
-    const cardContainer = document.getElementById('cardContainer');
-    const cardContent = document.getElementById('cardContent');
-    const prevBtn = document.getElementById('prevBtn');
-    const nextBtn = document.getElementById('nextBtn');
-
-    function showCard() {
-      cardContainer.style.display = 'block';
-      cardContent.textContent = cards[currentIndex].text;
-      prevBtn.style.display = currentIndex <= 1 ? 'none' : 'inline-block';
-      nextBtn.textContent = currentIndex === cards.length - 1 ? 'End' : 'Next';
-    }
-
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex === cards.length - 1) {
-        world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
-        currentIndex = 0;
-        showCard();
-      } else {
-        currentIndex++;
-        showCard();
-        if (!cards[currentIndex].start) {
-          world.pointOfView({ lat: cards[currentIndex].lat, lng: cards[currentIndex].lng, altitude: 1.5 }, 2000);
-        }
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 1) {
-        currentIndex--;
-        showCard();
-        world.pointOfView({ lat: cards[currentIndex].lat, lng: cards[currentIndex].lng, altitude: 1.5 }, 2000);
-      }
-    });
-
-    showCard();
   </script>
 </body>
 </html>
