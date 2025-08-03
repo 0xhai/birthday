@@ -62,11 +62,15 @@
       transition: opacity 0.5s;
     }
     #globeViz { 
-      width: 100vw; 
-      height: 100vh; 
-      position: relative;
-      z-index: 1;
-    }
+  width: 100vw; 
+  height: 100vh; 
+  position: relative;
+  z-index: 2; /* raised above confetti */
+}
+.title, .subtitle, .card, .popup {
+  z-index: 3; /* raised above confetti */
+  position: relative;
+}
     .popup {
       position: absolute;
       top: 20px;
@@ -188,20 +192,20 @@
 
     // Function to start confetti behind globe
     function startConfetti() {
-      const canvas = document.createElement('canvas');
-      canvas.style.position = 'fixed';
-      canvas.style.top = '0';
-      canvas.style.left = '0';
-      canvas.style.width = '100vw';
-      canvas.style.height = '100vh';
-      canvas.style.zIndex = '0'; // behind globe and text
-      canvas.style.pointerEvents = 'none';
-      document.body.appendChild(canvas);
-      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
-      setInterval(() => {
-        myConfetti({ particleCount: 50, spread: 80, origin: { y: 0.6 } });
-      }, 1500);
-    }
+  const canvas = document.createElement('canvas');
+  canvas.style.position = 'fixed';
+  canvas.style.top = '0';
+  canvas.style.left = '0';
+  canvas.style.width = '100vw';
+  canvas.style.height = '100vh';
+  canvas.style.zIndex = '1'; // now below globe/text but above background
+  canvas.style.pointerEvents = 'none';
+  document.body.appendChild(canvas);
+  const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+  setInterval(() => {
+    myConfetti({ particleCount: 50, spread: 100, origin: { y: 0.6 } });
+  }, 1500);
+}
 
     // Hide loading screen on enter/tap and start confetti
     function hideLoading() {
