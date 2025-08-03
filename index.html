@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Happy Birthday name 🎉</title>
+  <title>Happy Birthday Name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
     html, body { 
@@ -27,6 +27,7 @@
       font-size: 18px;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      z-index: 10;
     }
     .title {
       position: absolute;
@@ -53,29 +54,30 @@
   </style>
 </head>
 <body>
-  <div class="title">🎂 Happy Birthday name 🎂</div>
+  <div class="title">🎂 Happy Birthday Name 🎂</div>
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
   <div class="subtitle">From country1 to country2, to country3, to country4... and beyond ❤️</div>
 
+  <script src="https://unpkg.com/three@0.157.0/build/three.min.js"></script>
   <script src="https://unpkg.com/globe.gl"></script>
   <script>
     const elem = document.getElementById('globeViz');
     const popup = document.getElementById('popup');
 
-    // Locations with messages
+    // Locations with placeholder messages
     const places = [
-      { lat: 40.0, lng: 50.0, name: "country1", message: "Message for country1 ❤️" },
-      { lat: 38.0, lng: 23.0, name: "country2", message: "Message for country2 🌸" },
-      { lat: 41.0, lng: 29.0, name: "country3", message: "Message for country3 🌉" },
-      { lat: 59.0, lng: 18.0, name: "country4", message: "Message for country4 🏡" },
-      { lat: 65.0, lng: -19.0, name: "country5", message: "Message for country5 🌋" }
+      { lat: 10.0, lng: 20.0, name: "country1", message: "Special memory 1 ❤️" },
+      { lat: 30.0, lng: 40.0, name: "country2", message: "Special memory 2 🌸" },
+      { lat: -20.0, lng: 50.0, name: "country3", message: "Special memory 3 🌉" },
+      { lat: 45.0, lng: -60.0, name: "country4", message: "Special memory 4 🏡" },
+      { lat: -30.0, lng: 80.0, name: "country5", message: "Special memory 5 🌋" }
     ];
 
     // Initialize globe
     const world = Globe()(elem)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
       .pointOfView({ lat: 20, lng: 0, altitude: 2 })
       .labelsData(places)
@@ -90,6 +92,10 @@
         popup.style.display = 'block';
         setTimeout(() => popup.style.display = 'none', 3000);
       });
+
+    // Auto-rotate the globe
+    world.controls().autoRotate = true;
+    world.controls().autoRotateSpeed = 0.8;
   </script>
 </body>
 </html>
