@@ -122,8 +122,8 @@
       z-index: 5;
     }
     .nav-buttons button {
-      padding: 14px 30px;
-      font-size: 20px;
+      padding: 16px 36px;
+      font-size: 22px;
       cursor: pointer;
       border: none;
       background: #ff69b4;
@@ -145,6 +145,7 @@
       z-index: 9999;
       display: none;
       pointer-events: none;
+      transform: translate(-50%, -50%);
     }
   </style>
 </head>
@@ -152,7 +153,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise11<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise12<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -212,12 +213,12 @@
       if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
 
-    // 🎉 Confetti visible on both loading and main page
+    // 🎉 Confetti everywhere
     setInterval(() => {
       confetti({
-        particleCount: 40,
-        spread: 90,
-        origin: { y: 0.6 },
+        particleCount: 80,
+        spread: 360,
+        origin: { y: Math.random(), x: Math.random() },
         zIndex: 0
       });
     }, 2000);
@@ -242,6 +243,9 @@
     ];
 
     let currentIndex = -1;
+    let planeX = -100;
+    let planeY = window.innerHeight / 2;
+
     const world = Globe()(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
@@ -257,15 +261,27 @@
 
     function animatePlane(destinationLat, destinationLng, callback) {
       airplane.style.display = "block";
-      airplane.style.left = "-100px";
-      airplane.style.top = "50%";
-      airplane.style.transition = "transform 2s linear, left 2s linear, top 2s linear";
+      airplane.style.left = planeX + "px";
+      airplane.style.top = planeY + "px";
+
+      // Middle curve point
+      const midX = (planeX + window.innerWidth / 2) / 2;
+      const midY = planeY - 100;
+
+      airplane.animate([
+        { transform: `translate(${planeX}px, ${planeY}px)` },
+        { transform: `translate(${midX}px, ${midY}px)` },
+        { transform: `translate(${window.innerWidth / 2}px, ${window.innerHeight / 2}px)` }
+      ], {
+        duration: 2000,
+        easing: 'ease-in-out'
+      });
+
       setTimeout(() => {
-        airplane.style.left = window.innerWidth / 2 + "px";
-        airplane.style.top = window.innerHeight / 2 + "px";
-      }, 50);
-      setTimeout(() => {
-        airplane.style.display = "none";
+        planeX = window.innerWidth / 2;
+        planeY = window.innerHeight / 2;
+        airplane.style.left = planeX + "px";
+        airplane.style.top = planeY + "px";
         if (callback) callback();
       }, 2100);
     }
@@ -278,7 +294,7 @@
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
-      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.2 }, 2000);
+      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.1 }, 2000);
     }
 
     startBtn.addEventListener('click', () => {
