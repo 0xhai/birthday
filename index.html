@@ -108,8 +108,12 @@
       border-radius: 10px;
       margin-bottom: 10px;
     }
-    .next-btn {
+    .btn-container {
+      display: flex;
+      justify-content: space-between;
       margin-top: 10px;
+    }
+    .nav-btn {
       padding: 8px 15px;
       background: #ff66a3;
       color: white;
@@ -117,8 +121,13 @@
       border-radius: 5px;
       cursor: pointer;
       font-size: 14px;
+      width: 48%;
     }
-    .next-btn:hover {
+    .nav-btn:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+    .nav-btn:hover:enabled {
       background: #ff3385;
     }
   </style>
@@ -143,7 +152,11 @@
   <div class="info-card" id="infoCard">
     <img id="infoImage" src="" alt="Location image">
     <p id="infoText"></p>
-    <button class="next-btn" id="nextBtn">Next ➡️</button>
+    <div class="btn-container">
+      <button class="nav-btn" id="prevBtn">⬅️ Previous</button>
+      <button class="nav-btn" id="nextBtn">Next ➡️</button>
+      <button class="nav-btn" id="endBtn" style="display:none;">🎉 End</button>
+    </div>
   </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
@@ -221,6 +234,8 @@
     const infoImage = document.getElementById('infoImage');
     const infoText = document.getElementById('infoText');
     const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const endBtn = document.getElementById('endBtn');
 
     const world = Globe()(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
@@ -236,23 +251,43 @@
       .labelColor(() => 'rgba(255, 105, 180, 0.9)');
 
     let currentStop = 0;
+    let animating = false;
+
+    function updateButtons() {
+      prevBtn.style.display = currentStop === 0 ? "none" : "inline-block";
+      nextBtn.style.display = currentStop === tourStops.length - 1 ? "none" : "inline-block";
+      endBtn.style.display = currentStop === tourStops.length - 1 ? "inline-block" : "none";
+    }
 
     function showStop(index) {
+      animating = true;
       world.pointOfView({ lat: tourStops[index].lat, lng: tourStops[index].lng, altitude: 0.5 }, 2000);
-      infoImage.src = tourStops[index].img;
-      infoText.textContent = tourStops[index].message;
-      infoCard.style.display = 'block';
+      setTimeout(() => {
+        infoImage.src = tourStops[index].img;
+        infoText.textContent = tourStops[index].message;
+        infoCard.style.display = 'block';
+        animating = false;
+        updateButtons();
+      }, 2200);
     }
 
     nextBtn.addEventListener('click', () => {
-      currentStop++;
-      if (currentStop < tourStops.length) {
-        world.pointOfView({ lat: tourStops[currentStop].lat, lng: tourStops[currentStop].lng, altitude: 2 }, 2000);
-        setTimeout(() => showStop(currentStop), 2500);
-      } else {
-        infoText.textContent = "🎉 That's the end of the journey ❤️";
-        nextBtn.style.display = 'none';
+      if (!animating && currentStop < tourStops.length - 1) {
+        currentStop++;
+        showStop(currentStop);
       }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (!animating && currentStop > 0) {
+        currentStop--;
+        showStop(currentStop);
+      }
+    });
+
+    endBtn.addEventListener('click', () => {
+      infoCard.style.display = 'none';
+      world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
     });
 
     function startTour() {
