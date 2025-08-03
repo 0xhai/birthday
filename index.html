@@ -3,7 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <title>Happy Birthday name 🎉</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     html, body { 
@@ -11,71 +13,28 @@
       height: 100%; 
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
-    }
-    #loadingScreen {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      flex-direction: column;
-      color: white;
-      font-size: 2em;
-      font-family: 'Pacifico', cursive;
-      text-align: center;
-      padding: 20px;
-    }
-    .ml11 {
-      font-weight: 700;
-      font-size: 3.5em;
-    }
-    .ml11 .text-wrapper {
-      position: relative;
-      display: inline-block;
-      overflow: hidden;
-    }
-    .ml11 .letter {
-      display: inline-block;
-      line-height: 1em;
-      transform-origin: 0 0;
-    }
-    #progress-container {
-      width: 80%;
-      background: rgba(255, 255, 255, 0.2);
-      height: 10px;
-      border-radius: 5px;
-      margin-top: 20px;
-      overflow: hidden;
-    }
-    #progress-bar {
-      width: 0%;
-      height: 100%;
-      background: white;
-      transition: width 0.3s ease;
-    }
-    #continueText {
-      margin-top: 20px;
-      font-size: 0.6em;
-      opacity: 0;
-      transition: opacity 1s ease;
+      font-family: 'Arial', sans-serif;
     }
     #globeViz { 
       width: 100vw; 
       height: 100vh; 
       position: relative;
-      z-index: 2;
-    }
-    canvas.confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100% !important;
-      height: 100% !important;
       z-index: 1;
-      pointer-events: none;
+    }
+    .popup, .info-card {
+      position: absolute;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-size: 18px;
+      display: none;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      max-width: 300px;
+      text-align: center;
+      z-index: 10;
     }
     .title {
       position: absolute;
@@ -88,211 +47,251 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-    .info-card {
+    .subtitle {
       position: absolute;
-      bottom: 50px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.95);
-      padding: 15px;
-      border-radius: 10px;
+      bottom: 20px;
+      width: 100%;
       text-align: center;
-      width: 280px;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.3);
-      z-index: 10;
-      display: none;
-      font-family: Arial, sans-serif;
+      font-family: 'Pacifico', cursive;
+      font-size: 24px;
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
+      z-index: 5;
     }
     .info-card img {
-      width: 100%;
-      border-radius: 10px;
+      max-width: 100%;
+      border-radius: 5px;
       margin-bottom: 10px;
     }
-    .btn-container {
+    .nav-buttons {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%);
       display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
+      gap: 15px;
+      z-index: 10;
     }
-    .nav-btn {
-      padding: 8px 15px;
-      background: #ff66a3;
+    .nav-buttons button {
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff69b4;
       color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 14px;
-      width: 48%;
     }
-    .nav-btn:disabled {
-      background: #ccc;
+    .nav-buttons button:disabled {
+      background-color: #ccc;
       cursor: not-allowed;
     }
-    .nav-btn:hover:enabled {
-      background: #ff3385;
+    #loadingScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      color: #fff;
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .ml11 {
+      font-weight: 700;
+      font-size: 3.5em;
+    }
+    .progress-bar {
+      width: 300px;
+      height: 20px;
+      border: 2px solid white;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background-color: white;
+      transition: width 0.1s;
+    }
+    #continueText {
+      display: none;
+      margin-top: 15px;
+      font-size: 1.2rem;
     }
   </style>
 </head>
 <body>
-  <!-- LOADING SCREEN -->
-  <div id="loadingScreen">
-    <h1 class="ml11">
-      <span class="text-wrapper">
-        <span class="letters">Preparing your surprise...</span>
-      </span>
-    </h1>
-    <div id="progress-container">
-      <div id="progress-bar"></div>
-    </div>
-    <div id="continueText">(Press ENTER or Tap to continue)</div>
+
+<div id="loadingScreen">
+  <div class="ml11">
+    <span class="text-wrapper">
+      <span class="letters">Preparing your surprise...</span>
+    </span>
   </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+  <div id="continueText">Press ENTER or Tap to continue</div>
+</div>
 
-  <!-- MAIN CONTENT -->
-  <div class="title">🎂 Happy Birthday name 🎂</div>
-  <div id="globeViz"></div>
-  <div class="info-card" id="infoCard">
-    <img id="infoImage" src="" alt="Location image">
-    <p id="infoText"></p>
-    <div class="btn-container">
-      <button class="nav-btn" id="prevBtn">⬅️ Previous</button>
-      <button class="nav-btn" id="nextBtn">Next ➡️</button>
-      <button class="nav-btn" id="endBtn" style="display:none;">🎉 End</button>
-    </div>
-  </div>
+<div class="title">🎂 Happy Birthday name 🎂</div>
+<div id="globeViz"></div>
+<div id="popup" class="popup"></div>
+<div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
-  <script src="https://unpkg.com/globe.gl"></script>
-  <script>
-    // Animate loading text
-    var textWrapper = document.querySelector('.ml11 .letters');
-    textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
+<div class="info-card" id="infoCard">
+  <img id="infoImage" src="" alt="Stop Image">
+  <div id="infoText"></div>
+</div>
 
-    anime.timeline({loop: true})
-      .add({
-        targets: '.ml11 .letter',
-        scale: [0,1],
-        duration: 1500,
-        elasticity: 600,
-        delay: (el, i) => 45 * (i+1)
-      }).add({
-        targets: '.ml11',
-        opacity: 0,
-        duration: 1000,
-        easing: "easeOutExpo",
-        delay: 1000
-      });
+<div class="nav-buttons" id="navButtons">
+  <button id="prevBtn">⬅ Previous</button>
+  <button id="nextBtn">Next ➡</button>
+  <button id="endBtn" style="display:none;">End 🎉</button>
+</div>
 
-    // Simulate loading progress
-    let progress = 0;
-    const progressBar = document.getElementById('progress-bar');
-    const continueText = document.getElementById('continueText');
-    const loadingInterval = setInterval(() => {
-      progress += 5;
-      if (progress > 100) progress = 100;
-      progressBar.style.width = progress + '%';
-      if (progress === 100) {
-        clearInterval(loadingInterval);
-        setTimeout(() => {
-          continueText.style.opacity = 1;
-        }, 500);
-      }
-    }, 200);
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
 
-    function showMainPage(){
-      if (progress === 100) {
-        document.getElementById('loadingScreen').style.display = 'none';
-        startConfetti();
-        startTour();
-      }
-    }
+<script>
+  // 🎉 Confetti effect in background
+  (function confettiLoop() {
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 }
+    });
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 }
+    });
+    requestAnimationFrame(confettiLoop);
+  })();
 
-    document.addEventListener('keydown', function(e){
-      if(e.key === "Enter") showMainPage();
+  // Loading animation
+  anime.timeline({loop: true})
+    .add({
+      targets: '.ml11 .letters',
+      scale: [0.2, 1],
+      opacity: [0, 1],
+      easing: "easeOutExpo",
+      duration: 800
+    }).add({
+      targets: '.ml11 .letters',
+      opacity: 0,
+      duration: 800,
+      easing: "easeOutExpo",
+      delay: 800
     });
 
-    document.addEventListener('click', function(){
-      showMainPage();
-    });
-
-    // Continuous confetti with wind
-    function startConfetti() {
-      setInterval(() => {
-        confetti({ particleCount: 4, angle: 60, spread: 55, startVelocity: 40, ticks: 200, origin: { x: 0 }, drift: Math.random() * 0.5 + 0.2 });
-        confetti({ particleCount: 4, angle: 120, spread: 55, startVelocity: 40, ticks: 200, origin: { x: 1 }, drift: -(Math.random() * 0.5 + 0.2) });
-      }, 300);
+  // Progress bar simulation
+  let progress = 0;
+  const fill = document.getElementById('progressFill');
+  const continueText = document.getElementById('continueText');
+  const loadingScreen = document.getElementById('loadingScreen');
+  const progressInterval = setInterval(() => {
+    if(progress < 100) {
+      progress++;
+      fill.style.width = progress + '%';
+    } else {
+      clearInterval(progressInterval);
+      continueText.style.display = 'block';
     }
+  }, 50);
 
-    // Tour data
-    const tourStops = [
-      { lat: 40.4, lng: 49.8, name: "country1", message: "Draft text for country1", img: "https://placekitten.com/300/200" },
-      { lat: 37.9, lng: 23.7, name: "country2", message: "Draft text for country2", img: "https://placekitten.com/301/200" },
-      { lat: 41.0, lng: 28.9, name: "country3", message: "Draft text for country3", img: "https://placekitten.com/302/200" },
-      { lat: 59.3, lng: 18.0, name: "country4", message: "Draft text for country4", img: "https://placekitten.com/303/200" }
-    ];
-
-    const elem = document.getElementById('globeViz');
-    const infoCard = document.getElementById('infoCard');
-    const infoImage = document.getElementById('infoImage');
-    const infoText = document.getElementById('infoText');
-    const nextBtn = document.getElementById('nextBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const endBtn = document.getElementById('endBtn');
-
-    const world = Globe()(elem)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: tourStops[0].lat, lng: tourStops[0].lng, altitude: 0.5 })
-      .labelsData(tourStops)
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
-
-    let currentStop = 0;
-    let animating = false;
-
-    function updateButtons() {
-      prevBtn.style.display = currentStop === 0 ? "none" : "inline-block";
-      nextBtn.style.display = currentStop === tourStops.length - 1 ? "none" : "inline-block";
-      endBtn.style.display = currentStop === tourStops.length - 1 ? "inline-block" : "none";
+  // Wait for Enter or Tap to continue
+  function dismissLoading() {
+    if(progress === 100) {
+      loadingScreen.style.display = 'none';
     }
+  }
+  document.addEventListener('keydown', (e) => { if(e.key === 'Enter') dismissLoading(); });
+  document.addEventListener('click', dismissLoading);
 
-    function showStop(index) {
-      animating = true;
+  // Globe Setup
+  const elem = document.getElementById('globeViz');
+  const infoCard = document.getElementById('infoCard');
+  const infoImage = document.getElementById('infoImage');
+  const infoText = document.getElementById('infoText');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const endBtn = document.getElementById('endBtn');
+
+  const tourStops = [
+    { lat: 10, lng: 20, name: "country1", message: "Draft text 1", img: "https://via.placeholder.com/200" },
+    { lat: 40, lng: -20, name: "country2", message: "Draft text 2", img: "https://via.placeholder.com/200" },
+    { lat: -10, lng: 100, name: "country3", message: "Draft text 3", img: "https://via.placeholder.com/200" },
+    { lat: 55, lng: 37, name: "country4", message: "Draft text 4", img: "https://via.placeholder.com/200" }
+  ];
+
+  let currentStop = 0;
+  let animating = false;
+
+  const world = Globe()(elem)
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundColor('rgba(0,0,0,0)')
+    .labelsData(tourStops)
+    .labelLat(d => d.lat)
+    .labelLng(d => d.lng)
+    .labelText(d => d.name)
+    .labelSize(1.5)
+    .labelDotRadius(0.7)
+    .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+
+  function showStop(index) {
+    animating = true;
+    infoCard.style.display = 'none';
+    
+    // Zoom out first
+    world.pointOfView({ lat: tourStops[index].lat, lng: tourStops[index].lng, altitude: 2 }, 500);
+    
+    // Then zoom in to destination
+    setTimeout(() => {
       world.pointOfView({ lat: tourStops[index].lat, lng: tourStops[index].lng, altitude: 0.5 }, 2000);
-      setTimeout(() => {
-        infoImage.src = tourStops[index].img;
-        infoText.textContent = tourStops[index].message;
-        infoCard.style.display = 'block';
-        animating = false;
-        updateButtons();
-      }, 2200);
+    }, 500);
+
+    setTimeout(() => {
+      infoImage.src = tourStops[index].img;
+      infoText.textContent = tourStops[index].message;
+      infoCard.style.display = 'block';
+      animating = false;
+      updateButtons();
+    }, 2800);
+  }
+
+  function updateButtons() {
+    prevBtn.disabled = currentStop === 0;
+    nextBtn.style.display = currentStop === tourStops.length - 1 ? 'none' : 'inline-block';
+    endBtn.style.display = currentStop === tourStops.length - 1 ? 'inline-block' : 'none';
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if(!animating && currentStop > 0){
+      currentStop--;
+      showStop(currentStop);
     }
+  });
 
-    nextBtn.addEventListener('click', () => {
-      if (!animating && currentStop < tourStops.length - 1) {
-        currentStop++;
-        showStop(currentStop);
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      if (!animating && currentStop > 0) {
-        currentStop--;
-        showStop(currentStop);
-      }
-    });
-
-    endBtn.addEventListener('click', () => {
-      infoCard.style.display = 'none';
-      world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
-    });
-
-    function startTour() {
-      showStop(0);
+  nextBtn.addEventListener('click', () => {
+    if(!animating && currentStop < tourStops.length - 1){
+      currentStop++;
+      showStop(currentStop);
     }
-  </script>
+  });
+
+  endBtn.addEventListener('click', () => {
+    infoCard.style.display = 'none';
+    world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
+  });
+
+  // Start on first stop
+  setTimeout(() => { showStop(0); }, 3000);
+</script>
 </body>
 </html>
