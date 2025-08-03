@@ -37,13 +37,10 @@
   <h1>✨ Our Journey Around the World ✨</h1>
   <div id="globeViz"></div>
 
-  <!-- Three.js -->
+  <!-- ✅ UMD builds instead of modules -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <!-- Fixed OrbitControls -->
-  <script src="https://rawcdn.githack.com/mrdoob/three.js/r152/examples/js/controls/OrbitControls.min.js"></script>
-  <!-- Three Globe -->
+  <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r152/examples/js/controls/OrbitControls.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
-  <!-- GSAP for animations -->
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
   <script>
@@ -59,11 +56,11 @@
 
     // Globe
     const GlobeObj = new ThreeGlobe()
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .pointsData([
-        { lat: 40.7128, lng: -74.0060, size: 0.3, color: 'red' },  // Placeholder: New York
-        { lat: 48.8566, lng: 2.3522, size: 0.3, color: 'blue' },   // Placeholder: Paris
-        { lat: 35.6895, lng: 139.6917, size: 0.3, color: 'green' } // Placeholder: Tokyo
+        { lat: 40.7128, lng: -74.0060, size: 0.3, color: 'red' },
+        { lat: 48.8566, lng: 2.3522, size: 0.3, color: 'blue' },
+        { lat: 35.6895, lng: 139.6917, size: 0.3, color: 'green' }
       ])
       .pointAltitude('size')
       .pointColor('color');
@@ -73,7 +70,7 @@
     // Camera
     camera.position.z = 250;
 
-    // OrbitControls
+    // Controls
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableZoom = false;
     controls.autoRotate = true;
