@@ -2,8 +2,10 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Happy Birthday name 🎉</title>
+  <title>Happy Birthday Name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     html, body { 
       margin: 0; 
@@ -11,63 +13,9 @@
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
     }
-    #loadingScreen {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      color: #fff;
-      font-family: 'Pacifico', cursive;
-    }
-    .ml11 {
-      font-weight: 700;
-      font-size: 2.5em;
-      white-space: nowrap;
-      overflow: hidden;
-    }
-    .loading-bar-container {
-      width: 300px;
-      height: 20px;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 20px;
-      position: relative;
-    }
-    .loading-bar {
-      height: 100%;
-      width: 0%;
-      background: #ff69b4;
-      transition: width 0.2s;
-    }
-    .loading-percentage {
-      margin-top: 5px;
-      font-size: 16px;
-      font-family: Arial, sans-serif;
-    }
-    .cake-emoji {
-      position: absolute;
-      top: -35px;
-      font-size: 24px;
-      transition: left 0.2s;
-    }
-    .continue-text {
-      opacity: 0;
-      margin-top: 15px;
-      font-size: 16px;
-      font-family: Arial, sans-serif;
-      transition: opacity 0.5s;
-    }
     #globeViz { 
       width: 100vw; 
       height: 100vh; 
-      position: relative;
-      z-index: 1;
     }
     .popup {
       position: absolute;
@@ -81,6 +29,7 @@
       font-size: 18px;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      z-index: 6;
     }
     .title {
       position: absolute;
@@ -104,67 +53,110 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
+    #loadingScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+      font-family: 'Pacifico', cursive;
+      color: #fff;
+      font-size: 32px;
+      text-align: center;
+    }
+    #loadingBarContainer {
+      position: relative;
+      width: 300px;
+      height: 20px;
+      background: #fff;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+    }
+    #loadingBar {
+      height: 100%;
+      width: 0%;
+      background: #ff69b4;
+      transition: width 0.2s;
+    }
+    #loadingPercentage {
+      margin-top: 10px;
+      font-size: 18px;
+    }
+    #cakeEmoji {
+      position: absolute;
+      top: -30px;
+      font-size: 24px;
+      transition: left 0.2s;
+    }
+    #continueText {
+      margin-top: 20px;
+      opacity: 0;
+      transition: opacity 0.5s;
+      font-size: 18px;
+    }
     .card {
       position: absolute;
-      top: 40%;
+      top: 20%;
       left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255,255,255,0.95);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
+      transform: translateX(-50%);
       width: 250px;
-      z-index: 5;
+      background: rgba(255,255,255,0.9);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      z-index: 6;
       display: none;
+      text-align: center;
     }
-    .nav-buttons {
-      margin-top: 10px;
-      display: flex;
-      justify-content: space-between;
+    .navigation {
+      position: absolute;
+      bottom: 80px;
+      width: 100%;
+      text-align: center;
+      z-index: 6;
     }
-    .nav-buttons button {
-      padding: 5px 10px;
-      font-size: 14px;
-      cursor: pointer;
-      border: none;
+    .nav-btn {
       background: #ff69b4;
+      border: none;
+      padding: 10px 20px;
+      margin: 0 10px;
       color: white;
+      font-size: 16px;
       border-radius: 5px;
+      cursor: pointer;
     }
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
   <div id="loadingScreen">
-    <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+    <div>🎁 Preparing your surprise<span id="dots">.</span></div>
+    <div id="loadingBarContainer">
+      <div id="loadingBar"></div>
+      <div id="cakeEmoji">🎂</div>
     </div>
-    <div class="loading-bar-container">
-      <div class="loading-bar" id="loadingBar"></div>
-      <div class="cake-emoji" id="cakeEmoji">🎂</div>
-    </div>
-    <div class="loading-percentage" id="loadingPercentage">0%</div>
-    <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
+    <div id="loadingPercentage">0%</div>
+    <div id="continueText">Press ENTER or Tap to continue</div>
   </div>
 
-  <div class="title">🎂 Happy Birthday name 🎂</div>
+  <div class="title">🎂 Happy Birthday Name 🎂</div>
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
-  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
+  <div class="subtitle">From country1 to country5... and beyond ❤️</div>
 
-  <!-- Cards -->
-  <div id="infoCard" class="card">
-    <img id="cardImage" src="" alt="Country Image" style="width:100%; border-radius:5px;">
-    <p id="cardText"></p>
-    <div class="nav-buttons">
-      <button id="prevBtn" style="display:none;">⬅ Previous</button>
-      <button id="nextBtn">Next ➡</button>
-      <button id="endBtn" style="display:none;">End 🎉</button>
-    </div>
+  <div id="card" class="card"></div>
+  <div class="navigation">
+    <button id="prevBtn" class="nav-btn">Previous</button>
+    <button id="nextBtn" class="nav-btn">Next</button>
+    <button id="endBtn" class="nav-btn" style="display:none;">End</button>
   </div>
 
-  <script src="https://unpkg.com/globe.gl"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
     // Animated dots
     setInterval(() => {
@@ -178,6 +170,7 @@
     const perc = document.getElementById('loadingPercentage');
     const cake = document.getElementById('cakeEmoji');
     const contText = document.getElementById('continueText');
+
     const interval = setInterval(() => {
       if (load < 100) {
         load++;
@@ -192,10 +185,14 @@
 
     // Hide loading screen on enter/tap
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+      if (e.key === 'Enter' && load >= 100) {
+        document.getElementById('loadingScreen').style.display = 'none';
+      }
     });
     document.addEventListener('click', () => {
-      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+      if (load >= 100) {
+        document.getElementById('loadingScreen').style.display = 'none';
+      }
     });
 
     // Confetti continuously
@@ -206,27 +203,26 @@
     // Globe setup
     const elem = document.getElementById('globeViz');
     const popup = document.getElementById('popup');
-    const card = document.getElementById('infoCard');
-    const cardImg = document.getElementById('cardImage');
-    const cardText = document.getElementById('cardText');
-    const nextBtn = document.getElementById('nextBtn');
+    const card = document.getElementById('card');
     const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
     const endBtn = document.getElementById('endBtn');
 
     const places = [
-      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "A beautiful journey starts here!", img: "https://placehold.co/250x150?text=Turkey" },
-      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "https://placehold.co/250x150?text=Azerbaijan" },
-      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "https://placehold.co/250x150?text=Greece" },
-      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "https://placehold.co/250x150?text=Sweden" },
-      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "https://placehold.co/250x150?text=Iceland" }
+      { lat: 39.9208, lng: 32.8541, name: "Turkey", message: "Draft text for Turkey", image: "" },
+      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Draft text for Azerbaijan", image: "" },
+      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Draft text for Greece", image: "" },
+      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "Draft text for Sweden", image: "" },
+      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Draft text for Iceland", image: "" }
     ];
 
     let currentIndex = 0;
+
     const world = Globe()(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: places[0].lat, lng: places[0].lng, altitude: 1.5 }, 0)
+      .pointOfView({ lat: places[0].lat, lng: places[0].lng, altitude: 1.5 })
       .labelsData(places)
       .labelLat(d => d.lat)
       .labelLng(d => d.lng)
@@ -235,28 +231,27 @@
       .labelDotRadius(0.7)
       .labelColor(() => 'rgba(255, 105, 180, 0.9)');
 
-    function updateCard(index) {
-      const place = places[index];
-      cardImg.src = place.img;
-      cardText.textContent = place.message;
+    function showCard(index) {
+      const p = places[index];
+      card.innerHTML = `<h3>${p.name}</h3><p>${p.message}</p>`;
       card.style.display = 'block';
-      prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
-      nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
+      world.pointOfView({ lat: p.lat, lng: p.lng, altitude: 1.5 }, 2000);
+      prevBtn.style.display = index === 0 ? 'none' : 'inline-block';
+      nextBtn.style.display = index === places.length - 1 ? 'none' : 'inline-block';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
-      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.5 }, 2000);
     }
 
     nextBtn.addEventListener('click', () => {
       if (currentIndex < places.length - 1) {
         currentIndex++;
-        updateCard(currentIndex);
+        showCard(currentIndex);
       }
     });
 
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
         currentIndex--;
-        updateCard(currentIndex);
+        showCard(currentIndex);
       }
     });
 
@@ -265,8 +260,7 @@
       world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
     });
 
-    // Start with Turkey
-    setTimeout(() => updateCard(0), 1000);
+    showCard(currentIndex);
   </script>
 </body>
 </html>
