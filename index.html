@@ -3,76 +3,95 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>🌍 Our Journey</title>
-  <script type="importmap">
-  {
-    "imports": {
-      "three": "https://unpkg.com/three@0.152.2/build/three.module.js",
-      "three/addons/": "https://unpkg.com/three@0.152.2/examples/jsm/"
-    }
-  }
-  </script>
-  <script async src="https://unpkg.com/es-module-shims@1.8.0/dist/es-module-shims.min.js"></script>
+  <title>🌍 Our Journey Around the World</title>
+  <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
   <style>
-    body { margin: 0; overflow: hidden; font-family: sans-serif; background: #ffb6c1; text-align: center; }
-    h1 { font-size: 2.5em; color: white; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); margin: 20px 0; }
-    canvas { display: block; }
+    body {
+      margin: 0;
+      background-color: #ffc0cb;
+      overflow: hidden;
+      font-family: 'Dancing Script', cursive;
+      color: white;
+      text-align: center;
+    }
+
+    h1 {
+      position: absolute;
+      width: 100%;
+      top: 20px;
+      font-size: 2.5em;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.3);
+      z-index: 10;
+    }
+
+    #globeViz {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
   </style>
 </head>
 <body>
   <h1>✨ Our Journey Around the World ✨</h1>
+  <div id="globeViz"></div>
 
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import ThreeGlobe from 'three/addons/controls/OrbitControls'; // incorrect
-  </script>
+  <!-- Three.js -->
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <!-- Fixed OrbitControls -->
+  <script src="https://rawcdn.githack.com/mrdoob/three.js/r152/examples/js/controls/OrbitControls.min.js"></script>
+  <!-- Three Globe -->
+  <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
+  <!-- GSAP for animations -->
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
-  <!-- Write globe logic below -->
-  <script type="module">
-    import * as THREE from 'three';
-    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
-    import { ThreeGlobe } from 'https://cdn.jsdelivr.net/npm/three-globe@2.24.10/+esm';
-
+  <script>
+    // Scene setup
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, innerWidth/innerHeight, 0.1, 1000);
-    camera.position.z = 300;
-
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
     const renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(innerWidth, innerHeight);
-    document.body.appendChild(renderer.domElement);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.getElementById('globeViz').appendChild(renderer.domElement);
 
-    const controls = new OrbitControls(camera, renderer.domElement);
-    controls.enableZoom = true;
+    // Lights
+    scene.add(new THREE.AmbientLight(0xffffff, 1));
 
-    const globe = new ThreeGlobe()
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-        .arcsData([
-            { startLat: 0, startLng: 0, endLat: 20, endLng: 20 }
-        ])
-        .arcColor(() => 'pink')
-        .arcAltitude(() => 0.2)
-        .arcStroke(1)
-        .arcDashLength(0.5)
-        .arcDashGap(4)
-        .arcDashAnimateTime(4000);
+    // Globe
+    const GlobeObj = new ThreeGlobe()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .pointsData([
+        { lat: 40.7128, lng: -74.0060, size: 0.3, color: 'red' },  // Placeholder: New York
+        { lat: 48.8566, lng: 2.3522, size: 0.3, color: 'blue' },   // Placeholder: Paris
+        { lat: 35.6895, lng: 139.6917, size: 0.3, color: 'green' } // Placeholder: Tokyo
+      ])
+      .pointAltitude('size')
+      .pointColor('color');
 
-    scene.add(globe);
+    scene.add(GlobeObj);
 
-    const light = new THREE.AmbientLight(0xffffff, 1); scene.add(light);
+    // Camera
+    camera.position.z = 250;
 
-    function animate(){
+    // OrbitControls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableZoom = false;
+    controls.autoRotate = true;
+    controls.autoRotateSpeed = 1;
+
+    // Animation loop
+    function animate() {
       requestAnimationFrame(animate);
-      globe.rotation.y += 0.001;
       controls.update();
       renderer.render(scene, camera);
     }
     animate();
 
-    addEventListener('resize', ()=>{
-      camera.aspect = innerWidth/innerHeight;
+    // Handle window resize
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
-      renderer.setSize(innerWidth, innerHeight);
+      renderer.setSize(window.innerWidth, window.innerHeight);
     });
   </script>
 </body>
