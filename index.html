@@ -4,20 +4,16 @@
   <meta charset="UTF-8">
   <title>Happy Birthday name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <script src="https://unpkg.com/globe.gl"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
     html, body {
       margin: 0;
-      padding: 0;
       height: 100%;
+      width: 100%;
+      font-family: 'Pacifico', cursive;
       overflow: hidden;
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      font-family: 'Pacifico', cursive;
     }
-
-    /* ===== LOADING SCREEN ===== */
-    #loading-screen {
+    #loadingScreen {
       position: absolute;
       top: 0;
       left: 0;
@@ -26,61 +22,40 @@
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
       display: flex;
       flex-direction: column;
-      justify-content: center;
       align-items: center;
-      z-index: 1000;
+      justify-content: center;
+      z-index: 100;
+      color: #fff;
       text-align: center;
     }
-
     .ml11 {
-      font-size: 2rem;
-      color: #d63384;
+      font-size: 2em;
       margin-bottom: 20px;
     }
-
-    #progress-container {
-      width: 80%;
-      height: 20px;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 20px;
+    .loading-bar {
       position: relative;
+      width: 80%;
+      height: 25px;
+      background: rgba(255,255,255,0.3);
+      border-radius: 15px;
+      overflow: hidden;
     }
-
-    #progress-bar {
+    .loading-progress {
       height: 100%;
       width: 0;
-      background: #ff69b4;
-      transition: width 0.3s ease;
+      background: #fff;
+      transition: width 0.2s;
     }
-
-    #progress-text {
+    #loadingText {
       margin-top: 10px;
-      font-weight: bold;
-      font-size: 16px;
-      color: #d63384;
+      font-size: 1.2em;
     }
-
-    /* ✅ FIX: Cake ABOVE bar */
-    #cake-emoji {
+    #cakeEmoji {
       position: absolute;
       top: -35px;
-      left: 0;
-      transform: translateX(-50%);
       font-size: 28px;
-      transition: left 0.3s ease;
-      z-index: 5;
+      transition: left 0.2s;
     }
-
-    #continue-text {
-      display: none;
-      margin-top: 20px;
-      font-size: 18px;
-      color: #d63384;
-    }
-
-    /* ===== MAIN PAGE ===== */
     .title {
       position: absolute;
       top: 20px;
@@ -91,7 +66,6 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-
     .subtitle {
       position: absolute;
       bottom: 20px;
@@ -102,134 +76,181 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-
     #globeViz {
-      position: absolute;
       width: 100vw;
       height: 100vh;
-      top: 0;
-      left: 0;
-      z-index: 0;
     }
-
-    /* Card styling */
     .card {
       position: absolute;
-      top: 30%;
+      top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255, 255, 255, 0.9);
       padding: 20px;
       border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
       max-width: 300px;
       text-align: center;
-      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
       z-index: 10;
     }
-
     .nav-buttons {
       margin-top: 15px;
       display: flex;
       justify-content: space-between;
     }
-
     .nav-buttons button {
-      padding: 8px 12px;
-      background: #ff69b4;
+      background: #ff66b2;
       color: #fff;
       border: none;
+      padding: 10px 15px;
       border-radius: 5px;
       cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      font-size: 16px;
     }
-
     .nav-buttons button:disabled {
-      background: #ccc;
+      opacity: 0.5;
       cursor: not-allowed;
     }
   </style>
 </head>
 <body>
-  <!-- LOADING SCREEN -->
-  <div id="loading-screen">
-    <h1 class="ml11">Preparing your surprise<span id="dots">...</span></h1>
-    <div id="progress-container">
-      <span id="cake-emoji">🎂</span>
-      <div id="progress-bar"></div>
+  <!-- Loading Screen -->
+  <div id="loadingScreen">
+    <div class="ml11">Preparing your surprise<span id="dots">...</span></div>
+    <div class="loading-bar">
+      <div id="cakeEmoji">🎂</div>
+      <div class="loading-progress" id="loadingProgress"></div>
     </div>
-    <div id="progress-text">0%</div>
-    <div id="continue-text">Press ENTER or Tap to continue</div>
+    <div id="loadingText">0%</div>
+    <div id="continueText" style="display:none;margin-top:10px;">Press ENTER or Tap to continue</div>
   </div>
 
-  <!-- MAIN PAGE -->
+  <!-- Main Page -->
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
   <div class="subtitle">From country1 to country5... and beyond ❤️</div>
-
-  <!-- Cards -->
-  <div id="card-container" class="card" style="display:none;">
-    <h3 id="card-title">Let's start our journey</h3>
-    <img id="card-image" src="" alt="" style="max-width:100%;border-radius:8px;display:none;">
-    <p id="card-text">Ready to explore?</p>
+  <div id="cardContainer" class="card" style="display:none;">
+    <div id="cardContent"></div>
     <div class="nav-buttons">
-      <button id="prev-btn" style="display:none;">Previous</button>
-      <button id="next-btn">Start</button>
+      <button id="prevBtn">Previous</button>
+      <button id="nextBtn">Next</button>
     </div>
   </div>
 
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
+    // Loading Screen
     let progress = 0;
-    const progressBar = document.getElementById('progress-bar');
-    const progressText = document.getElementById('progress-text');
-    const cakeEmoji = document.getElementById('cake-emoji');
-    const continueText = document.getElementById('continue-text');
+    const loadingProgress = document.getElementById('loadingProgress');
+    const loadingText = document.getElementById('loadingText');
+    const cakeEmoji = document.getElementById('cakeEmoji');
+    const continueText = document.getElementById('continueText');
+    const dots = document.getElementById('dots');
 
-    // ✅ Loading bar simulation
-    const progressInterval = setInterval(() => {
+    const loadingInterval = setInterval(() => {
       if (progress < 100) {
-        progress += 1;
-        progressBar.style.width = progress + '%';
-        progressText.textContent = progress + '%';
-        cakeEmoji.style.left = progress + '%';
-      }
-      if (progress === 100) {
-        clearInterval(progressInterval);
+        progress++;
+        loadingProgress.style.width = progress + '%';
+        cakeEmoji.style.left = `calc(${progress}% - 12px)`;
+        loadingText.textContent = progress + '%';
+      } else {
+        clearInterval(loadingInterval);
         continueText.style.display = 'block';
       }
     }, 50);
 
-    // Animated dots
     setInterval(() => {
-      const dots = document.getElementById("dots");
-      dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '';
+      dots.textContent = dots.textContent.length < 3 ? dots.textContent + '.' : '.';
     }, 500);
 
-    // Show main page
-    function showMainPage() {
-      document.getElementById('loading-screen').style.display = 'none';
-      document.getElementById('globeViz').style.display = 'block';
-      document.getElementById('card-container').style.display = 'block';
-      initGlobe();
+    function hideLoading() {
+      document.getElementById('loadingScreen').style.display = 'none';
+      startConfetti();
     }
 
     document.addEventListener('keydown', (e) => {
-      if (progress === 100 && e.key === 'Enter') {
-        showMainPage();
-      }
+      if (progress === 100 && (e.key === 'Enter')) hideLoading();
     });
-
     document.addEventListener('click', () => {
-      if (progress === 100) {
-        showMainPage();
+      if (progress === 100) hideLoading();
+    });
+
+    // Confetti
+    function startConfetti() {
+      setInterval(() => {
+        confetti({ particleCount: 5, spread: 70, origin: { x: 0 } });
+        confetti({ particleCount: 5, spread: 70, origin: { x: 1 } });
+      }, 400);
+    }
+
+    // Globe
+    const elem = document.getElementById('globeViz');
+    const world = Globe()(elem)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundColor('rgba(0,0,0,0)')
+      .pointOfView({ lat: 39, lng: 35, altitude: 2 })
+      .labelsData([
+        { lat: 39.9334, lng: 32.8597, name: "Turkey" },
+        { lat: 40.4093, lng: 49.8671, name: "Azerbaijan" },
+        { lat: 37.9838, lng: 23.7275, name: "Greece" },
+        { lat: 59.3293, lng: 18.0686, name: "Sweden" },
+        { lat: 64.9631, lng: -19.0208, name: "Iceland" }
+      ])
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.name)
+      .labelSize(1.5)
+      .labelDotRadius(0.7)
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+
+    const cards = [
+      { text: "Let's start our journey!", start: true },
+      { text: "First stop: Beautiful Turkey 🇹🇷", lat: 39.9334, lng: 32.8597 },
+      { text: "Next is lovely Azerbaijan 🇦🇿", lat: 40.4093, lng: 49.8671 },
+      { text: "Dreaming in Greece 🇬🇷", lat: 37.9838, lng: 23.7275 },
+      { text: "Exploring Sweden 🇸🇪", lat: 59.3293, lng: 18.0686 },
+      { text: "Ending in magical Iceland 🇮🇸", lat: 64.9631, lng: -19.0208 }
+    ];
+
+    let currentIndex = 0;
+    const cardContainer = document.getElementById('cardContainer');
+    const cardContent = document.getElementById('cardContent');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function showCard() {
+      cardContainer.style.display = 'block';
+      cardContent.textContent = cards[currentIndex].text;
+      prevBtn.style.display = currentIndex <= 1 ? 'none' : 'inline-block';
+      nextBtn.textContent = currentIndex === cards.length - 1 ? 'End' : 'Next';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex === cards.length - 1) {
+        world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
+        currentIndex = 0;
+        showCard();
+      } else {
+        currentIndex++;
+        showCard();
+        if (!cards[currentIndex].start) {
+          world.pointOfView({ lat: cards[currentIndex].lat, lng: cards[currentIndex].lng, altitude: 1.5 }, 2000);
+        }
       }
     });
 
-    // ✅ Restore globe as in Draft1
-    function initGlobe() {
-      const globeElement = document.getElementById('globeViz');
-      const world = Globe()(globeElement)
-        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-        .backgroundColor('rgba(0,0,0,0)');
-    }
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 1) {
+        currentIndex--;
+        showCard();
+        world.pointOfView({ lat: cards[currentIndex].lat, lng: cards[currentIndex].lng, altitude: 1.5 }, 2000);
+      }
+    });
+
+    showCard();
   </script>
 </body>
 </html>
