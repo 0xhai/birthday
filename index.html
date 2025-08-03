@@ -186,18 +186,32 @@
       }
     }, 30);
 
-    // Hide loading screen on enter/tap
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
-    });
-    document.addEventListener('click', () => {
-      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
-    });
+    // Function to start confetti behind globe
+    function startConfetti() {
+      const canvas = document.createElement('canvas');
+      canvas.style.position = 'fixed';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100vw';
+      canvas.style.height = '100vh';
+      canvas.style.zIndex = '0'; // behind globe and text
+      canvas.style.pointerEvents = 'none';
+      document.body.appendChild(canvas);
+      const myConfetti = confetti.create(canvas, { resize: true, useWorker: true });
+      setInterval(() => {
+        myConfetti({ particleCount: 50, spread: 80, origin: { y: 0.6 } });
+      }, 1500);
+    }
 
-    // Confetti continuously
-    setInterval(() => {
-      confetti({ particleCount: 30, spread: 60, origin: { y: 0.6 } });
-    }, 1500);
+    // Hide loading screen on enter/tap and start confetti
+    function hideLoading() {
+      if (load >= 100) {
+        document.getElementById('loadingScreen').style.display = 'none';
+        startConfetti();
+      }
+    }
+    document.addEventListener('keydown', e => { if (e.key === 'Enter') hideLoading(); });
+    document.addEventListener('click', hideLoading);
 
     // Globe setup
     const elem = document.getElementById('globeViz');
