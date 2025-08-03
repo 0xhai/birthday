@@ -37,9 +37,9 @@
   <h1>✨ Our Journey Around the World ✨</h1>
   <div id="globeViz"></div>
 
-  <!-- ✅ UMD builds instead of modules -->
+  <!-- ✅ Stable CDNs -->
   <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/mrdoob/three.js@r152/examples/js/controls/OrbitControls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
@@ -70,7 +70,7 @@
     // Camera
     camera.position.z = 250;
 
-    // Controls
+    // ✅ OrbitControls now works
     const controls = new THREE.OrbitControls(camera, renderer.domElement);
     controls.enableZoom = false;
     controls.autoRotate = true;
