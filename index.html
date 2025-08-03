@@ -72,7 +72,7 @@
 
     #cakeEmoji {
       position: absolute;
-      top: -40px;  /* ✅ FLOATS ABOVE BAR */
+      top: -40px;  
       font-size: 28px;
       left: 0;
       transition: left 0.2s ease;
@@ -194,22 +194,29 @@
       }
     }, 40);
 
+    let confettiStarted = false;
+
+    function hideLoading() {
+      document.getElementById("loadingScreen").style.display = "none";
+      if (!confettiStarted) {
+        confettiStarted = true;
+        setInterval(() => {
+          confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
+        }, 1500);
+      }
+    }
+
     document.addEventListener("keydown", function(e){
       if(e.key === "Enter" && progress === 100){
-        document.getElementById("loadingScreen").style.display = "none";
+        hideLoading();
       }
     });
 
     document.addEventListener("click", function(){
       if(progress === 100){
-        document.getElementById("loadingScreen").style.display = "none";
+        hideLoading();
       }
     });
-
-    // Continuous confetti
-    setInterval(() => {
-      confetti({ particleCount: 50, spread: 60, origin: { y: 0.6 } });
-    }, 1500);
 
     const elem = document.getElementById('globeViz');
     const places = [
