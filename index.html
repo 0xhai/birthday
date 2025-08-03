@@ -77,20 +77,6 @@
       z-index: 1;
       pointer-events: none;
     }
-    .popup {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-family: 'Arial', sans-serif;
-      font-size: 18px;
-      display: none;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-      z-index: 5;
-    }
     .title {
       position: absolute;
       top: 20px;
@@ -102,16 +88,38 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-    .subtitle {
+    .info-card {
       position: absolute;
-      bottom: 20px;
-      width: 100%;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px;
+      border-radius: 10px;
       text-align: center;
-      font-family: 'Pacifico', cursive;
-      font-size: 24px;
-      color: #fff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
+      width: 280px;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.3);
+      z-index: 10;
+      display: none;
+      font-family: Arial, sans-serif;
+    }
+    .info-card img {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 10px;
+    }
+    .next-btn {
+      margin-top: 10px;
+      padding: 8px 15px;
+      background: #ff66a3;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    .next-btn:hover {
+      background: #ff3385;
     }
   </style>
 </head>
@@ -132,8 +140,11 @@
   <!-- MAIN CONTENT -->
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
-  <div id="popup" class="popup"></div>
-  <div class="subtitle">From country1 to country2, to country3, to country4... and beyond ❤️</div>
+  <div class="info-card" id="infoCard">
+    <img id="infoImage" src="" alt="Location image">
+    <p id="infoText"></p>
+    <button class="next-btn" id="nextBtn">Next ➡️</button>
+  </div>
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
   <script src="https://unpkg.com/globe.gl"></script>
@@ -173,11 +184,11 @@
       }
     }, 200);
 
-    // Wait for user interaction to load main page
     function showMainPage(){
       if (progress === 100) {
         document.getElementById('loadingScreen').style.display = 'none';
         startConfetti();
+        startTour();
       }
     }
 
@@ -189,59 +200,64 @@
       showMainPage();
     });
 
-    // Continuous confetti with wind effect
+    // Continuous confetti with wind
     function startConfetti() {
       setInterval(() => {
-        confetti({
-          particleCount: 4,
-          angle: 60,
-          spread: 55,
-          startVelocity: 40,
-          ticks: 200,
-          origin: { x: 0 },
-          drift: Math.random() * 0.5 + 0.2 // Wind to the right
-        });
-        confetti({
-          particleCount: 4,
-          angle: 120,
-          spread: 55,
-          startVelocity: 40,
-          ticks: 200,
-          origin: { x: 1 },
-          drift: -(Math.random() * 0.5 + 0.2) // Wind to the left
-        });
+        confetti({ particleCount: 4, angle: 60, spread: 55, startVelocity: 40, ticks: 200, origin: { x: 0 }, drift: Math.random() * 0.5 + 0.2 });
+        confetti({ particleCount: 4, angle: 120, spread: 55, startVelocity: 40, ticks: 200, origin: { x: 1 }, drift: -(Math.random() * 0.5 + 0.2) });
       }, 300);
     }
 
-    // Globe setup
-    const elem = document.getElementById('globeViz');
-    const popup = document.getElementById('popup');
-
-    const places = [
-      { lat: 40.4, lng: 49.8, name: "country1", message: "Message 1 ❤️" },
-      { lat: 37.9, lng: 23.7, name: "country2", message: "Message 2 🌸" },
-      { lat: 41.0, lng: 28.9, name: "country3", message: "Message 3 🌉" },
-      { lat: 59.3, lng: 18.0, name: "country4", message: "Message 4 🏡" },
-      { lat: 64.9, lng: -19.0, name: "country5", message: "Message 5 🌋" }
+    // Tour data
+    const tourStops = [
+      { lat: 40.4, lng: 49.8, name: "country1", message: "Draft text for country1", img: "https://placekitten.com/300/200" },
+      { lat: 37.9, lng: 23.7, name: "country2", message: "Draft text for country2", img: "https://placekitten.com/301/200" },
+      { lat: 41.0, lng: 28.9, name: "country3", message: "Draft text for country3", img: "https://placekitten.com/302/200" },
+      { lat: 59.3, lng: 18.0, name: "country4", message: "Draft text for country4", img: "https://placekitten.com/303/200" }
     ];
 
-    Globe()(elem)
+    const elem = document.getElementById('globeViz');
+    const infoCard = document.getElementById('infoCard');
+    const infoImage = document.getElementById('infoImage');
+    const infoText = document.getElementById('infoText');
+    const nextBtn = document.getElementById('nextBtn');
+
+    const world = Globe()(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 20, lng: 0, altitude: 2 })
-      .labelsData(places)
+      .pointOfView({ lat: tourStops[0].lat, lng: tourStops[0].lng, altitude: 0.5 })
+      .labelsData(tourStops)
       .labelLat(d => d.lat)
       .labelLng(d => d.lng)
       .labelText(d => d.name)
       .labelSize(1.5)
       .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
-      .onLabelClick(d => {
-        popup.textContent = d.message;
-        popup.style.display = 'block';
-        setTimeout(() => popup.style.display = 'none', 3000);
-      });
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+
+    let currentStop = 0;
+
+    function showStop(index) {
+      world.pointOfView({ lat: tourStops[index].lat, lng: tourStops[index].lng, altitude: 0.5 }, 2000);
+      infoImage.src = tourStops[index].img;
+      infoText.textContent = tourStops[index].message;
+      infoCard.style.display = 'block';
+    }
+
+    nextBtn.addEventListener('click', () => {
+      currentStop++;
+      if (currentStop < tourStops.length) {
+        world.pointOfView({ lat: tourStops[currentStop].lat, lng: tourStops[currentStop].lng, altitude: 2 }, 2000);
+        setTimeout(() => showStop(currentStop), 2500);
+      } else {
+        infoText.textContent = "🎉 That's the end of the journey ❤️";
+        nextBtn.style.display = 'none';
+      }
+    });
+
+    function startTour() {
+      showStop(0);
+    }
   </script>
 </body>
 </html>
