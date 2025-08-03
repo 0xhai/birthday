@@ -91,7 +91,7 @@
     }
     .subtitle {
       position: absolute;
-      bottom: 80px;
+      bottom: 30px;
       width: 100%;
       text-align: center;
       font-size: 24px;
@@ -114,7 +114,7 @@
     }
     .nav-buttons {
       position: fixed;
-      bottom: 20px;
+      bottom: 80px; /* above subtitle */
       left: 50%;
       transform: translateX(-50%);
       display: flex;
@@ -122,15 +122,16 @@
       z-index: 6;
     }
     .nav-buttons button {
-      padding: 10px 20px;
-      font-size: 18px;
+      padding: 14px 28px;
+      font-size: 22px;
       cursor: pointer;
       border: none;
       background: #ff69b4;
       color: white;
-      border-radius: 5px;
-      min-width: 120px;
-      opacity: 0.9;
+      border-radius: 8px;
+      min-width: 140px;
+      opacity: 0.95;
+      font-family: 'Pacifico', cursive;
     }
     .nav-buttons button:disabled {
       background: #ccc;
@@ -142,7 +143,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -210,7 +211,6 @@
 
     // Globe setup
     const elem = document.getElementById('globeViz');
-    const popup = document.getElementById('popup');
     const card = document.getElementById('infoCard');
     const cardImg = document.getElementById('cardImage');
     const cardText = document.getElementById('cardText');
@@ -227,7 +227,7 @@
       { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "https://placehold.co/250x150?text=Iceland" }
     ];
 
-    let currentIndex = -1; // Start before first
+    let currentIndex = -1; 
     let animationInProgress = false;
 
     const world = Globe()(elem)
@@ -252,7 +252,7 @@
 
       animationInProgress = true;
       navBtns.querySelectorAll("button").forEach(b => b.disabled = true);
-      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.5 }, 2000);
+      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.0 }, 2000);
       setTimeout(() => {
         animationInProgress = false;
         navBtns.querySelectorAll("button").forEach(b => b.disabled = false);
@@ -260,8 +260,12 @@
     }
 
     // Navigation buttons
-    nextBtn.addEventListener('click', () => { if (!animationInProgress && currentIndex < places.length - 1) updateCard(++currentIndex); });
-    prevBtn.addEventListener('click', () => { if (!animationInProgress && currentIndex > 0) updateCard(--currentIndex); });
+    function goNext() { if (!animationInProgress && currentIndex < places.length - 1) updateCard(++currentIndex); }
+    function goPrev() { if (!animationInProgress && currentIndex > 0) updateCard(--currentIndex); }
+
+    nextBtn.addEventListener('click', goNext);
+    prevBtn.addEventListener('click', goPrev);
+
     endBtn.addEventListener('click', () => {
       cardImg.src = "https://placehold.co/250x150?text=Happy+Birthday!";
       cardText.textContent = "🎉 Wishing you all the happiness in the world! 🎂";
@@ -276,14 +280,16 @@
       card.style.display = 'block';
       cardImg.src = "https://placehold.co/250x150?text=Welcome";
       cardText.textContent = "Let's start our journey!";
-      navBtns.style.display = "block";
+      navBtns.style.display = "flex";
       prevBtn.style.display = 'none';
       nextBtn.textContent = "Start ▶";
       endBtn.style.display = 'none';
+
       nextBtn.onclick = () => {
         currentIndex = 0;
-        nextBtn.textContent = "Next ▶";
         updateCard(currentIndex);
+        nextBtn.textContent = "Next ▶";
+        nextBtn.onclick = goNext; // restore normal function
       };
     }
 
