@@ -3,94 +3,89 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Special Story 🌍</title>
-
-  <!-- Google Font -->
+  <title>✨ Our Journey Around the World ✨</title>
   <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
-
   <style>
-    html, body {
+    body {
       margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      overflow-x: hidden;
+      background: #ffccd5;
       font-family: 'Dancing Script', cursive;
-    }
-
-    #globeViz {
-      width: 100vw;
-      height: 100vh;
-    }
-
-    .popup {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-family: 'Dancing Script', cursive;
-      font-size: 20px;
-      display: none;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .intro-text {
-      position: absolute;
-      top: 40px;
-      left: 50%;
-      transform: translateX(-50%);
-      font-size: 36px;
-      color: #fff;
-      text-shadow: 1px 1px 3px rgba(0,0,0,0.3);
-      z-index: 10;
       text-align: center;
     }
+    h1 {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      font-size: 3em;
+      color: #fff;
+      text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+    }
+    canvas { display: block; }
   </style>
 </head>
 <body>
-  <div class="intro-text">✨ Our Journey Around the World ✨</div>
-  <div id="globeViz"></div>
-  <div id="popup" class="popup"></div>
+  <h1>✨ Our Journey Around the World ✨</h1>
 
-  <!-- Libraries -->
-  <script src="libs/three.min.js"></script>
-  <script src="libs/OrbitControls.min.js"></script>
-  <script src="libs/three-globe.min.js"></script>
-  <script src="libs/gsap.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.152.2/examples/js/controls/OrbitControls.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three-globe@2.24.10/dist/three-globe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/gsap@3.12.2/dist/gsap.min.js"></script>
 
   <script>
-    const elem = document.getElementById('globeViz');
-    const popup = document.getElementById('popup');
+    // Scene setup
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-    // Placeholder locations and messages
-    const places = [
-      { lat: 41.0, lng: 28.9, name: "PLACE 1", message: "This is where it all began ❤️" },
-      { lat: 40.4, lng: 49.8, name: "PLACE 2", message: "A special chapter of the story 🌸" },
-      { lat: 37.9, lng: 23.7, name: "PLACE 3", message: "An unforgettable moment 🌟" },
-      { lat: 59.3, lng: 18.0, name: "PLACE 4", message: "Dreaming of the future 🏡" },
-      { lat: 64.9, lng: -19.0, name: "PLACE 5", message: "A future adventure awaits ✈️" }
-    ];
+    // Controls
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    camera.position.z = 300;
+    controls.enableZoom = true;
 
-    // Initialize globe
-    const world = Globe()(elem)
-      .globeImageUrl('libs/earth-night.jpg')
-      .bumpImageUrl('libs/earth-topology.png')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 20, lng: 0, altitude: 2 })
-      .labelsData(places)
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
-      .onLabelClick(d => {
-        popup.textContent = d.message;
-        popup.style.display = 'block';
-        setTimeout(() => popup.style.display = 'none', 3000);
-      });
+    // Globe
+    const globe = new ThreeGlobe()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png');
+
+    scene.add(globe);
+
+    // Example arcs (replace placeholders with real coordinates)
+    globe.arcsData([
+      { startLat: 41.0082, startLng: 28.9784, endLat: 40.4093, endLng: 49.8671 }, // Istanbul -> Baku
+      { startLat: 40.4093, startLng: 49.8671, endLat: 37.9838, endLng: 23.7275 }, // Baku -> Greece
+      { startLat: 59.3293, startLng: 18.0686, endLat: 64.9631, endLng: -19.0208 } // Sweden -> Iceland
+    ])
+    .arcColor(() => 'pink')
+    .arcAltitude(() => 0.3)
+    .arcStroke(2)
+    .arcDashLength(0.5)
+    .arcDashGap(4)
+    .arcDashAnimateTime(4000);
+
+    // Lights
+    const ambientLight = new THREE.AmbientLight(0xbbbbbb);
+    scene.add(ambientLight);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    directionalLight.position.set(1, 1, 1);
+    scene.add(directionalLight);
+
+    // Animate
+    function animate() {
+      requestAnimationFrame(animate);
+      globe.rotation.y += 0.001;
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
   </script>
 </body>
 </html>
