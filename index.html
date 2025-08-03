@@ -2,81 +2,31 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Happy Birthday name 🎉</title>
+  <title>Happy Birthday Name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
   <style>
     html, body { 
       margin: 0; 
       height: 100%; 
       overflow: hidden; 
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
     }
-    body::before {
-      content: "";
+    #confetti-canvas {
       position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      z-index: -3;
-    }
-    #loadingScreen {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: #ff99cc;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 1000;
-    }
-    .ml11 {
-      font-weight: 700;
-      font-size: 2.5em;
-      font-family: 'Pacifico', cursive;
-      color: white;
-    }
-    .ml11 .text-wrapper {
-      position: relative;
-      display: inline-block;
-      padding-top: 0.2em;
-      padding-right: 0.05em;
-      padding-bottom: 0.1em;
-    }
-    .ml11 .line {
-      opacity: 0;
-      position: absolute;
-      left: 0;
-      height: 3px;
-      width: 100%;
-      background-color: white;
-      transform-origin: 0 0;
-      bottom: 0;
-    }
-    .ml11 .letter {
-      display: inline-block;
-      line-height: 1em;
-    }
-    #globeViz { 
-      width: 100vw; 
-      height: 100vh; 
-      display: none;
-      opacity: 0;
-      position: relative;
-      z-index: 1;
-      transition: opacity 1.5s ease;
-    }
-    #confettiCanvas, #sparkleCanvas {
-      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
       pointer-events: none;
+      z-index: 0;
     }
-    #confettiCanvas { z-index: 2; }
-    #sparkleCanvas { z-index: 1; }
+    #globeViz { 
+      width: 100vw; 
+      height: 100vh; 
+      position: relative;
+      z-index: 1;
+    }
     .popup {
       position: absolute;
       top: 20px;
@@ -89,10 +39,7 @@
       font-size: 18px;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    }
-    .title, .subtitle {
-      opacity: 0;
-      transition: opacity 1.5s ease;
+      z-index: 10;
     }
     .title {
       position: absolute;
@@ -104,7 +51,6 @@
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
-      display: none;
     }
     .subtitle {
       position: absolute;
@@ -116,122 +62,131 @@
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
-      display: none;
+    }
+    /* Loading screen */
+    #loading-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .ml11 {
+      font-weight: 700;
+      font-size: 3.5em;
+      color: white;
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+    }
+    .ml11 .text-wrapper {
+      position: relative;
+      display: inline-block;
+      padding-top: 0.1em;
+      padding-right: 0.05em;
+      padding-bottom: 0.15em;
+    }
+    .ml11 .line {
+      opacity: 0;
+      position: absolute;
+      left: 0;
+      height: 100%;
+      width: 3px;
+      background-color: white;
+      transform-origin: 0 50%;
+    }
+    .ml11 .letter {
+      display: inline-block;
+      line-height: 1em;
     }
   </style>
 </head>
 <body>
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
   <!-- Loading Screen -->
-  <div id="loadingScreen">
+  <div id="loading-screen">
     <h1 class="ml11">
       <span class="text-wrapper">
         <span class="line line1"></span>
-        <span class="letters">Loading a surprise for you...</span>
+        <span class="letters">Loading your surprise...</span>
       </span>
     </h1>
   </div>
 
-  <div id="globeViz">
-    <canvas id="sparkleCanvas"></canvas>
-    <canvas id="confettiCanvas"></canvas>
-  </div>
-  
-  <div class="title">🎂 Happy Birthday name 🎂</div>
+  <!-- Main Content -->
+  <div class="title">🎂 Happy Birthday Name 🎂</div>
+  <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
   <div class="subtitle">From country1 to country2, to country3, to country4... and beyond ❤️</div>
 
+  <!-- External scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
   <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <script>
-    // Animate loading text
-    function startAnimation() {
-      var textWrapper = document.querySelector('.ml11 .letters');
-      textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
+    // Animate Loading Text (ml11)
+    var textWrapper = document.querySelector('.ml11 .letters');
+    textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
 
-      return anime.timeline({loop: true})
-        .add({
-          targets: '.ml11 .line',
-          scaleY: [0,1],
-          opacity: [0.5,1],
-          easing: "easeOutExpo",
-          duration: 700
-        }).add({
-          targets: '.ml11 .line',
-          translateX: [0, document.querySelector('.ml11 .letters').getBoundingClientRect().width + 10],
-          easing: "easeOutExpo",
-          duration: 700,
-          delay: 100
-        }).add({
-          targets: '.ml11 .letter',
-          opacity: [0,1],
-          easing: "easeOutExpo",
-          duration: 600,
-          offset: '-=775',
-          delay: (el, i) => 34 * (i+1)
-        }).add({
-          targets: '.ml11',
-          opacity: 0,
-          duration: 1000,
-          easing: "easeOutExpo",
-          delay: 1000
-        }).add({
-          targets: '.ml11',
-          opacity: 1,
-          duration: 1000,
-          easing: "easeOutExpo"
+    anime.timeline({loop: false})
+      .add({
+        targets: '.ml11 .letter',
+        scale: [0, 1],
+        duration: 1500,
+        elasticity: 600,
+        delay: (el, i) => 45 * (i+1)
+      }).add({
+        targets: '.ml11',
+        opacity: 0,
+        duration: 1000,
+        easing: "easeOutExpo",
+        delay: 1000
+      });
+
+    // Hide loading screen
+    setTimeout(() => {
+      document.getElementById('loading-screen').style.display = 'none';
+    }, 4000);
+
+    // Start confetti in the background
+    function startConfetti() {
+      const duration = 600000;
+      const end = Date.now() + duration;
+      (function frame() {
+        confetti({
+          particleCount: 3,
+          startVelocity: 30,
+          spread: 360,
+          ticks: 60,
+          origin: { x: Math.random(), y: Math.random() - 0.2 }
         });
+        if (Date.now() < end) {
+          requestAnimationFrame(frame);
+        }
+      })();
     }
-    let loadingAnimation = startAnimation();
+    startConfetti();
 
-    // 🎉 Confetti
-    const confettiCanvas = document.getElementById('confettiCanvas');
-    const confettiSettings = confetti.create(confettiCanvas, { resize: true, useWorker: true });
-    function launchConfetti() {
-      confettiSettings({
-        particleCount: 3,
-        spread: 70,
-        origin: { y: 0.6 },
-        colors: ['#ff69b4', '#ff1493', '#ffb6c1', '#ffffff']
-      });
-      requestAnimationFrame(launchConfetti);
-    }
-
-    // ✨ Sparkle effect
-    const sparkleCanvas = document.getElementById('sparkleCanvas');
-    const ctx = sparkleCanvas.getContext('2d');
-    let stars = Array.from({length: 80}).map(() => ({
-      x: Math.random() * window.innerWidth,
-      y: Math.random() * window.innerHeight,
-      radius: Math.random() * 2,
-      alpha: Math.random()
-    }));
-
-    function drawSparkles() {
-      ctx.clearRect(0, 0, sparkleCanvas.width, sparkleCanvas.height);
-      stars.forEach(s => {
-        ctx.beginPath();
-        ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(255,255,255,${s.alpha})`;
-        ctx.fill();
-        s.alpha += (Math.random() - 0.5) * 0.05;
-        if (s.alpha < 0) s.alpha = 0;
-        if (s.alpha > 1) s.alpha = 1;
-      });
-      requestAnimationFrame(drawSparkles);
-    }
-    sparkleCanvas.width = window.innerWidth;
-    sparkleCanvas.height = window.innerHeight;
-    drawSparkles();
+    // Globe setup
+    const elem = document.getElementById('globeViz');
+    const popup = document.getElementById('popup');
 
     const places = [
-      { lat: 40.0, lng: 49.0, name: "country1", message: "Message 1 ❤️" },
-      { lat: 37.9, lng: 23.7, name: "country2", message: "Message 2 🌸" },
-      { lat: 41.0, lng: 28.9, name: "country3", message: "Message 3 🌉" },
-      { lat: 59.3, lng: 18.0, name: "country4", message: "Message 4 🏡" },
-      { lat: 64.9, lng: -19.0, name: "country5", message: "Message 5 🌋" }
+      { lat: 10, lng: 20, name: "country1", message: "Special message 1 ❤️" },
+      { lat: 30, lng: 40, name: "country2", message: "Special message 2 🌸" },
+      { lat: 50, lng: 60, name: "country3", message: "Special message 3 🌉" },
+      { lat: 70, lng: 80, name: "country4", message: "Special message 4 🏡" },
+      { lat: -20, lng: -50, name: "country5", message: "Special message 5 🌋" }
     ];
 
-    const globeContainer = document.getElementById('globeViz');
-    const world = Globe()(globeContainer)
+    Globe()(elem)
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
@@ -244,31 +199,10 @@
       .labelDotRadius(0.7)
       .labelColor(() => 'rgba(255, 105, 180, 0.9)')
       .onLabelClick(d => {
-        const popup = document.getElementById('popup');
         popup.textContent = d.message;
         popup.style.display = 'block';
         setTimeout(() => popup.style.display = 'none', 3000);
       });
-
-    // Show page after globe loads
-    const texture = new Image();
-    texture.src = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
-    texture.onload = () => {
-      loadingAnimation.pause();
-      document.getElementById('loadingScreen').style.display = 'none';
-
-      globeContainer.style.display = 'block';
-      document.querySelector('.title').style.display = 'block';
-      document.querySelector('.subtitle').style.display = 'block';
-
-      launchConfetti();
-
-      setTimeout(() => {
-        globeContainer.style.opacity = 1;
-        document.querySelector('.title').style.opacity = 1;
-        document.querySelector('.subtitle').style.opacity = 1;
-      }, 100);
-    };
   </script>
 </body>
 </html>
