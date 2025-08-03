@@ -12,6 +12,15 @@
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
     }
+    body::before {
+      /* Ensure gradient stays visible behind globe */
+      content: "";
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      z-index: -1;
+    }
     #loadingScreen {
       position: fixed;
       top: 0; left: 0;
@@ -53,8 +62,10 @@
       width: 100vw; 
       height: 100vh; 
       display: none;
+      opacity: 0;
       position: relative;
       z-index: 1;
+      transition: opacity 1.5s ease;
     }
     .popup {
       position: absolute;
@@ -68,6 +79,10 @@
       font-size: 18px;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+    }
+    .title, .subtitle {
+      opacity: 0;
+      transition: opacity 1.5s ease;
     }
     .title {
       position: absolute;
@@ -113,7 +128,7 @@
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script>
-    // Animate letters repeatedly
+    // Animate loading text
     function startAnimation() {
       var textWrapper = document.querySelector('.ml11 .letters');
       textWrapper.innerHTML = textWrapper.textContent.replace(/([^\x00-\x80]|\w)/g, "<span class='letter'>$&</span>");
@@ -154,7 +169,6 @@
 
     let loadingAnimation = startAnimation();
 
-    // Locations with messages
     const places = [
       { lat: 40.0, lng: 49.0, name: "country1", message: "Message 1 ❤️" },
       { lat: 37.9, lng: 23.7, name: "country2", message: "Message 2 🌸" },
@@ -183,22 +197,34 @@
         setTimeout(() => popup.style.display = 'none', 3000);
       });
 
-    // ✅ Real load detection
+    // Detect when texture finishes loading
     const texture = new Image();
     texture.src = 'https://unpkg.com/three-globe/example/img/earth-night.jpg';
     texture.onload = () => {
       loadingAnimation.pause();
       document.getElementById('loadingScreen').style.display = 'none';
-      document.getElementById('globeViz').style.display = 'block';
+
+      // Smooth fade-in
+      globeContainer.style.display = 'block';
       document.querySelector('.title').style.display = 'block';
       document.querySelector('.subtitle').style.display = 'block';
+
+      setTimeout(() => {
+        globeContainer.style.opacity = 1;
+        document.querySelector('.title').style.opacity = 1;
+        document.querySelector('.subtitle').style.opacity = 1;
+      }, 100);
     };
     texture.onerror = () => {
-      // Fallback if texture fails to load (mobile)
       loadingAnimation.pause();
       document.getElementById('loadingScreen').style.display = 'none';
       document.querySelector('.title').style.display = 'block';
       document.querySelector('.subtitle').style.display = 'block';
+
+      setTimeout(() => {
+        document.querySelector('.title').style.opacity = 1;
+        document.querySelector('.subtitle').style.opacity = 1;
+      }, 100);
     };
   </script>
 </body>
