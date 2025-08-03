@@ -3,94 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <title>Happy Birthday name 🎉</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/globe.gl"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      font-family: 'Pacifico', cursive;
+    html, body { 
+      margin: 0; 
+      height: 100%; 
+      overflow: hidden; 
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
+      font-family: 'Arial', sans-serif;
     }
-
-    /* Loading Screen */
-    #loading-screen {
-      position: absolute;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      z-index: 100;
-    }
-
-    .ml12 {
-      font-weight: 200;
-      font-size: 2em;
-      text-align: center;
-      color: #fff;
-      margin-bottom: 20px;
-    }
-
-    .loading-container {
+    #globeViz { 
+      width: 100vw; 
+      height: 100vh; 
       position: relative;
-      width: 300px;
-      height: 30px;
-      background: #fff;
-      border-radius: 15px;
-      overflow: hidden;
-      margin-top: 10px;
+      z-index: 1;
     }
-
-    .loading-bar {
-      width: 0;
-      height: 100%;
-      background: #ff66a3;
-      transition: width 0.2s;
-    }
-
-    .percentage {
+    .popup, .info-card {
       position: absolute;
-      width: 100%;
-      text-align: center;
-      top: 4px;
-      color: #444;
-      font-size: 16px;
-      font-weight: bold;
-      font-family: Arial, sans-serif;
-    }
-
-    .cake {
-      position: absolute;
-      top: -28px; /* ✅ fixed position so cake is fully visible */
-      font-size: 20px;
-      left: calc(var(--cake-position, 0%) - 10px);
-      transition: left 0.2s;
-    }
-
-    #continue-text {
-      margin-top: 15px;
-      font-size: 1em;
-      color: #fff;
-      opacity: 0;
-      transition: opacity 0.5s;
-    }
-
-    /* Main Page */
-    #main-page {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 15px 20px;
+      border-radius: 10px;
+      font-size: 18px;
       display: none;
-      width: 100%;
-      height: 100%;
-      position: relative;
+      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      max-width: 300px;
+      text-align: center;
+      z-index: 10;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -130%);
     }
-
-    #globeViz {
-      width: 100vw;
-      height: 100vh;
-    }
-
     .title {
       position: absolute;
       top: 20px;
@@ -102,7 +47,6 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-
     .subtitle {
       position: absolute;
       bottom: 20px;
@@ -114,103 +58,271 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-
-    .card {
+    .info-card img {
+      max-width: 100%;
+      border-radius: 5px;
+      margin-bottom: 10px;
+    }
+    .nav-buttons {
       position: absolute;
-      top: 20%;
+      bottom: 80px;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
-      border-radius: 10px;
-      width: 280px;
-      text-align: center;
-      font-family: Arial, sans-serif;
-      font-size: 16px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      display: flex;
+      gap: 15px;
       z-index: 10;
     }
-
-    .nav-buttons {
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-
     .nav-buttons button {
-      padding: 5px 10px;
-      background-color: #ff66a3;
-      color: #fff;
+      padding: 10px 20px;
+      font-size: 16px;
+      background-color: #ff69b4;
+      color: white;
       border: none;
       border-radius: 5px;
       cursor: pointer;
     }
-
     .nav-buttons button:disabled {
       background-color: #ccc;
       cursor: not-allowed;
     }
+    #loadingScreen {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      color: #fff;
+      font-family: 'Pacifico', cursive;
+      font-size: 2rem;
+      text-align: center;
+    }
+    .ml11 {
+      font-weight: 700;
+      font-size: 3.5em;
+    }
+    .progress-bar {
+      width: 300px;
+      height: 20px;
+      border: 2px solid white;
+      border-radius: 10px;
+      overflow: hidden;
+      margin-top: 20px;
+      position: relative;
+    }
+    .progress-fill {
+      height: 100%;
+      width: 0;
+      background-color: white;
+      transition: width 0.1s;
+    }
+    #progressText {
+      position: absolute;
+      width: 100%;
+      text-align: center;
+      top: 0;
+      left: 0;
+      font-size: 14px;
+      color: #ff69b4;
+      font-weight: bold;
+      line-height: 20px;
+    }
+    #continueText {
+      display: none;
+      margin-top: 15px;
+      font-size: 1.2rem;
+    }
   </style>
 </head>
 <body>
-  <!-- Loading Screen -->
-  <div id="loading-screen">
-    <h1 class="ml12">Preparing your surprise<span class="dots">...</span></h1>
-    <div class="loading-container">
-      <div class="cake">🎂</div>
-      <div class="loading-bar"></div>
-      <div class="percentage">0%</div>
-    </div>
-    <div id="continue-text">Press ENTER or Tap to continue</div>
+
+<div id="loadingScreen">
+  <div class="ml11">
+    <span class="text-wrapper">
+      <span class="letters">Preparing your surprise...</span>
+    </span>
   </div>
-
-  <!-- Main Page -->
-  <div id="main-page">
-    <div class="title">🎂 Happy Birthday name 🎂</div>
-    <div id="globeViz"></div>
-    <div class="subtitle">From country1 to country5... and beyond ❤️</div>
-    <div class="card" id="infoCard">
-      <p id="cardText">Let's start our journey</p>
-      <div class="nav-buttons">
-        <button id="startBtn">Start</button>
-      </div>
-    </div>
+  <div class="progress-bar">
+    <div class="progress-fill" id="progressFill"></div>
+    <div id="progressText">0%</div>
   </div>
+  <div id="continueText">Press ENTER or Tap to continue</div>
+</div>
 
-  <script src="https://unpkg.com/globe.gl"></script>
-  <script>
-    /* Loading animation */
-    let progress = 0;
-    const loadingBar = document.querySelector('.loading-bar');
-    const percentageText = document.querySelector('.percentage');
-    const cake = document.querySelector('.cake');
-    const continueText = document.getElementById('continue-text');
-    const interval = setInterval(() => {
-      if (progress < 100) {
-        progress++;
-        loadingBar.style.width = progress + '%';
-        percentageText.textContent = progress + '%';
-        cake.style.setProperty('--cake-position', progress + '%');
-      }
-      if (progress === 100) {
-        continueText.style.opacity = 1;
-        clearInterval(interval);
-      }
-    }, 50);
+<div class="title">🎂 Happy Birthday name 🎂</div>
+<div id="globeViz"></div>
+<div id="popup" class="popup"></div>
+<div class="subtitle">From Turkey to Azerbaijan, to Greece, Sweden, Iceland... and beyond ❤️</div>
 
-    /* Switch to main page */
-    document.addEventListener('keydown', e => {
-      if (progress === 100 && (e.key === 'Enter' || e.keyCode === 13)) {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('main-page').style.display = 'block';
-      }
+<div class="info-card" id="infoCard">
+  <img id="infoImage" src="" alt="Stop Image">
+  <div id="infoText"></div>
+</div>
+
+<div class="nav-buttons" id="navButtons">
+  <button id="prevBtn">⬅ Previous</button>
+  <button id="nextBtn">Next ➡</button>
+  <button id="endBtn" style="display:none;">End 🎉</button>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+
+<script>
+  // 🎉 Confetti effect
+  (function confettiLoop() {
+    confetti({
+      particleCount: 3,
+      angle: 60,
+      spread: 55,
+      origin: { x: 0 }
     });
-    document.addEventListener('click', () => {
-      if (progress === 100) {
-        document.getElementById('loading-screen').style.display = 'none';
-        document.getElementById('main-page').style.display = 'block';
-      }
+    confetti({
+      particleCount: 3,
+      angle: 120,
+      spread: 55,
+      origin: { x: 1 }
     });
-  </script>
+    requestAnimationFrame(confettiLoop);
+  })();
+
+  // Loading animation
+  anime.timeline({loop: true})
+    .add({
+      targets: '.ml11 .letters',
+      scale: [0.2, 1],
+      opacity: [0, 1],
+      easing: "easeOutExpo",
+      duration: 800
+    }).add({
+      targets: '.ml11 .letters',
+      opacity: 0,
+      duration: 800,
+      easing: "easeOutExpo",
+      delay: 800
+    });
+
+  // Progress bar simulation
+  let progress = 0;
+  const fill = document.getElementById('progressFill');
+  const progressText = document.getElementById('progressText');
+  const continueText = document.getElementById('continueText');
+  const loadingScreen = document.getElementById('loadingScreen');
+  const progressInterval = setInterval(() => {
+    if(progress < 100) {
+      progress++;
+      fill.style.width = progress + '%';
+      progressText.textContent = progress + '%';
+    } else {
+      clearInterval(progressInterval);
+      continueText.style.display = 'block';
+    }
+  }, 50);
+
+  // Wait for Enter or Tap
+  function dismissLoading() {
+    if(progress === 100) {
+      loadingScreen.style.display = 'none';
+      setTimeout(() => { showStop(0); }, 1000);
+    }
+  }
+  document.addEventListener('keydown', (e) => { if(e.key === 'Enter') dismissLoading(); });
+  document.addEventListener('click', dismissLoading);
+
+  // Globe setup
+  const elem = document.getElementById('globeViz');
+  const infoCard = document.getElementById('infoCard');
+  const infoImage = document.getElementById('infoImage');
+  const infoText = document.getElementById('infoText');
+  const prevBtn = document.getElementById('prevBtn');
+  const nextBtn = document.getElementById('nextBtn');
+  const endBtn = document.getElementById('endBtn');
+
+  const tourStops = [
+    { lat: 39.9208, lng: 32.8541, name: "Turkey", message: "Draft text for Turkey", img: "https://via.placeholder.com/200" },
+    { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Draft text for Azerbaijan", img: "https://via.placeholder.com/200" },
+    { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Draft text for Greece", img: "https://via.placeholder.com/200" },
+    { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "Draft text for Sweden", img: "https://via.placeholder.com/200" },
+    { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "Draft text for Iceland", img: "https://via.placeholder.com/200" }
+  ];
+
+  let currentStop = 0;
+  let animating = false;
+
+  const world = Globe()(elem)
+    .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+    .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+    .backgroundColor('rgba(0,0,0,0)')
+    .labelsData(tourStops)
+    .labelLat(d => d.lat)
+    .labelLng(d => d.lng)
+    .labelText(d => d.name)
+    .labelSize(1.5)
+    .labelDotRadius(0.7)
+    .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+
+  function typeWriterEffect(text, element) {
+    element.textContent = '';
+    let i = 0;
+    const speed = 40;
+    function type() {
+      if (i < text.length) {
+        element.textContent += text.charAt(i);
+        i++;
+        setTimeout(type, speed);
+      }
+    }
+    type();
+  }
+
+  function showStop(index) {
+    animating = true;
+    infoCard.style.display = 'none';
+
+    // Smooth cinematic camera travel
+    world.pointOfView({ lat: tourStops[index].lat, lng: tourStops[index].lng, altitude: 2 }, 1000);
+    setTimeout(() => {
+      world.pointOfView({ lat: tourStops[index].lat + 5, lng: tourStops[index].lng + 10, altitude: 1.5 }, 1500);
+    }, 800);
+    setTimeout(() => {
+      world.pointOfView({ lat: tourStops[index].lat, lng: tourStops[index].lng, altitude: 0.5 }, 2000);
+    }, 2000);
+
+    setTimeout(() => {
+      infoImage.src = tourStops[index].img;
+      typeWriterEffect(tourStops[index].message, infoText);
+      infoCard.style.display = 'block';
+      animating = false;
+      updateButtons();
+    }, 4000);
+  }
+
+  function updateButtons() {
+    prevBtn.disabled = currentStop === 0;
+    nextBtn.style.display = currentStop === tourStops.length - 1 ? 'none' : 'inline-block';
+    endBtn.style.display = currentStop === tourStops.length - 1 ? 'inline-block' : 'none';
+  }
+
+  prevBtn.addEventListener('click', () => {
+    if(!animating && currentStop > 0){
+      currentStop--;
+      showStop(currentStop);
+    }
+  });
+
+  nextBtn.addEventListener('click', () => {
+    if(!animating && currentStop < tourStops.length - 1){
+      currentStop++;
+      showStop(currentStop);
+    }
+  });
+
+  endBtn.addEventListener('click', () => {
+    infoCard.style.display = 'none';
+    world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 2000);
+  });
+</script>
 </body>
 </html>
