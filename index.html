@@ -50,13 +50,14 @@
       font-size: 16px;
       font-family: 'Pacifico', cursive;
     }
+    /* Make the cake emoji visible and move with the bar */
     .cake-emoji {
       position: absolute;
-      top: 50%; /* Ensure it stays vertically aligned with the loading bar */
-      left: 0; /* Start at the left edge of the loading bar */
+      top: 0; /* Keep it aligned vertically with the bar */
+      left: 0; /* Start from the left of the loading bar */
       font-size: 24px;
-      z-index: 11; /* Ensure it stays above the loading bar */
-      transition: left 0.2s ease; /* Smooth transition for movement */
+      transition: left 0.2s; /* Smooth transition for horizontal movement */
+      z-index: 12; /* Ensure it stays in front of the loading bar */
     }
     .continue-text {
       opacity: 0;
@@ -165,7 +166,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseD<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseE<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
