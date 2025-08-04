@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise01<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise027<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -320,6 +320,9 @@
     startBtn.addEventListener('click', () => {
       startBtn.disabled = true;
       currentIndex = 0;
+      // Set airplane's initial position
+      airplane.style.left = window.innerWidth / 2 + 'px';
+      airplane.style.top = window.innerHeight / 2 + 'px';
       flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0);
         nextBtn.style.display = 'inline-block';
