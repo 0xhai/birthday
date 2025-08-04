@@ -10,7 +10,7 @@
       height: 100%; 
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
-      font-size: 18px; /* Base font size */
+      font-size: 16px; /* Base font size */
     }
 
     #loadingScreen {
@@ -29,16 +29,15 @@
 
     .ml11 {
       font-weight: 700;
-      font-size: 4em;
+      font-size: 3em; /* Larger font size for mobile */
       white-space: nowrap;
       overflow: hidden;
-      text-align: center;
     }
 
     .loading-bar-container {
-      width: 80%;
-      max-width: 350px;
-      height: 40px;
+      width: 80%; /* More responsive width */
+      max-width: 300px;
+      height: 25px;
       background: #fff;
       border-radius: 10px;
       overflow: hidden;
@@ -55,23 +54,21 @@
 
     .loading-percentage {
       margin-top: 10px;
-      font-size: 2em;
+      font-size: 1.2em;
       font-family: 'Pacifico', cursive;
     }
 
-    /* Cake Emoji outside the bar, moving with the progress */
     .cake-emoji {
       position: absolute;
-      top: -60px;
-      left: 0;
-      font-size: 5em;
-      transition: left 0.2s !important;
+      top: -40px;
+      font-size: 3em; /* Larger emoji */
+      transition: left 0.2s;
     }
 
     .continue-text {
       opacity: 0;
       margin-top: 20px;
-      font-size: 2em;
+      font-size: 1.2em; /* Larger font for mobile */
       font-family: 'Pacifico', cursive;
       transition: opacity 0.5s;
     }
@@ -89,10 +86,10 @@
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.9);
-      padding: 20px;
+      padding: 15px 20px;
       border-radius: 10px;
       font-family: 'Pacifico', cursive;
-      font-size: 2em;
+      font-size: 1.2em;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
     }
@@ -103,13 +100,10 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 10vw; /* Dynamic title size based on screen size */
+      font-size: 3.5em; /* Adjusted for visibility on mobile */
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
-      white-space: nowrap; /* Ensure the title doesn't break into multiple lines */
-      overflow: hidden;
-      text-overflow: ellipsis; /* Ensure text fits */
     }
 
     .subtitle {
@@ -118,7 +112,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 3em;
+      font-size: 1.5em;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -130,11 +124,11 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
-      padding: 40px;
+      padding: 25px;
       border-radius: 10px;
       text-align: center;
-      width: 85%;
-      max-width: 400px;
+      width: 80%; /* Adjusted for mobile view */
+      max-width: 320px;
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
@@ -142,36 +136,31 @@
 
     .card img {
       width: 100%;
-      max-height: 300px;
+      max-height: 200px;
       object-fit: cover;
       border-radius: 5px;
     }
 
-    .card p {
-      font-size: 2em;
-      margin-top: 20px;
-    }
-
     .nav-buttons {
       position: absolute;
-      bottom: 140px; /* Adjust to ensure buttons stay above subtitle */
+      bottom: 80px;
       width: 100%;
       text-align: center;
       z-index: 6;
     }
 
     .nav-buttons button {
-      padding: 12px 24px;
-      font-size: 2em; /* Increased text size in buttons */
+      padding: 12px 25px;
+      font-size: 1.5em; /* Larger buttons */
       cursor: pointer;
       border: none;
       background: #ff69b4;
       color: white;
       border-radius: 8px;
-      margin: 0 15px;
+      margin: 0 10px;
       font-family: 'Pacifico', cursive;
       transition: opacity 0.3s;
-      width: 40%; /* Make buttons compact */
+      width: 60%; /* Larger buttons for touch screens */
     }
 
     .nav-buttons button:disabled {
@@ -181,7 +170,7 @@
 
     #airplane {
       position: absolute;
-      font-size: 5em;
+      font-size: 4em;
       z-index: 9999;
       transition: transform 1s linear;
       display: block;
@@ -200,39 +189,32 @@
     /* Media Queries for smaller screens (Mobile) */
     @media only screen and (max-width: 768px) {
       .title {
-        font-size: 7vw; /* Smaller font for title on mobile screens */
+        font-size: 2.5em; /* Adjust for mobile */
       }
       .subtitle {
-        font-size: 3.5em;
+        font-size: 1.3em;
       }
       .card {
-        padding: 30px;
-        width: 90%;
-        max-width: 350px;
-      }
-      .card p {
-        font-size: 2.2em;
+        padding: 15px;
+        width: 90%; /* Make card slightly bigger on mobile */
+        max-width: 300px;
       }
       .nav-buttons button {
-        font-size: 2.2em;
-        padding: 18px 35px;
+        font-size: 1.2em; /* Larger buttons for mobile */
+        padding: 15px 30px;
         width: 80%;
       }
     }
 
     @media only screen and (max-width: 480px) {
       .ml11 {
-        font-size: 3em;
-      }
-      .continue-text {
         font-size: 2.2em;
       }
-      .loading-bar-container {
-        width: 90%;
+      .continue-text {
+        font-size: 1.5em;
       }
-      .nav-buttons button {
-        font-size: 2.4em;
-        padding: 20px 40px;
+      .loading-bar-container {
+        width: 90%; /* Responsive width on mobile */
       }
     }
   </style>
@@ -241,11 +223,11 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseT<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseF<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
-      <div class="cake-emoji" id="cakeEmoji">🎂</div> <!-- Cake emoji outside the bar -->
+      <div class="cake-emoji" id="cakeEmoji">🎂</div>
     </div>
     <div class="loading-percentage" id="loadingPercentage">0%</div>
     <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
@@ -288,7 +270,7 @@
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = `calc(${load}% - 20px)`;  // Cake emoji moves along the bar
+        cake.style.left = `calc(${load}% - 12px)`;  // Corrected line
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
