@@ -29,7 +29,7 @@
 
     .ml11 {
       font-weight: 700;
-      font-size: 3.5em; /* Larger text */
+      font-size: 3.5em;
       white-space: nowrap;
       overflow: hidden;
     }
@@ -58,10 +58,12 @@
       font-family: 'Pacifico', cursive;
     }
 
+    /* Cake Emoji outside the bar */
     .cake-emoji {
       position: absolute;
-      top: -40px;
-      font-size: 4em; /* Larger emoji */
+      top: -40px; /* Move it above the bar */
+      left: 0;
+      font-size: 4em;
       transition: left 0.2s;
     }
 
@@ -100,7 +102,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 4em; /* Larger title font size */
+      font-size: 4em;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -112,7 +114,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 2em; /* Bigger subtitle */
+      font-size: 2em;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -142,7 +144,7 @@
     }
 
     .card p {
-      font-size: 1.6em; /* Bigger text inside the card */
+      font-size: 1.6em;
       margin-top: 15px;
     }
 
@@ -205,7 +207,7 @@
         max-width: 300px;
       }
       .card p {
-        font-size: 1.5em; /* Bigger text inside cards for mobile */
+        font-size: 1.5em;
       }
       .nav-buttons button {
         font-size: 1.2em;
@@ -235,11 +237,11 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise11<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise22<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
-      <div class="cake-emoji" id="cakeEmoji">🎂</div>
+      <div class="cake-emoji" id="cakeEmoji">🎂</div> <!-- Cake emoji outside the bar -->
     </div>
     <div class="loading-percentage" id="loadingPercentage">0%</div>
     <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
@@ -282,7 +284,7 @@
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = `calc(${load}% - 12px)`;  // Corrected line
+        cake.style.left = `calc(${load}% - 20px)`;  // Cake emoji moves along the bar
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
