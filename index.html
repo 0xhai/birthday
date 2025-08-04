@@ -32,6 +32,7 @@
       font-size: 3.5em;
       white-space: nowrap;
       overflow: hidden;
+      text-align: center;
     }
 
     .loading-bar-container {
@@ -106,6 +107,9 @@
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
+      white-space: nowrap; /* Ensure the title doesn't break into multiple lines */
+      overflow: hidden;
+      text-overflow: ellipsis; /* Ensure text fits */
     }
 
     .subtitle {
@@ -237,7 +241,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseG<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseK<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
