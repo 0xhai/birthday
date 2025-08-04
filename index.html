@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise10<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -298,6 +298,10 @@
         airplane.style.left = planeX + 'px';
         airplane.style.top = planeY + 'px';
         airplane.style.transform = `rotate(${angle}deg)`;
+
+        // Dynamically move the card to follow the plane
+        card.style.left = `${planeX + 100}px`; 
+        card.style.top = `${planeY + 50}px`;
 
         if (step < steps) {
           requestAnimationFrame(animate);
