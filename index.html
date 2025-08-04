@@ -1,181 +1,210 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Birthday Surprise</title>
-  <link rel="stylesheet" href="style.css">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/three-globe"></script>
-  <script src="https://cdn.jsdelivr.net/npm/tween.js@18.6.4/dist/tween.umd.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background-color: #000;
+      color: white;
+    }
+    #loadingScreen {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      background-color: black;
+      color: white;
+      font-size: 2em;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+    }
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 1;
+    }
+    #globeViz {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 2;
+    }
+    #cardContainer {
+      position: absolute;
+      bottom: 50px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.6);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      max-width: 300px;
+      z-index: 5;
+    }
+    #navigationButtons {
+      position: absolute;
+      bottom: 120px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      gap: 15px;
+      z-index: 6;
+    }
+    .nav-btn {
+      font-size: 1.3em;
+      padding: 12px 25px;
+      border: none;
+      background: #ff69b4;
+      color: white;
+      cursor: pointer;
+      border-radius: 8px;
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      transition: background 0.3s ease, opacity 0.3s ease;
+    }
+    .nav-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    #airplane {
+      position: absolute;
+      font-size: 3rem;
+      z-index: 4;
+      transition: transform 2s linear;
+      pointer-events: none;
+    }
+  </style>
 </head>
 <body>
-  <!-- Loading screen -->
-  <div id="loadingScreen">
-    <h1>Preparing your surprise20 🎉</h1>
+  <div id="loadingScreen">Loading your surprise...</div>
+  <canvas id="confetti-canvas"></canvas>
+  <div id="globeViz"></div>
+  <div id="airplane">✈️</div>
+  <div id="cardContainer" style="display:none;">
+    <h2 id="cardTitle">Welcome</h2>
+    <p id="cardText"></p>
+    <img id="cardImage" src="" style="width:100%; display:none;" />
+  </div>
+  <div id="navigationButtons" style="display:none;">
+    <button id="prevBtn" class="nav-btn">Previous</button>
+    <button id="nextBtn" class="nav-btn">Next</button>
   </div>
 
-  <!-- Main container -->
-  <div id="mainContent" style="display:none;">
-    <canvas id="confettiCanvas"></canvas>
-    <div id="globeContainer"></div>
-
-    <!-- Airplane -->
-    <div id="airplane">✈️</div>
-
-    <!-- Card container -->
-    <div id="cardContainer" class="card hidden"></div>
-
-    <!-- Buttons -->
-    <div id="buttonsContainer">
-      <button id="prevButton" disabled>⬅ Previous</button>
-      <button id="nextButton">Start</button>
-    </div>
-
-    <!-- Footer text -->
-    <div id="footerText">From country1 to country2, to country3... and beyond ❤️</div>
-  </div>
-
+  <script src="https://unpkg.com/three@0.152.2/build/three.min.js"></script>
+  <script src="https://unpkg.com/globe.gl"></script>
   <script>
-    // ===== Globe Setup =====
-    let scene, camera, renderer, GlobeObj;
-    let currentIndex = -1;
-    let isAnimating = false;
+    const airplane = document.getElementById("airplane");
+    let currentCoords = null;
+    let isFlying = false;
 
     const destinations = [
-      { name: "Turkey", lat: 39.9334, lng: 32.8597, text: "Welcome to Turkey!", img: "images/turkey.jpg" },
-      { name: "Azerbaijan", lat: 40.1431, lng: 47.5769, text: "Hello from Azerbaijan!", img: "images/azerbaijan.jpg" },
-      { name: "Greece", lat: 37.9838, lng: 23.7275, text: "Greetings from Greece!", img: "images/greece.jpg" },
-      { name: "Sweden", lat: 59.3293, lng: 18.0686, text: "Hej from Sweden!", img: "images/sweden.jpg" },
-      { name: "Iceland", lat: 64.1355, lng: -21.8954, text: "Magical Iceland awaits!", img: "images/iceland.jpg" }
+      { name: "Turkey", lat: 39.9334, lng: 32.8597 },
+      { name: "Azerbaijan", lat: 40.4093, lng: 49.8671 },
+      { name: "Greece", lat: 37.9838, lng: 23.7275 },
+      { name: "Sweden", lat: 59.3293, lng: 18.0686 },
+      { name: "Iceland", lat: 64.1355, lng: -21.8954 }
     ];
 
-    let planeEl = document.getElementById("airplane");
-    let cardEl = document.getElementById("cardContainer");
-    let nextBtn = document.getElementById("nextButton");
-    let prevBtn = document.getElementById("prevButton");
+    let currentIndex = -1;
 
-    // Show confetti (only after loading screen)
-    function startConfetti() {
-      let duration = 10 * 1000;
-      let end = Date.now() + duration;
-      (function frame() {
-        confetti({
-          particleCount: 5,
-          spread: 120,
-          origin: { y: Math.random() - 0.2, x: Math.random() },
+    const Globe = GlobeGL()
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundColor('#000000')(document.getElementById('globeViz'));
+
+    function showConfetti() {
+      const canvas = document.getElementById('confetti-canvas');
+      const ctx = canvas.getContext('2d');
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      let confetti = Array.from({length:200}).map(()=>({
+        x: Math.random()*canvas.width,
+        y: Math.random()*canvas.height,
+        r: Math.random()*4+1,
+        dx: Math.random()-0.5,
+        dy: Math.random()*2+1,
+        color: `hsl(${Math.random()*360},100%,50%)`
+      }));
+      function draw(){
+        ctx.clearRect(0,0,canvas.width,canvas.height);
+        confetti.forEach(c=>{
+          ctx.beginPath();
+          ctx.arc(c.x,c.y,c.r,0,Math.PI*2);
+          ctx.fillStyle=c.color;
+          ctx.fill();
         });
-        if (Date.now() < end) {
-          requestAnimationFrame(frame);
-        }
-      })();
+        update();
+      }
+      function update(){
+        confetti.forEach(c=>{
+          c.x+=c.dx;
+          c.y+=c.dy;
+          if(c.y>canvas.height) c.y=0;
+        });
+      }
+      setInterval(draw,10);
     }
 
-    // Simulate flight animation
-    function animatePlane(startX, startY, endX, endY, callback) {
-      planeEl.style.display = "block";
-      planeEl.style.left = startX + "px";
-      planeEl.style.top = startY + "px";
+    function flyToDestination(index) {
+      if (isFlying) return;
+      isFlying = true;
 
-      new TWEEN.Tween({ x: startX, y: startY })
-        .to({ x: endX, y: endY }, 3000)
-        .easing(TWEEN.Easing.Quadratic.InOut)
-        .onUpdate(function (coords) {
-          planeEl.style.left = coords.x + "px";
-          planeEl.style.top = coords.y + "px";
-        })
-        .onComplete(callback)
-        .start();
-    }
+      const dest = destinations[index];
+      const startX = currentCoords ? currentCoords.lng : -200;
+      const startY = currentCoords ? currentCoords.lat : 20;
 
-    // Show card dynamically
-    function showCard(destination, fromRight = true) {
-      cardEl.classList.add("hidden");
+      // Airplane start pos
+      airplane.style.display = "block";
+      airplane.style.transform = `translate(${window.innerWidth * 0.1}px, ${window.innerHeight}px)`;
+
       setTimeout(() => {
-        cardEl.innerHTML = `
-          <h2>${destination.name}</h2>
-          <img src="${destination.img}" alt="${destination.name}" style="max-width:100%;">
-          <p>${destination.text}</p>
-        `;
-        cardEl.classList.remove("hidden");
-        cardEl.style.animation = fromRight
-          ? "slideInRight 0.8s ease forwards"
-          : "slideInLeft 0.8s ease forwards";
-      }, 300);
+        const x = window.innerWidth / 2 + (dest.lng * 5);
+        const y = window.innerHeight / 2 - (dest.lat * 3);
+
+        airplane.style.transition = "transform 3s ease-in-out";
+        airplane.style.transform = `translate(${x}px, ${y}px)`;
+
+        setTimeout(() => {
+          currentCoords = dest;
+          isFlying = false;
+        }, 3000);
+      }, 100);
     }
 
-    // Move to a destination
-    function goToDestination(index, fromRight = true) {
-      if (isAnimating) return;
-      isAnimating = true;
-
-      let dest = destinations[index];
-      let screenW = window.innerWidth;
-      let screenH = window.innerHeight;
-      let startX = planeEl.offsetLeft || -100;
-      let startY = planeEl.offsetTop || screenH / 2;
-      let endX = screenW / 2 + (Math.random() * 100 - 50);
-      let endY = screenH / 2 + (Math.random() * 50 - 25);
-
-      animatePlane(startX, startY, endX, endY, () => {
-        showCard(dest, fromRight);
-        currentIndex = index;
-
-        prevBtn.disabled = index <= 0;
-        nextBtn.textContent = index === destinations.length - 1 ? "End" : "Next";
-        isAnimating = false;
-      });
-    }
-
-    // Handle button clicks
-    nextBtn.addEventListener("click", () => {
-      if (nextBtn.textContent === "Start") {
-        goToDestination(0);
-      } else if (currentIndex < destinations.length - 1) {
-        goToDestination(currentIndex + 1, true);
-      } else {
-        alert("🎉 Happy Birthday! 🎉");
+    document.getElementById('nextBtn').addEventListener('click', () => {
+      if (currentIndex < destinations.length - 1) {
+        currentIndex++;
+        flyToDestination(currentIndex);
       }
     });
 
-    prevBtn.addEventListener("click", () => {
+    document.getElementById('prevBtn').addEventListener('click', () => {
       if (currentIndex > 0) {
-        goToDestination(currentIndex - 1, false);
+        currentIndex--;
+        flyToDestination(currentIndex);
       }
     });
 
-    // Simulate loading
-    window.addEventListener("load", () => {
+    window.onload = () => {
       setTimeout(() => {
-        document.getElementById("loadingScreen").style.display = "none";
-        document.getElementById("mainContent").style.display = "block";
-        startConfetti();
+        document.getElementById('loadingScreen').style.display = 'none';
+        showConfetti();
+        document.getElementById('navigationButtons').style.display = 'flex';
+        currentIndex = 0;
+        flyToDestination(currentIndex);
       }, 2000);
-    });
-
-    // Animation frame
-    function animate() {
-      requestAnimationFrame(animate);
-      TWEEN.update();
-    }
-    animate();
+    };
   </script>
-
-  <style>
-    body, html { margin: 0; padding: 0; overflow: hidden; background: #000; color: #fff; font-family: Arial, sans-serif; }
-    #loadingScreen { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 2em; }
-    #globeContainer { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; }
-    #airplane { position: absolute; font-size: 3rem; display: none; z-index: 2; }
-    #cardContainer { position: absolute; bottom: 10%; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.6); padding: 20px; border-radius: 10px; width: 300px; text-align: center; z-index: 3; }
-    .hidden { opacity: 0; }
-    #buttonsContainer { position: absolute; bottom: 20%; left: 50%; transform: translateX(-50%); z-index: 4; }
-    #buttonsContainer button { font-size: 1.3em; padding: 12px 24px; margin: 0 10px; font-family: Arial, sans-serif; }
-    #footerText { position: absolute; bottom: 10px; width: 100%; text-align: center; font-size: 1.2em; z-index: 2; }
-    #confettiCanvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
-
-    @keyframes slideInRight { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(-50%); opacity: 1; } }
-    @keyframes slideInLeft { from { transform: translateX(-200%); opacity: 0; } to { transform: translateX(-50%); opacity: 1; } }
-  </style>
 </body>
 </html>
