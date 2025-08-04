@@ -144,7 +144,7 @@
     #airplane {
       position: absolute;
       font-size: 40px;
-      z-index: 4;
+      z-index: 9999; /* Ensure airplane stays on top of everything */
       transition: transform 1s linear;
       display: block; /* Ensure airplane stays visible */
     }
@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
