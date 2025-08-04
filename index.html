@@ -10,7 +10,6 @@
       height: 100%; 
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
-      font-family: 'Pacifico', cursive;
     }
     #loadingScreen {
       position: absolute;
@@ -23,6 +22,7 @@
       justify-content: center;
       z-index: 10;
       color: #fff;
+      font-family: 'Pacifico', cursive;
     }
     .ml11 {
       font-weight: 700;
@@ -48,6 +48,7 @@
     .loading-percentage {
       margin-top: 5px;
       font-size: 16px;
+      font-family: 'Pacifico', cursive;
     }
     .cake-emoji {
       position: absolute;
@@ -59,6 +60,7 @@
       opacity: 0;
       margin-top: 15px;
       font-size: 16px;
+      font-family: 'Pacifico', cursive;
       transition: opacity 0.5s;
     }
     #globeViz { 
@@ -75,6 +77,7 @@
       background: rgba(255, 255, 255, 0.9);
       padding: 15px 20px;
       border-radius: 10px;
+      font-family: 'Pacifico', cursive;
       font-size: 18px;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
@@ -84,6 +87,7 @@
       top: 20px;
       width: 100%;
       text-align: center;
+      font-family: 'Pacifico', cursive;
       font-size: 40px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
@@ -94,6 +98,7 @@
       bottom: 20px;
       width: 100%;
       text-align: center;
+      font-family: 'Pacifico', cursive;
       font-size: 24px;
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
@@ -111,41 +116,46 @@
       width: 250px;
       z-index: 5;
       display: none;
+      font-family: 'Pacifico', cursive;
     }
     .nav-buttons {
       position: absolute;
-      bottom: 70px;
+      bottom: 80px;
       width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      z-index: 5;
+      text-align: center;
+      z-index: 6;
     }
     .nav-buttons button {
-      padding: 16px 36px;
-      font-size: 22px;
+      padding: 10px 20px;
+      font-size: 18px;
       cursor: pointer;
       border: none;
       background: #ff69b4;
       color: white;
       border-radius: 8px;
+      margin: 0 10px;
       font-family: 'Pacifico', cursive;
-      opacity: 1;
-      transition: background 0.3s, opacity 0.3s;
+      transition: opacity 0.3s;
     }
     .nav-buttons button:disabled {
-      background: #aaa;
+      opacity: 0.5;
       cursor: not-allowed;
-      opacity: 0.6;
     }
-    /* Airplane emoji */
     #airplane {
       position: absolute;
-      font-size: 60px;
-      z-index: 9999;
+      font-size: 40px;
+      z-index: 4;
+      transition: transform 1s linear;
       display: none;
+    }
+    canvas.confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw !important;
+      height: 100vh !important;
+      z-index: 0 !important;
       pointer-events: none;
-      transform: translate(-50%, -50%);
     }
   </style>
 </head>
@@ -153,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise12<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise13<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -166,23 +176,24 @@
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
+  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
+
+  <!-- Airplane -->
+  <div id="airplane">✈️</div>
+
+  <!-- Cards -->
+  <div id="infoCard" class="card"></div>
   <div class="nav-buttons">
-    <button id="startBtn">Start</button>
     <button id="prevBtn" style="display:none;">⬅ Previous</button>
     <button id="nextBtn" style="display:none;">Next ➡</button>
     <button id="endBtn" style="display:none;">End 🎉</button>
+    <button id="startBtn">Start ✈️</button>
   </div>
-  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
-  <div id="infoCard" class="card">
-    <img id="cardImage" src="" alt="Country Image" style="width:100%; border-radius:5px;">
-    <p id="cardText"></p>
-  </div>
-  <div id="airplane">✈️</div>
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    // Loading dots
+    // Animated dots
     setInterval(() => {
       const dots = document.getElementById('dots');
       dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
@@ -213,29 +224,22 @@
       if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
 
-    // 🎉 Confetti everywhere
+    // Confetti - full screen
     setInterval(() => {
-      confetti({
-        particleCount: 80,
-        spread: 360,
-        origin: { y: Math.random(), x: Math.random() },
-        zIndex: 0
-      });
-    }, 2000);
+      confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
+    }, 1500);
 
     // Globe setup
     const elem = document.getElementById('globeViz');
     const card = document.getElementById('infoCard');
-    const cardImg = document.getElementById('cardImage');
-    const cardText = document.getElementById('cardText');
-    const startBtn = document.getElementById('startBtn');
     const nextBtn = document.getElementById('nextBtn');
     const prevBtn = document.getElementById('prevBtn');
     const endBtn = document.getElementById('endBtn');
+    const startBtn = document.getElementById('startBtn');
     const airplane = document.getElementById('airplane');
 
     const places = [
-      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "A beautiful journey starts here!", img: "https://placehold.co/250x150?text=Turkey" },
+      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "Our amazing journey begins here!", img: "https://placehold.co/250x150?text=Turkey" },
       { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "https://placehold.co/250x150?text=Azerbaijan" },
       { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "https://placehold.co/250x150?text=Greece" },
       { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "https://placehold.co/250x150?text=Sweden" },
@@ -250,8 +254,8 @@
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
       .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 20, lng: 0, altitude: 2.5 }, 0)
-      .labelsData([])
+      .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
+      .labelsData(places)
       .labelLat(d => d.lat)
       .labelLng(d => d.lng)
       .labelText(d => d.name)
@@ -259,60 +263,66 @@
       .labelDotRadius(0.7)
       .labelColor(() => 'rgba(255, 105, 180, 0.9)');
 
-    function animatePlane(destinationLat, destinationLng, callback) {
-      airplane.style.display = "block";
-      airplane.style.left = planeX + "px";
-      airplane.style.top = planeY + "px";
-
-      // Middle curve point
-      const midX = (planeX + window.innerWidth / 2) / 2;
-      const midY = planeY - 100;
-
-      airplane.animate([
-        { transform: `translate(${planeX}px, ${planeY}px)` },
-        { transform: `translate(${midX}px, ${midY}px)` },
-        { transform: `translate(${window.innerWidth / 2}px, ${window.innerHeight / 2}px)` }
-      ], {
-        duration: 2000,
-        easing: 'ease-in-out'
-      });
-
-      setTimeout(() => {
-        planeX = window.innerWidth / 2;
-        planeY = window.innerHeight / 2;
-        airplane.style.left = planeX + "px";
-        airplane.style.top = planeY + "px";
-        if (callback) callback();
-      }, 2100);
-    }
-
     function updateCard(index) {
       const place = places[index];
-      cardImg.src = place.img;
-      cardText.textContent = place.message;
+      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
-      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 1.1 }, 2000);
+      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 0.8 }, 2000);
+    }
+
+    function flyPlaneTo(lat, lng, callback) {
+      airplane.style.display = 'block';
+
+      const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
+      const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
+
+      const dx = targetX - planeX;
+      const dy = targetY - planeY;
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
+      const steps = 100;
+      let step = 0;
+      const startX = planeX;
+      const startY = planeY;
+
+      function animate() {
+        step++;
+        const t = step / steps;
+        const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t); 
+        planeX = startX + dx * t;
+        planeY = curveY;
+
+        airplane.style.left = planeX + 'px';
+        airplane.style.top = planeY + 'px';
+        airplane.style.transform = `rotate(${angle}deg)`;
+
+        if (step < steps) {
+          requestAnimationFrame(animate);
+        } else {
+          if (callback) callback();
+        }
+      }
+      animate();
     }
 
     startBtn.addEventListener('click', () => {
       startBtn.disabled = true;
-      animatePlane(places[0].lat, places[0].lng, () => {
-        currentIndex = 0;
-        world.labelsData(places);
+      currentIndex = 0;
+      flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0);
-        startBtn.style.display = "none";
-        nextBtn.style.display = "inline-block";
+        nextBtn.style.display = 'inline-block';
+        startBtn.style.display = 'none';
       });
     });
 
     nextBtn.addEventListener('click', () => {
-      nextBtn.disabled = true;
       if (currentIndex < places.length - 1) {
-        animatePlane(places[currentIndex + 1].lat, places[currentIndex + 1].lng, () => {
-          currentIndex++;
+        nextBtn.disabled = true;
+        currentIndex++;
+        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
           updateCard(currentIndex);
           nextBtn.disabled = false;
         });
@@ -320,10 +330,10 @@
     });
 
     prevBtn.addEventListener('click', () => {
-      prevBtn.disabled = true;
       if (currentIndex > 0) {
-        animatePlane(places[currentIndex - 1].lat, places[currentIndex - 1].lng, () => {
-          currentIndex--;
+        prevBtn.disabled = true;
+        currentIndex--;
+        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
           updateCard(currentIndex);
           prevBtn.disabled = false;
         });
@@ -331,11 +341,10 @@
     });
 
     endBtn.addEventListener('click', () => {
-      card.style.display = 'none';
-      nextBtn.style.display = "none";
-      prevBtn.style.display = "none";
-      endBtn.style.display = "none";
-      alert("🎉 Happy Birthday! 🎉");
+      card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>We love you to the moon and back ❤️</p>";
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+      endBtn.style.display = 'none';
     });
   </script>
 </body>
