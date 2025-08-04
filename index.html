@@ -10,7 +10,7 @@
       height: 100%; 
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
-      font-size: 16px; /* Base font size */
+      font-size: 18px; /* Larger base font size */
     }
 
     #loadingScreen {
@@ -29,15 +29,15 @@
 
     .ml11 {
       font-weight: 700;
-      font-size: 3em; /* Larger font size for mobile */
+      font-size: 3.5em; /* Increased font size */
       white-space: nowrap;
       overflow: hidden;
     }
 
     .loading-bar-container {
-      width: 80%; /* More responsive width */
-      max-width: 300px;
-      height: 25px;
+      width: 80%;
+      max-width: 350px;
+      height: 30px; /* Slightly bigger loading bar */
       background: #fff;
       border-radius: 10px;
       overflow: hidden;
@@ -54,21 +54,21 @@
 
     .loading-percentage {
       margin-top: 10px;
-      font-size: 1.2em;
+      font-size: 1.5em;
       font-family: 'Pacifico', cursive;
     }
 
     .cake-emoji {
       position: absolute;
       top: -40px;
-      font-size: 3em; /* Larger emoji */
+      font-size: 4em; /* Larger emoji */
       transition: left 0.2s;
     }
 
     .continue-text {
       opacity: 0;
       margin-top: 20px;
-      font-size: 1.2em; /* Larger font for mobile */
+      font-size: 1.5em; /* Larger font size */
       font-family: 'Pacifico', cursive;
       transition: opacity 0.5s;
     }
@@ -86,10 +86,10 @@
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255, 255, 255, 0.9);
-      padding: 15px 20px;
+      padding: 20px;
       border-radius: 10px;
       font-family: 'Pacifico', cursive;
-      font-size: 1.2em;
+      font-size: 1.5em;
       display: none;
       box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
     }
@@ -100,7 +100,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 3.5em; /* Adjusted for visibility on mobile */
+      font-size: 4em; /* Larger title font size */
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -112,7 +112,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 1.5em;
+      font-size: 2em; /* Bigger subtitle */
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -124,11 +124,11 @@
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
-      padding: 25px;
+      padding: 30px;
       border-radius: 10px;
       text-align: center;
-      width: 80%; /* Adjusted for mobile view */
-      max-width: 320px;
+      width: 85%;
+      max-width: 350px;
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
@@ -136,7 +136,7 @@
 
     .card img {
       width: 100%;
-      max-height: 200px;
+      max-height: 250px;
       object-fit: cover;
       border-radius: 5px;
     }
@@ -151,7 +151,7 @@
 
     .nav-buttons button {
       padding: 12px 25px;
-      font-size: 1.5em; /* Larger buttons */
+      font-size: 1.5em; /* Slightly smaller buttons */
       cursor: pointer;
       border: none;
       background: #ff69b4;
@@ -160,7 +160,7 @@
       margin: 0 10px;
       font-family: 'Pacifico', cursive;
       transition: opacity 0.3s;
-      width: 60%; /* Larger buttons for touch screens */
+      width: 65%; /* Smaller width */
     }
 
     .nav-buttons button:disabled {
@@ -189,18 +189,18 @@
     /* Media Queries for smaller screens (Mobile) */
     @media only screen and (max-width: 768px) {
       .title {
-        font-size: 2.5em; /* Adjust for mobile */
+        font-size: 3em;
       }
       .subtitle {
-        font-size: 1.3em;
+        font-size: 1.8em;
       }
       .card {
-        padding: 15px;
-        width: 90%; /* Make card slightly bigger on mobile */
+        padding: 20px;
+        width: 90%;
         max-width: 300px;
       }
       .nav-buttons button {
-        font-size: 1.2em; /* Larger buttons for mobile */
+        font-size: 1.3em;
         padding: 15px 30px;
         width: 80%;
       }
@@ -208,13 +208,17 @@
 
     @media only screen and (max-width: 480px) {
       .ml11 {
-        font-size: 2.2em;
+        font-size: 2.5em;
       }
       .continue-text {
-        font-size: 1.5em;
+        font-size: 1.6em;
       }
       .loading-bar-container {
-        width: 90%; /* Responsive width on mobile */
+        width: 90%;
+      }
+      .nav-buttons button {
+        font-size: 1.4em;
+        padding: 18px 35px;
       }
     }
   </style>
@@ -223,7 +227,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
