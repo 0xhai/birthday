@@ -36,7 +36,7 @@
     .nav-buttons { position: absolute; bottom: 70px; width: 100%; display: flex; justify-content: center; gap: 20px; z-index: 6; }
     .nav-buttons button { padding: 14px 30px; font-size: 22px; cursor: pointer; border: none; background: #ff69b4; color: white; border-radius: 5px; font-family: 'Pacifico', cursive; opacity: 1; transition: opacity 0.3s; }
     .nav-buttons button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .airplane { position: absolute; font-size: 50px; pointer-events: none; z-index: 15; transition: transform 3s linear; display: none; }
+    .airplane { position: absolute; font-size: 50px; pointer-events: none; z-index: 9999; transition: transform 3s linear; display: none; }
     .card {
       position: absolute;
       width: 260px;
@@ -47,7 +47,7 @@
       font-family: 'Pacifico', cursive;
       text-align: center;
       transition: transform 1s ease-in-out, opacity 0.8s;
-      z-index: 12;
+      z-index: 9999;
       opacity: 0;
       pointer-events: none;
     }
@@ -58,7 +58,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise18<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise19<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -177,10 +177,12 @@
       endBtn.disabled = true;
       infoCard.style.opacity = 0;
 
+      airplane.style.display = 'block';
+      airplane.style.zIndex = '9999';
+
       const targetX = window.innerWidth / 2 + (Math.random() * 50 - 25);
       const targetY = window.innerHeight / 2 + (Math.random() * 50 - 25);
-      airplane.style.display = 'block';
-      airplane.style.zIndex = '15';
+
       airplane.style.transform = `translate(${airplanePos.x}px, ${airplanePos.y}px)`;
 
       setTimeout(() => {
