@@ -210,7 +210,8 @@
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = calc(${load}% - 12px);
+        cake.style.left = `calc(${load}% - 12px)`;
+
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
