@@ -58,13 +58,13 @@
       font-family: 'Pacifico', cursive;
     }
 
-    /* Cake Emoji outside the bar */
+    /* Cake Emoji outside the bar, moving with the progress */
     .cake-emoji {
       position: absolute;
       top: -50px; /* Move it above the bar */
       left: 0;
       font-size: 4em;
-      transition: left 0.2s;
+      transition: left 0.2s !important; /* Ensure it's positioned correctly */
     }
 
     .continue-text {
@@ -157,8 +157,8 @@
     }
 
     .nav-buttons button {
-      padding: 12px 25px;
-      font-size: 1.3em; /* Moderate button size */
+      padding: 10px 20px;
+      font-size: 1.4em !important; /* Increased button text size */
       cursor: pointer;
       border: none;
       background: #ff69b4;
@@ -167,7 +167,7 @@
       margin: 0 10px;
       font-family: 'Pacifico', cursive;
       transition: opacity 0.3s;
-      width: 65%;
+      width: 50%; /* Adjust button width */
     }
 
     .nav-buttons button:disabled {
@@ -211,7 +211,7 @@
       }
       .nav-buttons button {
         font-size: 1.2em;
-        padding: 15px 30px;
+        padding: 12px 25px;
         width: 80%;
       }
     }
@@ -228,7 +228,7 @@
       }
       .nav-buttons button {
         font-size: 1.4em;
-        padding: 18px 35px;
+        padding: 15px 30px;
       }
     }
   </style>
@@ -237,7 +237,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise37<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise45<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
