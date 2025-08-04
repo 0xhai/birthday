@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise9<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise7<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -272,9 +272,8 @@
     }
 
     function flyPlaneTo(lat, lng, callback) {
-      const targetPosition = world.getCoords(lat, lng); // Get 3D coordinates of the pin
-      const targetX = targetPosition[0]; // X coordinate
-      const targetY = targetPosition[1]; // Y coordinate
+      const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
+      const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
 
       const dx = targetX - airplane.offsetLeft;
       const dy = targetY - airplane.offsetTop;
