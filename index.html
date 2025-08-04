@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -210,8 +210,7 @@
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = `calc(${load}% - 12px)`;
-
+        cake.style.left = `calc(${load}% - 12px)`;  // Corrected line
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
@@ -264,7 +263,7 @@
 
     function updateCard(index) {
       const place = places[index];
-      card.innerHTML = <img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>;
+      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
@@ -291,7 +290,7 @@
         const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
         airplane.style.left = startX + dx * t + 'px';
         airplane.style.top = curveY + 'px';
-        airplane.style.transform = rotate(${angle}deg);
+        airplane.style.transform = `rotate(${angle}deg)`;
 
         if (step < steps) {
           requestAnimationFrame(animate);
