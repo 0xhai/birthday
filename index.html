@@ -29,7 +29,7 @@
 
     .ml11 {
       font-weight: 700;
-      font-size: 3.5em;
+      font-size: 4em;
       white-space: nowrap;
       overflow: hidden;
       text-align: center;
@@ -103,7 +103,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 5em;
+      font-size: 8vw; /* Responsive font size based on viewport width */
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -154,7 +154,7 @@
 
     .nav-buttons {
       position: absolute;
-      bottom: 160px; /* Ensure buttons stay above subtitle */
+      bottom: 120px; /* Adjust to ensure buttons stay above subtitle */
       width: 100%;
       text-align: center;
       z-index: 6;
@@ -200,10 +200,10 @@
     /* Media Queries for smaller screens (Mobile) */
     @media only screen and (max-width: 768px) {
       .title {
-        font-size: 4em;
+        font-size: 6vw; /* Adjust title size on smaller screens */
       }
       .subtitle {
-        font-size: 3em;
+        font-size: 3.5em;
       }
       .card {
         padding: 30px;
@@ -241,7 +241,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseK<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseJ<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
