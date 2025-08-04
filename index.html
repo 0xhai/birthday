@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseK<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseQ<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -210,7 +210,7 @@
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = calc(${load}% - 12px);  // Corrected line
+        cake.style.left = `calc(${load}% - 12px)`;
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
@@ -239,11 +239,11 @@
     const airplane = document.getElementById('airplane');
 
     const places = [
-      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "Our amazing journey begins here!", img: "./image1.jpg" },
-      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "./image2.jpg" },
-      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "./image3.jpg" },
-      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "./image4.jpg" },
-      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "./image5.jpg" }
+      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "Our amazing journey begins here!", img: "https://placehold.co/250x150?text=Turkey" },
+      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "https://placehold.co/250x150?text=Azerbaijan" },
+      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "https://placehold.co/250x150?text=Greece" },
+      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "https://placehold.co/250x150?text=Sweden" },
+      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "https://placehold.co/250x150?text=Iceland" }
     ];
 
     let currentIndex = -1;
@@ -263,7 +263,7 @@
 
     function updateCard(index) {
       const place = places[index];
-      card.innerHTML = <img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>;
+      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
@@ -279,7 +279,7 @@
       const dy = targetY - airplane.offsetTop;
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-      const steps = 200;
+      const steps = 100;
       let step = 0;
       const startX = airplane.offsetLeft;
       const startY = airplane.offsetTop;
@@ -290,7 +290,7 @@
         const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
         airplane.style.left = startX + dx * t + 'px';
         airplane.style.top = curveY + 'px';
-        airplane.style.transform = rotate(${angle}deg);
+        airplane.style.transform = `rotate(${angle}deg)`;
 
         if (step < steps) {
           requestAnimationFrame(animate);
