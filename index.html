@@ -176,7 +176,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseF<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseH<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -226,7 +226,27 @@
         cake.style.left = `calc(${load}% )`;
       } else {
         clearInterval(interval);
-        cake.classList.add('cake-bounce'); // Bounce when finished
+        cake.classList.add('cake-bounce'); 
+        
+        // 🎉 Confetti bursts from cake position
+        const cakeRect = cake.getBoundingClientRect();
+        const originX = cakeRect.left / window.innerWidth;
+        const originY = cakeRect.top / window.innerHeight;
+        confetti({
+          particleCount: 100,
+          spread: 70,
+          origin: { x: originX, y: originY },
+          zIndex: 9999
+        });
+        setTimeout(() => {
+          confetti({
+            particleCount: 80,
+            spread: 90,
+            origin: { x: originX, y: originY },
+            zIndex: 9999
+          });
+        }, 300);
+        
         contText.style.opacity = 1;
       }
     }, 30);
@@ -238,7 +258,7 @@
       if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
 
-    // Confetti - full screen
+    // Continuous background confetti
     setInterval(() => {
       confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
     }, 1500);
