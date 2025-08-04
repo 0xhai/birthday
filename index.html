@@ -11,7 +11,6 @@
       overflow: hidden; 
       background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
     }
-    /* Loading Screen */
     #loadingScreen {
       position: absolute;
       top: 0; left: 0;
@@ -46,29 +45,16 @@
       background: #ff69b4;
       transition: width 0.2s;
     }
-    .cake-emoji {
-      position: absolute;
-      top: -30px;
-      left: 0%;
-      transform: translate(-50%, 0);
-      font-size: 26px;
-      transition: left 0.2s linear, transform 0.3s ease;
-      z-index: 50;
-      pointer-events: none;
-    }
-    .cake-bounce {
-      animation: bounce 0.6s ease-in-out;
-    }
-    @keyframes bounce {
-      0% { transform: translate(-50%, 0) scale(1); }
-      30% { transform: translate(-50%, -10px) scale(1.3); }
-      60% { transform: translate(-50%, -5px) scale(0.9); }
-      100% { transform: translate(-50%, 0) scale(1); }
-    }
     .loading-percentage {
       margin-top: 5px;
       font-size: 16px;
       font-family: 'Pacifico', cursive;
+    }
+    .cake-emoji {
+      position: absolute;
+      top: -35px;
+      font-size: 24px;
+      transition: left 0.2s;
     }
     .continue-text {
       opacity: 0;
@@ -77,8 +63,6 @@
       font-family: 'Pacifico', cursive;
       transition: opacity 0.5s;
     }
-
-    /* Main Scene */
     #globeViz { 
       width: 100vw; 
       height: 100vh; 
@@ -160,18 +144,18 @@
     #airplane {
       position: absolute;
       font-size: 40px;
-      z-index: 9999;
+      z-index: 9999; /* Ensure airplane stays on top of everything */
       transition: transform 1s linear;
-      display: block;
+      display: block; /* Ensure airplane stays visible */
     }
     canvas.confetti-canvas {
-      position: fixed !important;
-      top: 0 !important;
-      left: 0 !important;
+      position: fixed;
+      top: 0;
+      left: 0;
       width: 100vw !important;
       height: 100vh !important;
-      z-index: 99999 !important;
-      pointer-events: none !important;
+      z-index: 0 !important;
+      pointer-events: none;
     }
   </style>
 </head>
@@ -179,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseR<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseK<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -189,7 +173,6 @@
     <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
   </div>
 
-  <!-- Main Content -->
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
@@ -210,44 +193,26 @@
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    /* =======================
-       LOADING SCREEN
-    ======================= */
+    // Animated dots
     setInterval(() => {
       const dots = document.getElementById('dots');
       dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
     }, 500);
 
+    // Simulate loading
     let load = 0;
     const bar = document.getElementById('loadingBar');
     const perc = document.getElementById('loadingPercentage');
     const cake = document.getElementById('cakeEmoji');
     const contText = document.getElementById('continueText');
-
     const interval = setInterval(() => {
       if (load < 100) {
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = `calc(${load}% )`;
+        cake.style.left = calc(${load}% - 12px);  // Corrected line
       } else {
         clearInterval(interval);
-        cake.classList.add('cake-bounce'); 
-        const cakeRect = cake.getBoundingClientRect();
-        const originX = cakeRect.left / window.innerWidth;
-        const originY = (cakeRect.top + 10) / window.innerHeight;
-
-        for (let i = 0; i < 3; i++) {
-          setTimeout(() => {
-            confetti({
-              particleCount: 120,
-              spread: 90,
-              startVelocity: 40,
-              origin: { x: originX, y: originY },
-              zIndex: 99999
-            });
-          }, i * 300);
-        }
         contText.style.opacity = 1;
       }
     }, 30);
@@ -259,13 +224,12 @@
       if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
 
-    /* =======================
-       MAIN GLOBE ANIMATION
-    ======================= */
+    // Confetti - full screen
     setInterval(() => {
       confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
     }, 1500);
 
+    // Globe setup
     const elem = document.getElementById('globeViz');
     const card = document.getElementById('infoCard');
     const nextBtn = document.getElementById('nextBtn');
@@ -299,7 +263,7 @@
 
     function updateCard(index) {
       const place = places[index];
-      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
+      card.innerHTML = <img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>;
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
@@ -310,9 +274,11 @@
     function flyPlaneTo(lat, lng, callback) {
       const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
       const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
+
       const dx = targetX - airplane.offsetLeft;
       const dy = targetY - airplane.offsetTop;
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+
       const steps = 200;
       let step = 0;
       const startX = airplane.offsetLeft;
@@ -324,11 +290,12 @@
         const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
         airplane.style.left = startX + dx * t + 'px';
         airplane.style.top = curveY + 'px';
-        airplane.style.transform = `rotate(${angle}deg)`;
+        airplane.style.transform = rotate(${angle}deg);
+
         if (step < steps) {
           requestAnimationFrame(animate);
-        } else if (callback) {
-          callback();
+        } else {
+          if (callback) callback();
         }
       }
       animate();
@@ -338,28 +305,39 @@
       startBtn.disabled = true;
       currentIndex = 0;
       flyPlaneTo(places[0].lat, places[0].lng, () => {
-        updateCard(currentIndex);
+        updateCard(0);
         nextBtn.style.display = 'inline-block';
+        startBtn.style.display = 'none';
       });
     });
 
     nextBtn.addEventListener('click', () => {
       if (currentIndex < places.length - 1) {
+        nextBtn.disabled = true;
         currentIndex++;
-        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => updateCard(currentIndex));
+        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
+          updateCard(currentIndex);
+          nextBtn.disabled = false;
+        });
       }
     });
 
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
+        prevBtn.disabled = true;
         currentIndex--;
-        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => updateCard(currentIndex));
+        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
+          updateCard(currentIndex);
+          prevBtn.disabled = false;
+        });
       }
     });
 
     endBtn.addEventListener('click', () => {
-      confetti({ particleCount: 300, spread: 150, origin: { y: 0.6 }, zIndex: 99999 });
-      card.innerHTML = "<p>🎉 Happy Birthday! May all your dreams take flight! ❤️</p>";
+      card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>We love you to the moon and back ❤️</p>";
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+      endBtn.style.display = 'none';
     });
   </script>
 </body>
