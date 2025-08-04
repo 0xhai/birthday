@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise7<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise8<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -272,34 +272,39 @@
     }
 
     function flyPlaneTo(lat, lng, callback) {
-      const targetPosition = world.getScreenPosition(lat, lng);
-      const targetX = targetPosition.x;
-      const targetY = targetPosition.y;
+      // Wait for the globe to load
+      setTimeout(() => {
+        const targetPosition = world.getScreenPosition(lat, lng);
+        if (targetPosition) {
+          const targetX = targetPosition.x;
+          const targetY = targetPosition.y;
 
-      const dx = targetX - airplane.offsetLeft;
-      const dy = targetY - airplane.offsetTop;
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+          const dx = targetX - airplane.offsetLeft;
+          const dy = targetY - airplane.offsetTop;
+          const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-      const steps = 100;
-      let step = 0;
-      const startX = airplane.offsetLeft;
-      const startY = airplane.offsetTop;
+          const steps = 100;
+          let step = 0;
+          const startX = airplane.offsetLeft;
+          const startY = airplane.offsetTop;
 
-      function animate() {
-        step++;
-        const t = step / steps;
-        const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
-        airplane.style.left = startX + dx * t + 'px';
-        airplane.style.top = curveY + 'px';
-        airplane.style.transform = `rotate(${angle}deg)`;
+          function animate() {
+            step++;
+            const t = step / steps;
+            const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
+            airplane.style.left = startX + dx * t + 'px';
+            airplane.style.top = curveY + 'px';
+            airplane.style.transform = `rotate(${angle}deg)`;
 
-        if (step < steps) {
-          requestAnimationFrame(animate);
-        } else {
-          if (callback) callback();
+            if (step < steps) {
+              requestAnimationFrame(animate);
+            } else {
+              if (callback) callback();
+            }
+          }
+          animate();
         }
-      }
-      animate();
+      }, 500); // Delay to ensure globe is ready
     }
 
     startBtn.addEventListener('click', () => {
