@@ -163,7 +163,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise76<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -272,48 +272,32 @@
     }
 
     function flyPlaneTo(lat, lng, callback) {
-      // Get the 3D world position of the target
-      const targetPosition = world.getPositionAt(lat, lng);
+      const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
+      const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
 
-      // Convert the 3D world position to 2D screen position
-      const targetX = targetPosition[0];
-      const targetY = targetPosition[1];
-
-      // Get current airplane position
-      const startX = airplane.offsetLeft;
-      const startY = airplane.offsetTop;
-
-      // Calculate the delta (difference) in x and y positions
-      const dx = targetX - startX;
-      const dy = targetY - startY;
-
-      // Calculate the angle of the path to move the airplane in a straight line
+      const dx = targetX - airplane.offsetLeft;
+      const dy = targetY - airplane.offsetTop;
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
       const steps = 100;
       let step = 0;
+      const startX = airplane.offsetLeft;
+      const startY = airplane.offsetTop;
 
       function animate() {
         step++;
         const t = step / steps;
-        
-        // Smooth curve to make the flight more realistic
         const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
-
-        // Update airplane position
         airplane.style.left = startX + dx * t + 'px';
         airplane.style.top = curveY + 'px';
         airplane.style.transform = `rotate(${angle}deg)`;
 
-        // If we reach the final position, stop the animation
         if (step < steps) {
           requestAnimationFrame(animate);
         } else {
-          // Callback when the airplane reaches its destination
           if (callback) callback();
         }
       }
-
       animate();
     }
 
