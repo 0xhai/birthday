@@ -47,22 +47,22 @@
     }
     .cake-emoji {
       position: absolute;
-      top: 50%;
+      top: -30px; /* ✅ ABOVE the bar */
       left: 0%;
-      transform: translate(-50%, -50%);
-      font-size: 22px;
+      transform: translate(-50%, 0);
+      font-size: 26px;
       transition: left 0.2s linear, transform 0.3s ease;
-      z-index: 12;
+      z-index: 50;
       pointer-events: none;
     }
     .cake-bounce {
       animation: bounce 0.6s ease-in-out;
     }
     @keyframes bounce {
-      0% { transform: translate(-50%, -50%) scale(1); }
-      30% { transform: translate(-50%, -70%) scale(1.3); }
-      60% { transform: translate(-50%, -40%) scale(0.9); }
-      100% { transform: translate(-50%, -50%) scale(1); }
+      0% { transform: translate(-50%, 0) scale(1); }
+      30% { transform: translate(-50%, -10px) scale(1.3); }
+      60% { transform: translate(-50%, -5px) scale(0.9); }
+      100% { transform: translate(-50%, 0) scale(1); }
     }
     .loading-percentage {
       margin-top: 5px;
@@ -117,58 +117,14 @@
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
     }
-    .card {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255,255,255,0.95);
-      padding: 20px;
-      border-radius: 10px;
-      text-align: center;
-      width: 250px;
-      z-index: 5;
-      display: none;
-      font-family: 'Pacifico', cursive;
-    }
-    .nav-buttons {
-      position: absolute;
-      bottom: 80px;
-      width: 100%;
-      text-align: center;
-      z-index: 6;
-    }
-    .nav-buttons button {
-      padding: 10px 20px;
-      font-size: 18px;
-      cursor: pointer;
-      border: none;
-      background: #ff69b4;
-      color: white;
-      border-radius: 8px;
-      margin: 0 10px;
-      font-family: 'Pacifico', cursive;
-      transition: opacity 0.3s;
-    }
-    .nav-buttons button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    #airplane {
-      position: absolute;
-      font-size: 40px;
-      z-index: 9999;
-      transition: transform 1.5s linear;
-      display: block;
-    }
     canvas.confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
+      position: fixed !important;
+      top: 0 !important;
+      left: 0 !important;
       width: 100vw !important;
       height: 100vh !important;
-      z-index: 0 !important;
-      pointer-events: none;
+      z-index: 99999 !important;
+      pointer-events: none !important;
     }
   </style>
 </head>
@@ -176,7 +132,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseH<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseI<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -186,24 +142,6 @@
     <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
   </div>
 
-  <div class="title">🎂 Happy Birthday name 🎂</div>
-  <div id="globeViz"></div>
-  <div id="popup" class="popup"></div>
-  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
-
-  <!-- Airplane -->
-  <div id="airplane">✈️</div>
-
-  <!-- Cards -->
-  <div id="infoCard" class="card"></div>
-  <div class="nav-buttons">
-    <button id="prevBtn" style="display:none;">⬅ Previous</button>
-    <button id="nextBtn" style="display:none;">Next ➡</button>
-    <button id="endBtn" style="display:none;">End 🎉</button>
-    <button id="startBtn">Start ✈️</button>
-  </div>
-
-  <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
     // Animated dots
@@ -218,6 +156,7 @@
     const perc = document.getElementById('loadingPercentage');
     const cake = document.getElementById('cakeEmoji');
     const contText = document.getElementById('continueText');
+
     const interval = setInterval(() => {
       if (load < 100) {
         load++;
@@ -227,26 +166,24 @@
       } else {
         clearInterval(interval);
         cake.classList.add('cake-bounce'); 
-        
-        // 🎉 Confetti bursts from cake position
+
+        // 🎉 Big Confetti bursts from cake position
         const cakeRect = cake.getBoundingClientRect();
         const originX = cakeRect.left / window.innerWidth;
-        const originY = cakeRect.top / window.innerHeight;
-        confetti({
-          particleCount: 100,
-          spread: 70,
-          origin: { x: originX, y: originY },
-          zIndex: 9999
-        });
-        setTimeout(() => {
-          confetti({
-            particleCount: 80,
-            spread: 90,
-            origin: { x: originX, y: originY },
-            zIndex: 9999
-          });
-        }, 300);
-        
+        const originY = (cakeRect.top + 10) / window.innerHeight;
+
+        for (let i = 0; i < 3; i++) {
+          setTimeout(() => {
+            confetti({
+              particleCount: 120,
+              spread: 90,
+              startVelocity: 40,
+              origin: { x: originX, y: originY },
+              zIndex: 99999
+            });
+          }, i * 300);
+        }
+
         contText.style.opacity = 1;
       }
     }, 30);
@@ -256,122 +193,6 @@
     });
     document.addEventListener('click', () => {
       if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
-    });
-
-    // Continuous background confetti
-    setInterval(() => {
-      confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
-    }, 1500);
-
-    // Globe setup
-    const elem = document.getElementById('globeViz');
-    const card = document.getElementById('infoCard');
-    const nextBtn = document.getElementById('nextBtn');
-    const prevBtn = document.getElementById('prevBtn');
-    const endBtn = document.getElementById('endBtn');
-    const startBtn = document.getElementById('startBtn');
-    const airplane = document.getElementById('airplane');
-
-    const places = [
-      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "Our amazing journey begins here!", img: "./image1.jpg" },
-      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "./image2.jpg" },
-      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "./image3.jpg" },
-      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "./image4.jpg" },
-      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "./image5.jpg" }
-    ];
-
-    let currentIndex = -1;
-
-    const world = Globe()(elem)
-      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
-      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
-      .backgroundColor('rgba(0,0,0,0)')
-      .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
-      .labelsData(places)
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.name)
-      .labelSize(1.5)
-      .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
-
-    function updateCard(index) {
-      const place = places[index];
-      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
-      card.style.display = 'block';
-      prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
-      nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
-      endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
-      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 0.8 }, 2000);
-    }
-
-    function flyPlaneTo(lat, lng, callback) {
-      const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
-      const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
-
-      const dx = targetX - airplane.offsetLeft;
-      const dy = targetY - airplane.offsetTop;
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-
-      const steps = 120;
-      let step = 0;
-      const startX = airplane.offsetLeft;
-      const startY = airplane.offsetTop;
-
-      function animate() {
-        step++;
-        const t = step / steps;
-        const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
-        airplane.style.left = startX + dx * t + 'px';
-        airplane.style.top = curveY + 'px';
-        airplane.style.transform = `rotate(${angle}deg)`;
-
-        if (step < steps) {
-          requestAnimationFrame(animate);
-        } else {
-          if (callback) callback();
-        }
-      }
-      animate();
-    }
-
-    startBtn.addEventListener('click', () => {
-      startBtn.disabled = true;
-      currentIndex = 0;
-      flyPlaneTo(places[0].lat, places[0].lng, () => {
-        updateCard(0);
-        nextBtn.style.display = 'inline-block';
-        startBtn.style.display = 'none';
-      });
-    });
-
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex < places.length - 1) {
-        nextBtn.disabled = true;
-        currentIndex++;
-        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
-          updateCard(currentIndex);
-          nextBtn.disabled = false;
-        });
-      }
-    });
-
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        prevBtn.disabled = true;
-        currentIndex--;
-        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
-          updateCard(currentIndex);
-          prevBtn.disabled = false;
-        });
-      }
-    });
-
-    endBtn.addEventListener('click', () => {
-      card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>We love you to the moon and back ❤️</p>";
-      prevBtn.style.display = 'none';
-      nextBtn.style.display = 'none';
-      endBtn.style.display = 'none';
     });
   </script>
 </body>
