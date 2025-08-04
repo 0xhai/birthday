@@ -52,13 +52,12 @@
     }
     .cake-emoji {
       position: absolute;
-      top: 50%; /* Position it just above the loading bar */
-      left: 0; /* Start at the left side of the bar */
+      top: 50%; /* Ensure it stays vertically aligned with the loading bar */
+      left: 0; /* Start at the left edge of the loading bar */
       font-size: 24px;
-      transition: left 0.2s; /* Animate left position */
-      z-index: 11; /* Ensure it stays in front of the loading bar */
+      z-index: 11; /* Ensure it stays above the loading bar */
+      transition: left 0.2s ease; /* Smooth transition for movement */
     }
-
     .continue-text {
       opacity: 0;
       margin-top: 15px;
@@ -166,7 +165,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseC<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseD<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -213,7 +212,7 @@
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = `calc(${load}% - 12px)`;  // Corrected line
+        cake.style.left = `calc(${load}% - 12px)`;  // Move cake with the bar
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
@@ -282,7 +281,7 @@
       const dy = targetY - airplane.offsetTop;
       const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
-      const steps = 200;
+      const steps = 100;
       let step = 0;
       const startX = airplane.offsetLeft;
       const startY = airplane.offsetTop;
