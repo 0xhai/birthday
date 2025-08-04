@@ -52,10 +52,12 @@
     }
     .cake-emoji {
       position: absolute;
-      top: -35px;
+      top: 50%; /* Adjust this value so the cake is centered vertically */
+      left: 50%; /* Center horizontally */
+      transform: translate(-50%, -50%); /* Adjust to center the cake exactly */
       font-size: 24px;
       transition: left 0.2s;
-      z-index: 11;
+      z-index: 11; /* Make sure it stays in front of the loading bar */
     }
     .continue-text {
       opacity: 0;
@@ -164,7 +166,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseL<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseO<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
