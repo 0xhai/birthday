@@ -222,7 +222,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -245,13 +245,13 @@
     <button id="endBtn" style="display:none;">End 🎉</button>
     <button id="startBtn" class="pulsing">Start ✈️</button>
   </div>
-
+  
+  <!-- KEEP EVERYTHING ELSE THE SAME -->
   <script src="https://unpkg.com/three@0.136.0/build/three.min.js"></script>
-  <script src="https://unpkg.com/globe.gl@2.23.6"></script>
+  <script src="https://unpkg.com/globe.gl@2.23.6/dist/globe.umd.js"></script>
   <script src="https://unpkg.com/topojson-client@3"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-
-  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+  
   <script>
     setInterval(() => {
       const dots = document.getElementById('dots');
