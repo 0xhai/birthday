@@ -220,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -309,7 +309,9 @@
       .labelText(d => d.name)
       .labelSize(1.5)
       .labelDotRadius(0.7)
-      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)')
+      .atmosphereColor('#ffb3da')
+      .atmosphereAltitude(0.25);
     
     // Add this block right after creating `world`
     const globeMaterial = world.globeMaterial();
