@@ -144,9 +144,9 @@
     #airplane {
       position: absolute;
       font-size: 40px;
-      z-index: 9999; /* Ensure airplane stays on top of everything */
+      z-index: 9999;
       transition: transform 1s linear;
-      display: block; /* Ensure airplane stays visible */
+      display: block;
     }
     canvas.confetti-canvas {
       position: fixed;
@@ -157,13 +157,29 @@
       z-index: 0 !important;
       pointer-events: none;
     }
+
+    /* Pulsing Start Button */
+    @keyframes pulse {
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(255, 105, 180, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0);
+      }
+    }
+    .pulsing {
+      animation: pulse 2s infinite;
+    }
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseQ<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -187,7 +203,7 @@
     <button id="prevBtn" style="display:none;">⬅ Previous</button>
     <button id="nextBtn" style="display:none;">Next ➡</button>
     <button id="endBtn" style="display:none;">End 🎉</button>
-    <button id="startBtn">Start ✈️</button>
+    <button id="startBtn" class="pulsing">Start ✈️</button>
   </div>
 
   <script src="https://unpkg.com/globe.gl"></script>
@@ -229,7 +245,6 @@
       confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
     }, 1500);
 
-    // Globe setup
     const elem = document.getElementById('globeViz');
     const card = document.getElementById('infoCard');
     const nextBtn = document.getElementById('nextBtn');
@@ -302,6 +317,7 @@
     }
 
     startBtn.addEventListener('click', () => {
+      startBtn.classList.remove('pulsing');
       startBtn.disabled = true;
       currentIndex = 0;
       flyPlaneTo(places[0].lat, places[0].lng, () => {
