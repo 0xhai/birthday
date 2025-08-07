@@ -220,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -307,9 +307,7 @@
       .labelLat(d => d.lat)
       .labelLng(d => d.lng)
       .labelText(d => d.name)
-      .labelDotRadius(1.4)
-      .labelColor(() => 'rgba(255, 0, 100, 1)') // hot pink/red
-      .labelText(d => `📍`);
+      .labelDotRadius(0.7);
 
     function updateCard(index) {
       const place = places[index];
