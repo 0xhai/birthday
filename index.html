@@ -220,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise23<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -311,14 +311,15 @@
       .labelDotRadius(0.7)
       .labelColor(() => 'rgba(255, 105, 180, 0.9)');
     
+    // Add this block right after creating `world`
     const globeMaterial = world.globeMaterial();
-    // Flatten terrain
-    globeMaterial.bumpScale = 0;
+    globeMaterial.bumpScale = 0; // flatten terrain
+    globeMaterial.shininess = 0;
     
-    // Make land light green & water blue via color tinting
-    globeMaterial.color = new THREE.Color('#00bcd4');      // base tint (affects water)
-    globeMaterial.emissive = new THREE.Color('#8bc34a');   // gives glow/tint to land
-    globeMaterial.emissiveIntensity = 0.7;
+    // Apply tint colors to simulate land & water
+    globeMaterial.color = new THREE.Color('#69c9f0');         // base (water)
+    globeMaterial.emissive = new THREE.Color('#7ed957');      // tint land (greenish)
+    globeMaterial.emissiveIntensity = 0.8;
 
     function updateCard(index) {
       const place = places[index];
