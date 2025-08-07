@@ -27,7 +27,7 @@
     }
     .ml11 {
       font-weight: 500;
-      font-size: 2em;
+      font-size: clamp(2.2rem, 4vw, 3rem);
       white-space: nowrap;
       overflow: hidden;
     }
@@ -83,7 +83,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 42px;
+      font-size: clamp(2.8rem, 5vw, 4rem);
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -94,7 +94,7 @@
       width: 100%;
       text-align: center;
       font-family: 'Pacifico', cursive;
-      font-size: 24px;
+      font-size: clamp(1.5rem, 3vw, 2.5rem);
       color: #fff;
       text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
       z-index: 5;
@@ -112,7 +112,7 @@
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
-      font-size: 26px;
+      font-size: clamp(22px, 4vw, 28px);
     }
     .nav-buttons {
       position: absolute;
@@ -122,8 +122,8 @@
       z-index: 6;
     }
     .nav-buttons button {
-      padding: 24px 50px;
-      font-size: 50px;
+      padding: clamp(12px, 4vw, 24px) clamp(20px, 5vw, 50px);
+      font-size: clamp(28px, 4vw, 50px);
       cursor: pointer;
       border: none;
       background: #ff69b4;
@@ -169,13 +169,14 @@
     .pulsing {
       animation: pulse 2s infinite;
     }
+
     @media screen and (max-width: 600px) {
-  .card {
-    width: 90vw;
-    padding: 36px;
-    font-size: 28px;
-  }
-}
+      .card {
+        width: 90vw;
+        padding: 36px;
+        font-size: clamp(24px, 6vw, 28px);
+      }
+    }
 
   </style>
 </head>
@@ -183,7 +184,7 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise29<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise30<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
