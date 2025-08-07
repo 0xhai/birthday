@@ -50,12 +50,6 @@
       font-size: 16px;
       font-family: 'Pacifico', cursive;
     }
-    .cake-emoji {
-      position: absolute;
-      top: -35px;
-      font-size: 24px;
-      transition: left 0.2s;
-    }
     .continue-text {
       opacity: 0;
       margin-top: 15px;
@@ -179,11 +173,10 @@
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise12<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise13<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
-      <div class="cake-emoji" id="cakeEmoji">🎂</div>
     </div>
     <div class="loading-percentage" id="loadingPercentage">0%</div>
     <div class="continue-text" id="continueText">Press ENTER or Tap to continue</div>
@@ -219,14 +212,12 @@
     let load = 0;
     const bar = document.getElementById('loadingBar');
     const perc = document.getElementById('loadingPercentage');
-    const cake = document.getElementById('cakeEmoji');
     const contText = document.getElementById('continueText');
     const interval = setInterval(() => {
       if (load < 100) {
         load++;
         bar.style.width = load + '%';
         perc.textContent = load + '%';
-        cake.style.left = `calc(${load}% - 12px)`;
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
