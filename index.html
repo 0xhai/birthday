@@ -6,11 +6,11 @@
   <title>Happy Birthday name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
-    html, body {
-      margin: 0;
-      height: 100%;
-      overflow: hidden;
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
+    html, body { 
+      margin: 0; 
+      height: 100%; 
+      overflow: hidden; 
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
     }
 
     #loadingScreen {
@@ -65,13 +65,11 @@
       transition: opacity 0.5s;
     }
 
-    #globeViz {
-      width: 100vw;
-      height: 100vh;
-      position: absolute;
-      top: 0;
-      left: 0;
-      z-index: 2;
+    #globeViz { 
+      width: 100vw; 
+      height: 100vh; 
+      position: relative;
+      z-index: 1;
     }
 
     .popup {
@@ -159,7 +157,7 @@
       font-size: 100px;
       z-index: 9999;
       transition: transform 1s linear;
-      display: none;
+      display: block;
     }
 
     canvas.confetti-canvas {
@@ -222,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -245,24 +243,21 @@
     <button id="endBtn" style="display:none;">End 🎉</button>
     <button id="startBtn" class="pulsing">Start ✈️</button>
   </div>
-  
-  <!-- KEEP EVERYTHING ELSE THE SAME -->
-  <script src="https://unpkg.com/three@0.136.0/build/three.min.js"></script>
-  <script src="https://unpkg.com/globe.gl@2.23.6/dist/globe.umd.js"></script>
-  <script src="https://unpkg.com/topojson-client@3"></script>
+
+  <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-  
   <script>
+    // Animated dots
     setInterval(() => {
       const dots = document.getElementById('dots');
       dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
     }, 500);
 
+    // Simulate loading
     let load = 0;
     const bar = document.getElementById('loadingBar');
     const perc = document.getElementById('loadingPercentage');
     const contText = document.getElementById('continueText');
-
     const interval = setInterval(() => {
       if (load < 100) {
         load++;
@@ -275,145 +270,124 @@
     }, 30);
 
     document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && load >= 100) {
-        document.getElementById('loadingScreen').style.display = 'none';
-        initGlobe();
-      }
+      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
-
     document.addEventListener('click', () => {
-      if (load >= 100) {
-        document.getElementById('loadingScreen').style.display = 'none';
-        initGlobe();
-      }
+      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
     });
 
     setInterval(() => {
       confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
     }, 1500);
 
-    function initGlobe() {
-      const elem = document.getElementById('globeViz');
-      const card = document.getElementById('infoCard');
-      const nextBtn = document.getElementById('nextBtn');
-      const prevBtn = document.getElementById('prevBtn');
-      const endBtn = document.getElementById('endBtn');
-      const startBtn = document.getElementById('startBtn');
-      const airplane = document.getElementById('airplane');
+    const elem = document.getElementById('globeViz');
+    const card = document.getElementById('infoCard');
+    const nextBtn = document.getElementById('nextBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const endBtn = document.getElementById('endBtn');
+    const startBtn = document.getElementById('startBtn');
+    const airplane = document.getElementById('airplane');
 
-      const places = [
-        { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "Our amazing journey begins here!", img: "image1.jpg" },
-        { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "image2.jpg" },
-        { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "image3.jpg" },
-        { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "image4.jpg" },
-        { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "image5.jpg" }
-      ];
+    const places = [
+      { lat: 39.9334, lng: 32.8597, name: "Turkey", message: "Our amazing journey begins here!", img: "image1.jpg" },
+      { lat: 40.4093, lng: 49.8671, name: "Azerbaijan", message: "Memories from our second stop!", img: "image2.jpg" },
+      { lat: 37.9838, lng: 23.7275, name: "Greece", message: "Sunny days and happy smiles!", img: "image3.jpg" },
+      { lat: 59.3293, lng: 18.0686, name: "Sweden", message: "A place of dreams and love!", img: "image4.jpg" },
+      { lat: 64.9631, lng: -19.0208, name: "Iceland", message: "An unforgettable adventure awaits!", img: "image5.jpg" }
+    ];
 
-      let currentIndex = -1;
+    let currentIndex = -1;
 
-      fetch('https://unpkg.com/world-atlas/countries-110m.json')
-        .then(res => res.json())
-        .then(worldData => {
-          const countries = topojson.feature(worldData, worldData.objects.countries);
+    const world = Globe()(elem)
+      .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+      .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+      .backgroundColor('rgba(0,0,0,0)')
+      .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
+      .labelsData(places)
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.name)
+      .labelSize(1.5)
+      .labelDotRadius(0.7)
+      .labelColor(() => 'rgba(255, 105, 180, 0.9)');
 
-          elem.innerHTML = ''; // Clean previous canvas
-          const world = Globe()(elem)
-            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-            .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
-            .polygonsData(countries.features)
-            .polygonCapColor(() => '#32cd32')
-            .polygonSideColor(() => 'rgba(0,0,0,0.15)')
-            .polygonStrokeColor(() => '#228b22')
-            .polygonAltitude(0.005)
-            .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
-            .labelsData(places)
-            .labelLat(d => d.lat)
-            .labelLng(d => d.lng)
-            .labelText(d => d.name)
-            .labelSize(1.5)
-            .labelDotRadius(0.7)
-            .labelColor(() => 'rgba(255, 105, 180, 0.9)');
-
-          function updateCard(index) {
-            const place = places[index];
-            card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
-            card.style.display = 'block';
-            prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
-            nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
-            endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
-            world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 0.8 }, 2000);
-          }
-
-          function flyPlaneTo(lat, lng, callback) {
-            const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
-            const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
-            const dx = targetX - airplane.offsetLeft;
-            const dy = targetY - airplane.offsetTop;
-            const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-            const steps = 150;
-            let step = 0;
-            const startX = airplane.offsetLeft;
-            const startY = airplane.offsetTop;
-
-            function animate() {
-              step++;
-              const t = step / steps;
-              const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
-              airplane.style.left = startX + dx * t + 'px';
-              airplane.style.top = curveY + 'px';
-              airplane.style.transform = `rotate(${angle}deg)`;
-
-              if (step < steps) {
-                requestAnimationFrame(animate);
-              } else {
-                if (callback) callback();
-              }
-            }
-            animate();
-          }
-
-          startBtn.addEventListener('click', () => {
-            startBtn.classList.remove('pulsing');
-            startBtn.disabled = true;
-            currentIndex = 0;
-            airplane.style.display = 'block';
-            flyPlaneTo(places[0].lat, places[0].lng, () => {
-              updateCard(0);
-              nextBtn.style.display = 'inline-block';
-              startBtn.style.display = 'none';
-            });
-          });
-
-          nextBtn.addEventListener('click', () => {
-            if (currentIndex < places.length - 1) {
-              nextBtn.disabled = true;
-              currentIndex++;
-              flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
-                updateCard(currentIndex);
-                nextBtn.disabled = false;
-              });
-            }
-          });
-
-          prevBtn.addEventListener('click', () => {
-            if (currentIndex > 0) {
-              prevBtn.disabled = true;
-              currentIndex--;
-              flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
-                updateCard(currentIndex);
-                prevBtn.disabled = false;
-              });
-            }
-          });
-
-          endBtn.addEventListener('click', () => {
-            card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>We love you to the moon and back ❤️</p>";
-            prevBtn.style.display = 'none';
-            nextBtn.style.display = 'none';
-            endBtn.style.display = 'none';
-          });
-        });
+    function updateCard(index) {
+      const place = places[index];
+      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
+      card.style.display = 'block';
+      prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
+      nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
+      endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
+      world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 0.8 }, 2000);
     }
+
+    function flyPlaneTo(lat, lng, callback) {
+      const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
+      const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
+      const dx = targetX - airplane.offsetLeft;
+      const dy = targetY - airplane.offsetTop;
+      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
+      const steps = 150;
+      let step = 0;
+      const startX = airplane.offsetLeft;
+      const startY = airplane.offsetTop;
+
+      function animate() {
+        step++;
+        const t = step / steps;
+        const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
+        airplane.style.left = startX + dx * t + 'px';
+        airplane.style.top = curveY + 'px';
+        airplane.style.transform = `rotate(${angle}deg)`;
+
+        if (step < steps) {
+          requestAnimationFrame(animate);
+        } else {
+          if (callback) callback();
+        }
+      }
+      animate();
+    }
+
+    startBtn.addEventListener('click', () => {
+      startBtn.classList.remove('pulsing');
+      startBtn.disabled = true;
+      currentIndex = 0;
+      flyPlaneTo(places[0].lat, places[0].lng, () => {
+        updateCard(0);
+        nextBtn.style.display = 'inline-block';
+        startBtn.style.display = 'none';
+      });
+    });
+
+    nextBtn.addEventListener('click', () => {
+      if (currentIndex < places.length - 1) {
+        nextBtn.disabled = true;
+        currentIndex++;
+        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
+          updateCard(currentIndex);
+          nextBtn.disabled = false;
+        });
+      }
+    });
+
+    prevBtn.addEventListener('click', () => {
+      if (currentIndex > 0) {
+        prevBtn.disabled = true;
+        currentIndex--;
+        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
+          updateCard(currentIndex);
+          prevBtn.disabled = false;
+        });
+      }
+    });
+
+    endBtn.addEventListener('click', () => {
+      card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>We love you to the moon and back ❤️</p>";
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+      endBtn.style.display = 'none';
+    });
   </script>
 </body>
 </html>
