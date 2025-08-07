@@ -159,7 +159,7 @@
       font-size: 100px;
       z-index: 9999;
       transition: transform 1s linear;
-      display: block;
+      display: none;
     }
 
     canvas.confetti-canvas {
@@ -222,7 +222,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -315,12 +315,8 @@
           const countries = topojson.feature(worldData, worldData.objects.countries);
 
           const world = Globe()(elem)
-            .globeImageUrl(null)
-            .bumpImageUrl(null)
-            .globeMaterial(new THREE.MeshPhongMaterial({
-              color: 0x1e90ff,
-              shininess: 10
-            }))
+            .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+            .backgroundColor(null)
             .backgroundColor(null)
             .polygonsData(countries.features)
             .polygonCapColor(() => '#32cd32')
@@ -378,6 +374,7 @@
             startBtn.classList.remove('pulsing');
             startBtn.disabled = true;
             currentIndex = 0;
+            airplane.style.display = 'block';
             flyPlaneTo(places[0].lat, places[0].lng, () => {
               updateCard(0);
               nextBtn.style.display = 'inline-block';
