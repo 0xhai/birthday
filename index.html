@@ -220,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -301,19 +301,20 @@
     let currentIndex = -1;
 
     fetch('https://unpkg.com/world-atlas/countries-110m.json')
-  .then(res => res.json())
-  .then(worldData => {
-    const countries = topojson.feature(worldData, worldData.objects.countries);
+      .then(res => res.json())
+      .then(worldData => {
+      const countries = topojson.feature(worldData, worldData.objects.countries);
 
     const world = Globe()(elem)
       .globeImageUrl(null)
       .bumpImageUrl(null)
       .globeMaterial(new THREE.MeshPhongMaterial({
-        color: 0x1e90ff, // blue ocean
+        color: 0x1e90ff, // ocean blue
         shininess: 10
       }))
+      .backgroundColor(null) // ✅ This fixes your issue
       .polygonsData(countries.features)
-      .polygonCapColor(() => '#32cd32')     // green land
+      .polygonCapColor(() => '#32cd32')
       .polygonSideColor(() => 'rgba(0,0,0,0.15)')
       .polygonStrokeColor(() => '#228b22')
       .polygonAltitude(0.005)
@@ -325,7 +326,6 @@
       .labelSize(1.5)
       .labelDotRadius(0.7)
       .labelColor(() => 'rgba(255, 105, 180, 0.9)');
-  });
 
     function updateCard(index) {
       const place = places[index];
