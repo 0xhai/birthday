@@ -220,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -300,6 +300,7 @@
 
     const world = Globe()(elem)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-water.png')
+      .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundColor('rgba(0,0,0,0)')
       .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
       .labelsData(places)
