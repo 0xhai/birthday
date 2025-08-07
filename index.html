@@ -71,7 +71,7 @@
       position: absolute;
       top: 0;
       left: 0;
-      z-index: 1;
+      z-index: 2;
     }
 
     .popup {
@@ -222,7 +222,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -314,9 +314,10 @@
         .then(worldData => {
           const countries = topojson.feature(worldData, worldData.objects.countries);
 
+          elem.innerHTML = ''; // Clean previous canvas
           const world = Globe()(elem)
             .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-            .backgroundColor(null)
+            .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
             .backgroundColor(null)
             .polygonsData(countries.features)
             .polygonCapColor(() => '#32cd32')
