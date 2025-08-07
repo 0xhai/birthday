@@ -6,11 +6,11 @@
   <title>Happy Birthday name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
-    html, body { 
-      margin: 0; 
-      height: 100%; 
-      overflow: hidden; 
-      background: linear-gradient(to bottom right, #ffcccc, #ff99cc); 
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(to bottom right, #ffcccc, #ff99cc);
     }
 
     #loadingScreen {
@@ -65,10 +65,12 @@
       transition: opacity 0.5s;
     }
 
-    #globeViz { 
-      width: 100vw; 
-      height: 100vh; 
-      position: relative;
+    #globeViz {
+      width: 100vw;
+      height: 100vh;
+      position: absolute;
+      top: 0;
+      left: 0;
       z-index: 1;
     }
 
@@ -171,9 +173,15 @@
     }
 
     @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(255, 105, 180, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
+      0% {
+        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7);
+      }
+      70% {
+        box-shadow: 0 0 0 15px rgba(255, 105, 180, 0);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0);
+      }
     }
 
     .pulsing {
@@ -181,21 +189,40 @@
     }
 
     @media screen and (max-width: 600px) {
-      .ml11 { font-size: 1.4rem; }
-      .loading-bar-container { height: 20px; width: 85%; }
-      .loading-percentage { font-size: 18px; }
-      .continue-text { font-size: 18px; }
-      .title { font-size: 1.6rem; }
-      .subtitle { font-size: 1rem; }
-      #airplane { font-size: 60px; }
-      .card { width: 90vw; padding: 36px; font-size: clamp(20px, 6vw, 24px); }
+      .ml11 {
+        font-size: 1.4rem;
+      }
+      .loading-bar-container {
+        height: 20px;
+        width: 85%;
+      }
+      .loading-percentage {
+        font-size: 18px;
+      }
+      .continue-text {
+        font-size: 18px;
+      }
+      .title {
+        font-size: 1.6rem;
+      }
+      .subtitle {
+        font-size: 1rem;
+      }
+      #airplane {
+        font-size: 60px;
+      }
+      .card {
+        width: 90vw;
+        padding: 36px;
+        font-size: clamp(20px, 6vw, 24px);
+      }
     }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -208,7 +235,9 @@
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
   <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
+
   <div id="airplane">✈️</div>
+
   <div id="infoCard" class="card"></div>
   <div class="nav-buttons">
     <button id="prevBtn" style="display:none;">⬅ Previous</button>
@@ -222,17 +251,16 @@
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    // Animated dots
     setInterval(() => {
       const dots = document.getElementById('dots');
       dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
     }, 500);
 
-    // Simulate loading
     let load = 0;
     const bar = document.getElementById('loadingBar');
     const perc = document.getElementById('loadingPercentage');
     const contText = document.getElementById('continueText');
+
     const interval = setInterval(() => {
       if (load < 100) {
         load++;
@@ -289,7 +317,10 @@
           const world = Globe()(elem)
             .globeImageUrl(null)
             .bumpImageUrl(null)
-            .globeMaterial(new THREE.MeshPhongMaterial({ color: 0x1e90ff, shininess: 10 }))
+            .globeMaterial(new THREE.MeshPhongMaterial({
+              color: 0x1e90ff,
+              shininess: 10
+            }))
             .backgroundColor(null)
             .polygonsData(countries.features)
             .polygonCapColor(() => '#32cd32')
@@ -333,8 +364,12 @@
               airplane.style.left = startX + dx * t + 'px';
               airplane.style.top = curveY + 'px';
               airplane.style.transform = `rotate(${angle}deg)`;
-              if (step < steps) requestAnimationFrame(animate);
-              else if (callback) callback();
+
+              if (step < steps) {
+                requestAnimationFrame(animate);
+              } else {
+                if (callback) callback();
+              }
             }
             animate();
           }
