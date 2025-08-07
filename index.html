@@ -220,7 +220,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -299,7 +299,7 @@
     let currentIndex = -1;
 
     const world = Globe()(elem)
-      .globeImageUrl('//unpkg.com/three-globe@2.44.0/example/img/earth-blue-marble.jpg')
+      .globeImageUrl('//unpkg.com/three-globe@2.44.0/example/img/earth-water.png')
       .bumpImageUrl(null)
       .backgroundColor('rgba(0,0,0,0)')
       .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
@@ -312,17 +312,13 @@
       .labelColor(() => 'rgba(255, 105, 180, 0.9)');
     
     const globeMaterial = world.globeMaterial();
-    globeMaterial.bumpScale = 0; // flatten terrain for a smoother, cartoon look
-    globeMaterial.shininess = 20; // make it pop with subtle gloss
-
-    new THREE.TextureLoader().load(
-      '//unpkg.com/three-globe@2.44.0/example/img/earth-water.png',
-      texture => {
-      globeMaterial.specularMap = texture;
-      globeMaterial.specular = new THREE.Color('white');
-      globeMaterial.shininess = 25;
-    }
-  );
+    // Flatten terrain
+    globeMaterial.bumpScale = 0;
+    
+    // Make land light green & water blue via color tinting
+    globeMaterial.color = new THREE.Color('#00bcd4');      // base tint (affects water)
+    globeMaterial.emissive = new THREE.Color('#8bc34a');   // gives glow/tint to land
+    globeMaterial.emissiveIntensity = 0.7;
 
     function updateCard(index) {
       const place = places[index];
