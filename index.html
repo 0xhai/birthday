@@ -168,20 +168,21 @@
     .pulsing {
       animation: pulse 2s infinite;
     }
-    @media (max-width: 600px) {
-    .card {
-      width: 98vw;         /* use most of the screen width */
-      padding: 70px;       /* more room to breathe */
-      font-size: 40px;     /* larger text for mobile readability */
-    }
+    @media screen and (max-width: 768px) {
+  .card {
+    width: 95vw;
+    padding: 70px;
+    font-size: 42px;
   }
+}
+
   </style>
 </head>
 <body>
   <!-- Loading Screen -->
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise23<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise24<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
