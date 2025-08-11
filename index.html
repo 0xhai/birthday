@@ -215,12 +215,30 @@
         font-size: clamp(20px, 6vw, 24px);
       }
     }
+
+    @keyframes pulseFade {
+      0%, 100% { opacity: 0.5; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.05); }
+    }
+
+    @keyframes vibrate {
+      0% { transform: translateX(0); }
+      20% { transform: translateX(-2px); }
+      40% { transform: translateX(2px); }
+      60% { transform: translateX(-2px); }
+      80% { transform: translateX(2px); }
+      100% { transform: translateX(0); }
+    }
+
+    .pulsating-vibrating {
+      animation: pulseFade 1.5s infinite ease-in-out, vibrate 0.3s infinite linear;
+    }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -266,6 +284,7 @@
       } else {
         clearInterval(interval);
         contText.style.opacity = 1;
+        contText.classList.add('pulsating-vibrating');
       }
     }, 30);
 
