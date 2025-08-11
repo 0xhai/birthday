@@ -238,7 +238,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseF<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -325,7 +325,7 @@
       .labelsData(places)
       .labelLat(d => d.lat)
       .labelLng(d => d.lng)
-      .labelText(d => `📍 ${d.name}`)
+      .labelText(d => `• ${d.name}`)
       .labelSize(1)
       .labelDotRadius(0.7)
       .labelColor(() => 'white');
