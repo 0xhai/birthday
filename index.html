@@ -217,6 +217,8 @@
         font-size: clamp(14px, 4vw, 18px);
         /* HIGHER on the screen */
         top: 25%;
+        max-height: 65vh;       /* prevents it from taking up most of the screen */
+        overflow-y: auto;
       }
       .card img {
         display: block;
@@ -256,7 +258,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseV<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseB<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
