@@ -112,7 +112,7 @@
 
     .card {
       position: absolute;
-      top: 25%;
+      top: 40%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
@@ -222,6 +222,7 @@
         max-height: 65vh;       /* prevents it from taking up most of the screen */
         overflow-y: auto;
       }
+      
       .card img {
         display: block;
         width: 100%;
@@ -230,7 +231,7 @@
         object-fit: cover;     /* crop if needed */
         border-radius: 5px;
       }
-    
+      
       /* Trim paragraph spacing to shorten card */
       .card p {
         margin: 8px 0 0;       /* remove big default margins */
@@ -260,7 +261,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseS<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
