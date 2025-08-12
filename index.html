@@ -210,9 +210,27 @@
         font-size: 50px;
       }
       .card {
-        width: 80vw;
-        padding: 6px;
-        font-size: clamp(12px, 3vw, 16px);
+        /* WIDER but still fits small phones */
+        width: min(92vw, 380px);
+        /* SHORTER */
+        padding: 10px 12px;
+        font-size: clamp(14px, 4vw, 18px);
+        /* HIGHER on the screen */
+        top: 25%;
+      }
+      .card img {
+        display: block;
+        width: 100%;
+        height: auto;          /* keep aspect */
+        max-height: 140px;     /* reduce card height */
+        object-fit: cover;     /* crop if needed */
+        border-radius: 5px;
+      }
+    
+      /* Trim paragraph spacing to shorten card */
+      .card p {
+        margin: 8px 0 0;       /* remove big default margins */
+        line-height: 1.25;     /* tighter lines */
       }
     }
 
@@ -238,7 +256,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseC<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseV<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
