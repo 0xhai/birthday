@@ -112,7 +112,7 @@
 
     .card {
       position: absolute;
-      top: 40%;
+      top: 35%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
@@ -261,7 +261,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseQ<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -357,7 +357,7 @@
       const place = places[index];
       card.innerHTML = `
       <img src="${place.img}" 
-           style="width:100%; border-radius:5px; max-height:180px; object-fit:cover;">
+           style="width:100%; border-radius:5px; max-height:160px; object-fit:cover;">
       <p>${place.message}</p>`;
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
