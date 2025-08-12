@@ -111,21 +111,46 @@
     }
 
     .card {
-      position: absolute;
-      top: 40%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255,255,255,0.95);
-      padding: 36px;
-      border-radius: 10px;
-      text-align: center;
-      width: 360px;
+      position: fixed; /* fixed so it doesn’t scroll with globe canvas */
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      padding: 24px;
+      border-radius: 14px;
+      text-align: left;
+      width: min(36ch, 92vw);
+      max-height: min(60vh, 460px);
+      overflow: auto;
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
-      font-size: clamp(22px, 4vw, 28px);
+      font-size: clamp(18px, 2.6vw, 22px);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.18);
     }
 
+    /* corner helpers */
+    .card--tl { top: 20px; left: 20px; right: auto; bottom: auto; }
+    .card--tr { top: 20px; right: 20px; left: auto; bottom: auto; }
+    .card--bl { bottom: 20px; left: 20px; right: auto; top: auto; }
+    .card--br { bottom: 20px; right: 20px; left: auto; top: auto; }
+
+    .card img { 
+      width: 100%; 
+      height: auto; 
+      border-radius: 10px; 
+      display: block; 
+      margin-bottom: 12px; 
+    }
+
+    /* tiny screens: keep it compact */
+    @media (max-width: 600px) {
+      .card { 
+        width: 88vw; 
+        max-height: 55vh; 
+        padding: 16px; 
+        font-size: clamp(16px, 4vw, 18px);
+      }
+    }
+    
     .nav-buttons {
       position: absolute;
       bottom: 80px;
@@ -238,7 +263,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -328,15 +353,24 @@
       .labelText(d => d.name)
       .labelSize(1)
       .labelDotRadius(0.65)
+      .labelAltitude(0.01)
       .labelColor(() => 'white');
 
     function updateCard(index) {
       const place = places[index];
-      card.innerHTML = `<img src="${place.img}" style="width:100%; border-radius:5px;"><p>${place.message}</p>`;
+      card.innerHTML = `
+        <img src="${place.img}" alt="${place.name}">
+        <p>${place.message}</p>
+      `;
+      // choose corner for this place
+      placeCardAtCorner(pickCardCornerFor(place.lat, place.lng));
+    
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
+    
+      // center POV on the place
       world.pointOfView({ lat: place.lat, lng: place.lng, altitude: 0.8 }, 2000);
     }
 
@@ -366,6 +400,24 @@
         }
       }
       animate();
+    }
+
+    function pickCardCornerFor(lat, lng) {
+      // Rough heuristic using lat/lng relative to screen halves:
+      // When you center POV on the place, the place will be near screen center.
+      // We still bias corners using signs to vary placement and avoid overlap with title/subtitle.
+      const preferTop = lat < 0;     // southern hem? prefer top to keep subtitle visible
+      const preferLeft = lng > 0;    // eastern hem? prefer left
+    
+      if (preferTop && preferLeft) return 'card--tr';
+      if (preferTop && !preferLeft) return 'card--tl';
+      if (!preferTop && preferLeft) return 'card--br';
+      return 'card--bl';
+    }
+    
+    function placeCardAtCorner(cornerClass) {
+      card.classList.remove('card--tl','card--tr','card--bl','card--br');
+      card.classList.add(cornerClass);
     }
 
     startBtn.addEventListener('click', () => {
