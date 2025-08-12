@@ -261,7 +261,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -364,7 +364,7 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
       world.pointOfView({
-        lat: parseFloat(place.lat) + 30,
+        lat: parseFloat(place.lat) + 10,
         lng: parseFloat(place.lng),
         altitude: 0.8
       }, 2000);
