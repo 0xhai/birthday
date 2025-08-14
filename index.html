@@ -181,6 +181,13 @@
     .pulsing { animation: pulse 2s infinite; }
 
     @media screen and (max-width: 600px) {
+      .slideshow { height: 240px; }
+      .slideshow .slide {
+        height: 100%;
+        max-height: none;
+        width: 100%;
+        object-fit: cover;
+      }
       .ml11 { font-size: 1.4rem; }
       .loading-bar-container { height: 20px; width: 85%; }
       .loading-percentage { font-size: 18px; }
@@ -222,7 +229,7 @@
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
     /* slideshow */
-    .slideshow { position: relative; width: 100%; height: 250px; overflow: hidden; border-radius: 5px; }
+    .slideshow { position: relative; width: 100%; height: 240px; overflow: hidden; border-radius: 5px; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
     .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
@@ -235,7 +242,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseF<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseA<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
