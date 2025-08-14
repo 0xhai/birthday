@@ -110,27 +110,22 @@
       z-index: 5;
     }
 
+    /* UPDATED: remove fixed top; JS will position the card so its bottom sits just above the pin */
     .card {
       position: absolute;
-      top: 55%; /* moved further down to be above pin */
       left: 50%;
-      transform: translate(-50%, -50%);
+      transform: translateX(-50%);
       background: rgba(255,255,255,0.95);
       padding: 14px 20px;
       border-radius: 10px;
       text-align: center;
-      width: 700px; /* wider to make images bigger */
+      width: 700px; /* wider to make images bigger on desktop */
       max-height: none;
       overflow-y: visible;
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.1vw, 24px);
-    }
-
-    /* Desktop-only: keep slight lift (safe to leave as-is) */
-    @media (min-width: 601px) {
-      .card { top: 55%; }
     }
 
     .nav-buttons {
@@ -189,10 +184,9 @@
       .subtitle { font-size: 1rem; }
       #airplane { font-size: 50px; }
       .card {
-        width: min(95vw, 420px); /* more space for mobile too */
+        width: min(95vw, 420px); /* more space on mobile */
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
-        top: 50%;
         max-height: 70vh;
         overflow-y: auto;
       }
@@ -221,8 +215,8 @@
     }
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    /* slideshow */
-    .slideshow { position: relative; width: 100%; height: 240px; overflow: hidden; border-radius: 5px; } /* taller slideshow */
+    /* UPDATED: taller slideshow -> bigger images */
+    .slideshow { position: relative; width: 100%; height: 240px; overflow: hidden; border-radius: 5px; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
     .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
@@ -235,7 +229,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseE<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -334,6 +328,22 @@
       return 8;
     }
 
+    /* NEW: utility to position the card so its BOTTOM edge sits just above the pin */
+    function positionCardAbovePin(place, gap = 10) {
+      if (!place) return;
+      const coords = world.getScreenCoords(place.lat, place.lng);
+      if (!coords) return;
+      // Ensure card has layout to measure height
+      const ensureLayout = () => {
+        const h = card.offsetHeight || 0;
+        card.style.left = coords.x + 'px';
+        card.style.top = (coords.y - h - gap) + 'px';
+        card.style.transform = 'translateX(-50%)'; // only horizontal centering
+      };
+      // Run twice to be safe after images/layout settle
+      requestAnimationFrame(() => requestAnimationFrame(ensureLayout));
+    }
+
     // Build + run slideshow for the current place
     function updateCard(index) {
       const place = places[index];
@@ -371,6 +381,8 @@
         imgIdx = (n + slides.length) % slides.length;
         slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
         dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
+        // Reposition in case height changes slightly
+        positionCardAbovePin(place);
       }
 
       prev.addEventListener('click', () => show(imgIdx - 1));
@@ -390,7 +402,7 @@
 
       // Autoplay every 2.5s (clear any prior timer)
       if (slideshowTimer) clearInterval(slideshowTimer);
-      slideshowTimer = setInterval(() => show(imgIdx + 1), 2500);
+      slideshowTimer = setInterval(() => show(imgIdx + 1), 4000);
       slideshowEl.addEventListener('mouseenter', () => { if (slideshowTimer) clearInterval(slideshowTimer); });
       slideshowEl.addEventListener('mouseleave', () => { slideshowTimer = setInterval(() => show(imgIdx + 1), 2500); });
 
@@ -407,6 +419,10 @@
         lng: parseFloat(place.lng),
         altitude: 0.8
       }, 2000);
+
+      // Position the card immediately and after POV transition completes
+      positionCardAbovePin(place);
+      setTimeout(() => positionCardAbovePin(place), 2050);
     }
 
     function flyPlaneTo(lat, lng, callback) {
@@ -476,6 +492,13 @@
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
+      // Keep card positioned above last pin
+      positionCardAbovePin(places[currentIndex]);
+    });
+
+    // Reposition card on window resize
+    window.addEventListener('resize', () => {
+      if (currentIndex >= 0) positionCardAbovePin(places[currentIndex]);
     });
   </script>
 </body>
