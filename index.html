@@ -110,21 +110,21 @@
       z-index: 5;
     }
 
-    /* Card is positioned dynamically in JS; start OFF-SCREEN to avoid any flash */
+    /* Card is positioned dynamically; keep it hidden until positioned to prevent flash */
     .card {
       position: absolute;
-      top: -10000px;
-      left: -10000px;
-      transform: translate(0, 0); /* JS will set translateX(-50%) */
+      left: 50%;
+      transform: translateX(-50%);
       background: rgba(255,255,255,0.95);
       padding: 14px 20px;
       border-radius: 10px;
       text-align: center;
-      width: 700px; /* bigger images on desktop */
+      width: 700px; /* wider images on desktop */
       max-height: none;
       overflow-y: visible;
       z-index: 5;
-      display: none;
+      display: none;           /* hidden until positioned */
+      visibility: hidden;      /* avoid any flicker */
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.1vw, 24px);
     }
@@ -230,7 +230,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -323,29 +323,32 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // Keep same DOWN offset across devices
+    // 🔧 Use same DOWN offset across devices
     function getLatDownOffset() { return 8; }
 
-    /* Position the card so its BOTTOM edge sits just above the pin (no initial flash) */
+    /* Position the card so its BOTTOM edge sits just above the pin */
     function positionCardAbovePin(place, gap = 10) {
-      if (!place) return;
       const coords = world.getScreenCoords(place.lat, place.lng);
       if (!coords) return;
 
-      // Ensure the card is rendered off-screen before measuring
-      if (card.style.display === 'none') {
-        card.style.display = 'block';
-        card.style.top = '-10000px';
-        card.style.left = '-10000px';
-        card.style.transform = 'translate(0,0)';
-      }
+      // Make sure it's in the layout but hidden
+      if (card.style.display === 'none') card.style.display = 'block';
+      card.style.visibility = 'hidden';
+      card.style.left = '-10000px';
+      card.style.top  = '-10000px';
+      card.style.transform = 'translate(0,0)';
 
+      // Measure after content is in
       const h = card.offsetHeight || 0;
 
       // Place centered horizontally at pin.x and just above pin.y
       card.style.left = coords.x + 'px';
       card.style.top  = (coords.y - h - gap) + 'px';
       card.style.transform = 'translateX(-50%)';
+    }
+
+    function revealCard() {
+      card.style.visibility = 'visible';
     }
 
     // Build + run slideshow for the current place
@@ -361,11 +364,9 @@
         `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
       ).join('');
 
-      // Insert content while card is off-screen; then position and it's instantly correct
+      // Insert content but keep hidden until after POV finishes
       card.style.display = 'block';
-      card.style.top = '-10000px';
-      card.style.left = '-10000px';
-      card.style.transform = 'translate(0,0)';
+      card.style.visibility = 'hidden';
       card.innerHTML = `
         <div class="slideshow" aria-label="${place.name} photos (slideshow)">
           ${slidesHtml}
@@ -390,7 +391,7 @@
         imgIdx = (n + slides.length) % slides.length;
         slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
         dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
-        positionCardAbovePin(place); // in case height changes slightly
+        positionCardAbovePin(place); // adjust if height changes
       }
 
       prev.addEventListener('click', () => show(imgIdx - 1));
@@ -408,18 +409,12 @@
         startX = null;
       }, { passive: true });
 
-      // Autoplay every 2.5s (clear any prior timer)
-      if (slideshowTimer) clearInterval(slideshowTimer);
-      slideshowTimer = setInterval(() => show(imgIdx + 1), 2500);
-      slideshowEl.addEventListener('mouseenter', () => { if (slideshowTimer) clearInterval(slideshowTimer); });
-      slideshowEl.addEventListener('mouseleave', () => { slideshowTimer = setInterval(() => show(imgIdx + 1), 2500); });
-
       // Show nav buttons
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // Move camera
+      // Move camera first; keep card hidden during the motion
       const latOffset = getLatDownOffset(place.name);
       world.pointOfView({
         lat: parseFloat(place.lat) + latOffset,
@@ -427,11 +422,11 @@
         altitude: 0.8
       }, 2000);
 
-      // Position the card immediately (off-screen -> correct spot, no flash)
-      positionCardAbovePin(place);
-
-      // Also re-position once after POV tween ends (in case of minor drift)
-      setTimeout(() => positionCardAbovePin(place), 2050);
+      // After POV animation finishes, position and reveal with NO intermediate flash
+      setTimeout(() => {
+        positionCardAbovePin(place);
+        revealCard();
+      }, 2050);
     }
 
     function flyPlaneTo(lat, lng, callback) {
@@ -466,6 +461,9 @@
       startBtn.classList.remove('pulsing');
       startBtn.disabled = true;
       currentIndex = 0;
+      // Hide card completely during plane animation and initial POV setup
+      card.style.display = 'none';
+      card.style.visibility = 'hidden';
       flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0);
         nextBtn.style.display = 'inline-block';
@@ -477,6 +475,9 @@
       if (currentIndex < places.length - 1) {
         nextBtn.disabled = true;
         currentIndex++;
+        // Hide card until moved and placed
+        card.style.display = 'none';
+        card.style.visibility = 'hidden';
         flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
           updateCard(currentIndex);
           nextBtn.disabled = false;
@@ -488,6 +489,9 @@
       if (currentIndex > 0) {
         prevBtn.disabled = true;
         currentIndex--;
+        // Hide card until moved and placed
+        card.style.display = 'none';
+        card.style.visibility = 'hidden';
         flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
           updateCard(currentIndex);
           prevBtn.disabled = false;
@@ -501,12 +505,16 @@
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
+      // Keep card above final pin
       positionCardAbovePin(places[currentIndex]);
+      revealCard();
     });
 
     // Reposition card on window resize
     window.addEventListener('resize', () => {
-      if (currentIndex >= 0) positionCardAbovePin(places[currentIndex]);
+      if (currentIndex >= 0) {
+        positionCardAbovePin(places[currentIndex]);
+      }
     });
   </script>
 </body>
