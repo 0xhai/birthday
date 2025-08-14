@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -387,7 +387,7 @@
     function normalizeCardHeightMobile() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (!isMobile) return;
-      const target = 335; // keep original target; space gained by moving arrows
+      const target = 330; // keep original target; space gained by moving arrows
       document.documentElement.style.setProperty('--card-target-height', target + 'px');
       const slideshow = card.querySelector('.slideshow');
       if (!slideshow) return;
