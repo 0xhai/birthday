@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise7<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -356,15 +356,12 @@
       const coords = world.getScreenCoords(place.lat, place.lng);
       if (!coords) return;
 
-      // Ensure it's in the layout
       if (card.style.display === 'none') card.style.display = 'block';
 
-      // Measure current height and place centered horizontally at pin.x and just above pin.y
       const h = card.offsetHeight || 0;
       card.style.left = coords.x + 'px';
       card.style.top  = (coords.y - h - gap) + 'px';
       card.style.transform = 'translateX(-50%)';
-      // NOTE: Do NOT change card visibility here — avoids accidental hiding on clicks
     }
 
     function revealCard() {
@@ -417,6 +414,58 @@
       };
       rafId = requestAnimationFrame(step);
       return () => { if (rafId) cancelAnimationFrame(rafId); };
+    }
+
+    // --- UPDATED: smooth flight to on-screen pin with easing + arc ---
+    function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, durationMs = 900) {
+      const coords = world.getScreenCoords(lat, lng);
+      if (!coords) { if (callback) callback(); return; }
+
+      const targetX = coords.x + offsetX;
+      const targetY = coords.y + offsetY;
+
+      // Initialize start from current position (default 0,0 if first time)
+      let startX = airplane.offsetLeft || 0;
+      let startY = airplane.offsetTop || 0;
+
+      // Ensure plane is visible
+      airplane.style.display = 'block';
+
+      // Easing (easeInOutCubic)
+      const ease = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
+
+      // Gentle arc for Y (visual niceness)
+      const arcHeight = 50; // px peak offset
+      let startTs = null;
+
+      function step(ts) {
+        if (!startTs) startTs = ts;
+        const p = Math.min(1, (ts - startTs) / durationMs);
+        const t = ease(p);
+
+        const x = startX + (targetX - startX) * t;
+        const yLinear = startY + (targetY - startY) * t;
+        const y = yLinear - Math.sin(Math.PI * t) * arcHeight;
+
+        // Face the direction of travel
+        const angle = Math.atan2((y - (airplane.offsetTop || 0)), (x - (airplane.offsetLeft || 0))) * 180 / Math.PI;
+
+        airplane.style.left = x + 'px';
+        airplane.style.top  = y + 'px';
+        airplane.style.transform = `rotate(${angle}deg)`;
+
+        if (p < 1) {
+          requestAnimationFrame(step);
+        } else {
+          // Snap exact at end
+          airplane.style.left = targetX + 'px';
+          airplane.style.top  = targetY + 'px';
+          airplane.style.transform = 'rotate(0deg)';
+          if (callback) callback();
+        }
+      }
+
+      requestAnimationFrame(step);
     }
 
     // Build + run slideshow for the current place
@@ -509,34 +558,6 @@
       }, 2050);
     }
 
-    function flyPlaneTo(lat, lng, callback) {
-      const targetX = window.innerWidth / 2 + (lng / 180) * (window.innerWidth / 2);
-      const targetY = window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
-      const dx = targetX - airplane.offsetLeft;
-      const dy = targetY - airplane.offsetTop;
-      const angle = Math.atan2(dy, dx) * 180 / Math.PI;
-      const steps = 150;
-      let step = 0;
-      const startX = airplane.offsetLeft;
-      const startY = airplane.offsetTop;
-
-      function animate() {
-        step++;
-        const t = step / steps;
-        const curveY = startY + dy * t - 50 * Math.sin(Math.PI * t);
-        airplane.style.left = startX + dx * t + 'px';
-        airplane.style.top = curveY + 'px';
-        airplane.style.transform = `rotate(${angle}deg)`;
-
-        if (step < steps) {
-          requestAnimationFrame(animate);
-        } else {
-          if (callback) callback();
-        }
-      }
-      animate();
-    }
-
     startBtn.addEventListener('click', () => {
       startBtn.classList.remove('pulsing');
       startBtn.disabled = true;
@@ -549,14 +570,14 @@
       // cancel any prior stick loop
       if (unstick) { unstick(); unstick = null; }
 
-      // Fly to just left of Turkey's pin
-      flyPlaneTo(places[0].lat, places[0].lng - 5, () => {
+      // Smooth flight to left of Turkey's pin (no premature snap)
+      flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0);
         // keep plane stuck left of pin during POV zoom
         unstick = stickPlaneToPlace(places[0], -40, -10, 2100);
         nextBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
-      });
+      }, -40, -10, 900);
     });
 
     nextBtn.addEventListener('click', () => {
@@ -573,13 +594,12 @@
 
         const dest = places[currentIndex];
 
-        // Fly to just left of destination pin
-        flyPlaneTo(dest.lat, dest.lng - 5, () => {
+        // Smooth flight to left of destination pin
+        flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex);
-          // keep plane stuck left of pin during POV zoom
           unstick = stickPlaneToPlace(dest, -40, -10, 2100);
           nextBtn.disabled = false;
-        });
+        }, -40, -10, 900);
       }
     });
 
@@ -597,13 +617,12 @@
 
         const dest = places[currentIndex];
 
-        // Fly to just left of destination pin
-        flyPlaneTo(dest.lat, dest.lng - 5, () => {
+        // Smooth flight to left of destination pin
+        flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex);
-          // keep plane stuck left of pin during POV zoom
           unstick = stickPlaneToPlace(dest, -40, -10, 2100);
           prevBtn.disabled = false;
-        });
+        }, -40, -10, 900);
       }
     });
 
@@ -613,7 +632,6 @@
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
-      // Keep card above final pin
       positionCardAbovePin(places[currentIndex]);
       revealCard();
     });
