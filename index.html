@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -529,8 +529,8 @@
       card.style.display = 'none';
       card.style.visibility = 'hidden';
 
-      const planeDur = 2400; // slower plane
-      const povDur   = 1200; // faster POV so card shows sooner
+      const planeDur = 3000; // slower plane
+      const povDur   = 2000; // faster POV so card shows sooner
       flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0, povDur);
         nextBtn.style.display = 'inline-block';
