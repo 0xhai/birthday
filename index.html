@@ -110,23 +110,23 @@
       z-index: 5;
     }
 
-    /* Card is positioned dynamically; keep it hidden until positioned to prevent flash */
+    /* ===== Desktop default (bigger, but clamped via JS) ===== */
     .card {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
       background: rgba(255,255,255,0.95);
-      padding: 14px 20px;
-      border-radius: 10px;
+      padding: 16px 22px;
+      border-radius: 12px;
       text-align: center;
-      width: 700px; /* wider images on desktop */
+      width: 820px;                  /* a bit bigger on PC */
       max-height: none;
       overflow-y: visible;
       z-index: 5;
-      display: none;           /* hidden until positioned */
-      visibility: hidden;      /* avoid any flicker */
+      display: none;                 /* hidden until positioned */
+      visibility: hidden;            /* avoid flicker */
       font-family: 'Pacifico', cursive;
-      font-size: clamp(18px, 1.1vw, 24px);
+      font-size: clamp(18px, 1.15vw, 24px);
     }
 
     .nav-buttons {
@@ -184,25 +184,27 @@
       .title { font-size: 1.6rem; }
       .subtitle { font-size: 1rem; }
       #airplane { font-size: 50px; }
+
+      /* ===== Mobile cards: unified, slightly shorter height ===== */
       .card {
         width: min(95vw, 420px);
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
-        max-height: 70vh;
-        overflow-y: auto;
+        height: var(--card-target-height, 340px);     /* equal height */
+        max-height: var(--card-target-height, 340px);
+        overflow-y: hidden;                            /* lock the height */
       }
+
+      /* Base slideshow height on mobile – JS fine-tunes per card */
+      .slideshow { height: 180px; }
       .card img {
         display: block;
         width: 100%;
         height: auto;
-        max-height: 200px;
         object-fit: cover;
         border-radius: 5px;
       }
-      .card p {
-        margin: 8px 0 0;
-        line-height: 1.25;
-      }
+      .card p { margin: 8px 0 0; line-height: 1.25; }
     }
 
     @keyframes pulseFade { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
@@ -216,8 +218,8 @@
     }
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    /* Taller slideshow for bigger images */
-    .slideshow { position: relative; width: 100%; height: 240px; overflow: hidden; border-radius: 5px; }
+    /* Taller slideshow for bigger images (desktop base) */
+    .slideshow { position: relative; width: 100%; height: 260px; overflow: hidden; border-radius: 6px; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
     .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
@@ -230,7 +232,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -351,6 +353,41 @@
       card.style.visibility = 'visible';
     }
 
+    // Keep cards from ever overlapping the title on desktop
+    function clampCardMaxHeightToTitle() {
+      const isMobile = window.matchMedia('(max-width: 600px)').matches;
+      if (isMobile) return;
+
+      const title = document.querySelector('.title');
+      const rect = title.getBoundingClientRect();
+      // space available between title bottom and viewport bottom
+      const safeGap = 20; // breathing room
+      const avail = Math.max(160, window.innerHeight - rect.bottom - safeGap);
+      card.style.maxHeight = avail + 'px';
+      card.style.overflowY = 'auto'; // if content exceeds clamp, scroll inside card
+    }
+
+    // Make all mobile cards the same (short) height by resizing the slideshow area
+    function normalizeCardHeightMobile() {
+      const isMobile = window.matchMedia('(max-width: 600px)').matches;
+      if (!isMobile) return;
+
+      const target = 340;               // unified mobile height (shorter than before)
+      document.documentElement.style.setProperty('--card-target-height', target + 'px');
+
+      // measure what's around the slideshow to compute its needed height
+      const slideshow = card.querySelector('.slideshow');
+      if (!slideshow) return;
+
+      // measure current layout
+      const totalNow = card.offsetHeight;
+      const otherHeight = totalNow - slideshow.offsetHeight;
+
+      // desired slideshow height so that card hits the exact target
+      const desiredSlideH = Math.max(140, target - otherHeight);
+      slideshow.style.height = desiredSlideH + 'px';
+    }
+
     // Build + run slideshow for the current place
     function updateCard(index) {
       const place = places[index];
@@ -413,6 +450,10 @@
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
+
+      // Desktop clamp + Mobile equalization (do this before measuring/placing)
+      normalizeCardHeightMobile();
+      clampCardMaxHeightToTitle();
 
       // Move camera first; keep card hidden during the motion
       const latOffset = getLatDownOffset(place.name);
@@ -510,9 +551,11 @@
       revealCard();
     });
 
-    // Reposition card on window resize
+    // Reposition + re-apply sizing on window resize
     window.addEventListener('resize', () => {
       if (currentIndex >= 0) {
+        normalizeCardHeightMobile();
+        clampCardMaxHeightToTitle();
         positionCardAbovePin(places[currentIndex]);
       }
     });
