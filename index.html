@@ -110,11 +110,12 @@
       z-index: 5;
     }
 
-    /* Card is positioned dynamically in JS; start hidden to avoid flicker */
+    /* Card is positioned dynamically in JS; start OFF-SCREEN to avoid any flash */
     .card {
       position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+      top: -10000px;
+      left: -10000px;
+      transform: translate(0, 0); /* JS will set translateX(-50%) */
       background: rgba(255,255,255,0.95);
       padding: 14px 20px;
       border-radius: 10px;
@@ -124,7 +125,6 @@
       overflow-y: visible;
       z-index: 5;
       display: none;
-      visibility: hidden; /* prevent top-corner flash */
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.1vw, 24px);
     }
@@ -230,7 +230,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise9<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -323,29 +323,29 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // 🔧 Keep same DOWN offset across devices
+    // Keep same DOWN offset across devices
     function getLatDownOffset() { return 8; }
 
-    /* Position the card so its BOTTOM edge sits just above the pin (no flicker) */
+    /* Position the card so its BOTTOM edge sits just above the pin (no initial flash) */
     function positionCardAbovePin(place, gap = 10) {
       if (!place) return;
       const coords = world.getScreenCoords(place.lat, place.lng);
       if (!coords) return;
 
-      // Make sure it's in the layout but invisible while positioning
-      if (card.style.display === 'none') card.style.display = 'block';
-      card.style.visibility = 'hidden';
+      // Ensure the card is rendered off-screen before measuring
+      if (card.style.display === 'none') {
+        card.style.display = 'block';
+        card.style.top = '-10000px';
+        card.style.left = '-10000px';
+        card.style.transform = 'translate(0,0)';
+      }
 
-      // Force a layout read to get height (slideshow has fixed height so it's stable)
       const h = card.offsetHeight || 0;
 
-      // Set position in the same frame to avoid visible jump
+      // Place centered horizontally at pin.x and just above pin.y
       card.style.left = coords.x + 'px';
       card.style.top  = (coords.y - h - gap) + 'px';
       card.style.transform = 'translateX(-50%)';
-
-      // Reveal now that it's in place
-      card.style.visibility = 'visible';
     }
 
     // Build + run slideshow for the current place
@@ -361,9 +361,11 @@
         `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
       ).join('');
 
-      // Insert content but keep it hidden until positioned
+      // Insert content while card is off-screen; then position and it's instantly correct
       card.style.display = 'block';
-      card.style.visibility = 'hidden';
+      card.style.top = '-10000px';
+      card.style.left = '-10000px';
+      card.style.transform = 'translate(0,0)';
       card.innerHTML = `
         <div class="slideshow" aria-label="${place.name} photos (slideshow)">
           ${slidesHtml}
@@ -417,7 +419,7 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // Move camera, then position the card immediately without flashing
+      // Move camera
       const latOffset = getLatDownOffset(place.name);
       world.pointOfView({
         lat: parseFloat(place.lat) + latOffset,
@@ -425,10 +427,10 @@
         altitude: 0.8
       }, 2000);
 
-      // Position now (hidden), then reveal in-place
+      // Position the card immediately (off-screen -> correct spot, no flash)
       positionCardAbovePin(place);
 
-      // Also re-position once after POV tween likely ends (in case of minor drift)
+      // Also re-position once after POV tween ends (in case of minor drift)
       setTimeout(() => positionCardAbovePin(place), 2050);
     }
 
