@@ -110,7 +110,7 @@
       z-index: 5;
     }
 
-    /* ===== Desktop default (bigger, but clamped via JS) ===== */
+    /* ===== Desktop default ===== */
     .card {
       position: absolute;
       left: 50%;
@@ -119,12 +119,12 @@
       padding: 16px 22px;
       border-radius: 12px;
       text-align: center;
-      width: 820px;                  /* a bit bigger on PC */
+      width: 820px;                  
       max-height: none;
       overflow-y: visible;
       z-index: 5;
-      display: none;                 /* hidden until positioned */
-      visibility: hidden;            /* avoid flicker */
+      display: none;                 
+      visibility: hidden;            
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.15vw, 24px);
     }
@@ -179,24 +179,23 @@
     @media screen and (max-width: 600px) {
       .ml11 { font-size: 1.4rem; }
       .loading-bar-container { height: 20px; width: 85%; }
-      .loading-percentage { font-size: 18px; }
-      .continue-text { font-size: 18px; }
+      .loading-percentage, .continue-text { font-size: 18px; }
       .title { font-size: 1.6rem; }
       .subtitle { font-size: 1rem; }
       #airplane { font-size: 50px; }
 
-      /* ===== Mobile cards: unified, slightly shorter height ===== */
+      /* ===== Mobile cards: unified shorter height, no scroll ===== */
       .card {
         width: min(95vw, 420px);
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
-        height: var(--card-target-height, 340px);     /* equal height */
+        height: var(--card-target-height, 340px);
         max-height: var(--card-target-height, 340px);
-        overflow-y: hidden;                            /* lock the height */
+        overflow-y: hidden;
       }
 
-      /* Base slideshow height on mobile – JS fine-tunes per card */
-      .slideshow { height: 160px; }
+      /* Keep slideshow size (do NOT shrink it) */
+      .slideshow { height: 180px; }
       .card img {
         display: block;
         width: 100%;
@@ -218,11 +217,35 @@
     }
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    /* Taller slideshow for bigger images (desktop base) */
+    /* Slideshow base (desktop & mobile) */
     .slideshow { position: relative; width: 100%; height: 260px; overflow: hidden; border-radius: 6px; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
-    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
+
+    /* Overlay arrows on the slideshow image (saves vertical space) */
+    .arrow-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 105, 180, 0.85);
+      color: #fff;
+      border: none;
+      border-radius: 999px;
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+      font-size: 20px;
+      cursor: pointer;
+      padding: 0;
+      user-select: none;
+    }
+    .arrow-left { left: 8px; }
+    .arrow-right { right: 8px; }
+
+    /* Controls row now just holds dots; tiny margin to save space */
+    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 2px; }
     .slide-controls button { background: #ff69b4; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
     .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #ffd1e6; display: inline-block; cursor: pointer; }
@@ -232,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -353,38 +376,29 @@
       card.style.visibility = 'visible';
     }
 
-    // Keep cards from ever overlapping the title on desktop
+    // Clamp desktop card height so it doesn't overlap title
     function clampCardMaxHeightToTitle() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (isMobile) return;
-
       const title = document.querySelector('.title');
       const rect = title.getBoundingClientRect();
-      // space available between title bottom and viewport bottom
-      const safeGap = 20; // breathing room
+      const safeGap = 20;
       const avail = Math.max(160, window.innerHeight - rect.bottom - safeGap);
       card.style.maxHeight = avail + 'px';
-      card.style.overflowY = 'auto'; // if content exceeds clamp, scroll inside card
+      card.style.overflowY = 'auto';
     }
 
-    // Make all mobile cards the same (short) height by resizing the slideshow area
+    // Equalize mobile card height but do NOT shrink slideshow below 180px
     function normalizeCardHeightMobile() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (!isMobile) return;
-
-      const target = 330;               // unified mobile height (shorter than before)
+      const target = 340; // keep original target; space gained by moving arrows
       document.documentElement.style.setProperty('--card-target-height', target + 'px');
-
-      // measure what's around the slideshow to compute its needed height
       const slideshow = card.querySelector('.slideshow');
       if (!slideshow) return;
-
-      // measure current layout
       const totalNow = card.offsetHeight;
       const otherHeight = totalNow - slideshow.offsetHeight;
-
-      // desired slideshow height so that card hits the exact target
-      const desiredSlideH = Math.max(120, target - otherHeight);
+      const desiredSlideH = Math.max(180, target - otherHeight); // never below 180
       slideshow.style.height = desiredSlideH + 'px';
     }
 
@@ -392,7 +406,7 @@
     function updateCard(index) {
       const place = places[index];
 
-      // Build slideshow HTML (2 images)
+      // Build slideshow HTML (2 images) + overlay arrows; controls row has only dots
       const slidesHtml = place.imgs.map((src, i) =>
         `<img class="slide ${i === 0 ? 'active' : ''}" src="${src}" alt="${place.name} photo ${i+1}">`
       ).join('');
@@ -407,11 +421,11 @@
       card.innerHTML = `
         <div class="slideshow" aria-label="${place.name} photos (slideshow)">
           ${slidesHtml}
+          <button class="arrow-btn arrow-left" aria-label="Previous image">‹</button>
+          <button class="arrow-btn arrow-right" aria-label="Next image">›</button>
         </div>
         <div class="slide-controls">
-          <button class="slide-prev" aria-label="Previous image">‹</button>
           <div class="dots">${dotsHtml}</div>
-          <button class="slide-next" aria-label="Next image">›</button>
         </div>
         <p>${place.message}</p>
       `;
@@ -420,8 +434,8 @@
       let imgIdx = 0;
       const slides = card.querySelectorAll('.slide');
       const dots = card.querySelectorAll('.dot');
-      const prev = card.querySelector('.slide-prev');
-      const next = card.querySelector('.slide-next');
+      const prev = card.querySelector('.arrow-left');
+      const next = card.querySelector('.arrow-right');
       const slideshowEl = card.querySelector('.slideshow');
 
       function show(n) {
@@ -431,10 +445,14 @@
         positionCardAbovePin(place); // adjust if height changes
       }
 
-      prev.addEventListener('click', () => show(imgIdx - 1));
-      next.addEventListener('click', () => show(imgIdx + 1));
-      dots.forEach(d => d.addEventListener('click', () => show(parseInt(d.dataset.idx))));
-      slideshowEl.addEventListener('click', () => show(imgIdx + 1));
+      // prevent clicks inside slideshow from bubbling (avoids weird hides)
+      const stop = e => { e.stopPropagation(); };
+
+      prev.addEventListener('click', (e) => { stop(e); show(imgIdx - 1); });
+      next.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
+
+      // Tap/click anywhere on the slideshow to advance
+      slideshowEl.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
 
       // Swipe (basic)
       let startX = null;
@@ -444,14 +462,18 @@
         const dx = e.changedTouches[0].clientX - startX;
         if (Math.abs(dx) > 30) show(imgIdx + (dx < 0 ? 1 : -1));
         startX = null;
+        e.stopPropagation();
       }, { passive: true });
+
+      // Dot navigation
+      dots.forEach(d => d.addEventListener('click', (e) => { e.stopPropagation(); show(parseInt(d.dataset.idx)); }));
 
       // Show nav buttons
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // Desktop clamp + Mobile equalization (do this before measuring/placing)
+      // Sizing helpers
       normalizeCardHeightMobile();
       clampCardMaxHeightToTitle();
 
@@ -551,7 +573,7 @@
       revealCard();
     });
 
-    // Reposition + re-apply sizing on window resize
+    // Reposition card and re-apply sizing on window resize
     window.addEventListener('resize', () => {
       if (currentIndex >= 0) {
         normalizeCardHeightMobile();
