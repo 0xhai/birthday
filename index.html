@@ -112,7 +112,7 @@
 
     .card {
       position: absolute;
-      top: 35%;
+      top: 35%; /* base (mobile already overrides below) */
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
@@ -126,6 +126,11 @@
       display: none;
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.1vw, 24px);
+    }
+
+    /* ⬇️ Desktop-only: lift the card slightly higher so it won't overlap pins/text */
+    @media (min-width: 601px) {
+      .card { top: 32%; }
     }
 
     .nav-buttons {
@@ -172,11 +177,7 @@
       pointer-events: none;
     }
 
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
-      70% { box-shadow: 0 0 0 15px rgba(255, 105, 180, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
-    }
+    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,105,180,.7)} 70%{box-shadow:0 0 0 15px rgba(255,105,180,0)} 100%{box-shadow:0 0 0 0 rgba(255,105,180,0)} }
     .pulsing { animation: pulse 2s infinite; }
 
     @media screen and (max-width: 600px) {
@@ -220,62 +221,21 @@
     }
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    /* --- minimal styles for the 2-image slideshow --- */
-    .slideshow {
-      position: relative;
-      width: 100%;
-      height: 160px;            /* reserve space so layout doesn't jump */
-      overflow: hidden;
-      border-radius: 5px;
-    }
-    .slideshow .slide {
-      position: absolute;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      opacity: 0;
-      transition: opacity .5s ease;
-    }
+    /* slideshow */
+    .slideshow { position: relative; width: 100%; height: 160px; overflow: hidden; border-radius: 5px; }
+    .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
-    .slide-controls {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 6px;
-    }
-    .slide-controls button {
-      background: #ff69b4;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 4px 10px;
-      cursor: pointer;
-      font-family: 'Pacifico', cursive;
-      font-size: 16px;
-    }
-    .dots {
-      display: flex;
-      gap: 6px;
-      align-items: center;
-      justify-content: center;
-    }
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: #ffd1e6;
-      display: inline-block;
-      cursor: pointer;
-    }
+    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
+    .slide-controls button { background: #ff69b4; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
+    .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: #ffd1e6; display: inline-block; cursor: pointer; }
     .dot.active { background: #ff69b4; }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseR<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseD<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -344,7 +304,6 @@
     const startBtn = document.getElementById('startBtn');
     const airplane = document.getElementById('airplane');
 
-    // Each place now uses a 2-image array: [imageX.jpg, imageXb.jpg]
     const places = [
       { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
       { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg"] },
@@ -354,7 +313,7 @@
     ];
 
     let currentIndex = -1;
-    let slideshowTimer = null; // <-- ensure we don't stack timers between cards
+    let slideshowTimer = null;
 
     const world = Globe()(elem)
       .globeImageUrl('earth-cartoon.png')
@@ -368,6 +327,19 @@
       .labelSize(1)
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
+
+    // Helper: figure out device + offset so the pin sits lower (near buttons)
+    function getLatDownOffset(placeName) {
+      const isMobile = window.matchMedia('(max-width: 600px)').matches;
+
+      // Base: push pin further DOWN on both devices
+      const base = isMobile ? 8 : 14; // degrees of latitude to push the camera north of the pin
+
+      // Desktop-only extra nudge for the 3 countries where the card overlapped before
+      const extraDesktopOverlap = (!isMobile && ["Turkey","Azerbaijan","Greece"].includes(placeName)) ? 4 : 0;
+
+      return base + extraDesktopOverlap;
+    }
 
     // Build + run slideshow for the current place
     function updateCard(index) {
@@ -408,12 +380,9 @@
         dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
       }
 
-      // Click controls
       prev.addEventListener('click', () => show(imgIdx - 1));
       next.addEventListener('click', () => show(imgIdx + 1));
       dots.forEach(d => d.addEventListener('click', () => show(parseInt(d.dataset.idx))));
-
-      // Tap/Click main image to advance
       slideshowEl.addEventListener('click', () => show(imgIdx + 1));
 
       // Swipe (basic)
@@ -429,8 +398,6 @@
       // Autoplay every 2.5s (clear any prior timer)
       if (slideshowTimer) clearInterval(slideshowTimer);
       slideshowTimer = setInterval(() => show(imgIdx + 1), 2500);
-
-      // Pause autoplay when hovering (desktop)
       slideshowEl.addEventListener('mouseenter', () => { if (slideshowTimer) clearInterval(slideshowTimer); });
       slideshowEl.addEventListener('mouseleave', () => { slideshowTimer = setInterval(() => show(imgIdx + 1), 2500); });
 
@@ -440,9 +407,10 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // Fly camera
+      // 📍 Make the pin appear LOWER on screen by centering the camera NORTH of the pin
+      const latOffset = getLatDownOffset(place.name);
       world.pointOfView({
-        lat: parseFloat(place.lat) + 2,
+        lat: parseFloat(place.lat) + latOffset,
         lng: parseFloat(place.lng),
         altitude: 0.8
       }, 2000);
