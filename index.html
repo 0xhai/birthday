@@ -6,6 +6,12 @@
   <title>Happy Birthday name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
+    :root{
+      /* Space reserved for the top title area and the bottom pins/buttons area */
+      --safe-top: 110px;      /* desktop default */
+      --safe-bottom: 160px;   /* desktop default */
+    }
+
     html, body { 
       margin: 0; 
       height: 100%; 
@@ -112,25 +118,27 @@
 
     .card {
       position: absolute;
-      top: 35%; /* base (mobile already overrides below) */
+      /* LOWER the card so it sits above the pins */
+      top: 56%;
       left: 50%;
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
       padding: 14px 20px;
       border-radius: 10px;
       text-align: center;
-      width: 600px;
-      max-height: none;
-      overflow-y: visible;
+
+      /* Responsive width: large but not too wide */
+      width: clamp(360px, 60vw, 680px);
+
+      /* Keep card between the title (top safe area) and pins/buttons (bottom safe area) */
+      max-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
+      overflow-y: auto;
+
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.1vw, 24px);
-    }
-
-    /* Desktop-only: keep slight lift (safe to leave as-is) */
-    @media (min-width: 601px) {
-      .card { top: 32%; }
+      box-sizing: border-box;
     }
 
     .nav-buttons {
@@ -177,10 +185,20 @@
       pointer-events: none;
     }
 
-    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(255,105,180,.7)} 70%{box-shadow:0 0 0 15px rgba(255,105,180,0)} 100%{box-shadow:0 0 0 0 rgba(255,105,180,0)} }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 105, 180, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
+    }
     .pulsing { animation: pulse 2s infinite; }
 
+    /* MOBILE overrides */
     @media screen and (max-width: 600px) {
+      :root{
+        --safe-top: 90px;     /* mobile title area */
+        --safe-bottom: 170px; /* mobile pins/buttons spacing */
+      }
+
       .ml11 { font-size: 1.4rem; }
       .loading-bar-container { height: 20px; width: 85%; }
       .loading-percentage { font-size: 18px; }
@@ -188,12 +206,14 @@
       .title { font-size: 1.6rem; }
       .subtitle { font-size: 1rem; }
       #airplane { font-size: 50px; }
+
       .card {
-        width: min(92vw, 380px);
+        /* slightly lower on mobile to sit just above pins */
+        top: 58%;
+        width: min(92vw, 430px);
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
-        top: 30%;
-        max-height: 65vh;
+        max-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
         overflow-y: auto;
       }
       .card img {
@@ -235,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseE<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseQ<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -328,9 +348,8 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // 🔧 Make desktop behave exactly like mobile for pin placement
-    function getLatDownOffset(/* placeName */) {
-      // This was 8° on mobile previously; now use it everywhere
+    // Same pin placement for all devices (already tuned)
+    function getLatDownOffset() {
       return 8;
     }
 
@@ -400,8 +419,8 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // 📍 Use same DOWN offset on all devices so laptop == mobile
-      const latOffset = getLatDownOffset(place.name);
+      // Keep pins low (near buttons) with the same offset for all devices
+      const latOffset = getLatDownOffset();
       world.pointOfView({
         lat: parseFloat(place.lat) + latOffset,
         lng: parseFloat(place.lng),
