@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -394,32 +394,30 @@
       slideshow.style.height = desiredSlideH + 'px';
     }
 
-    // Smooth flight that runs in parallel with POV animation
-    function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, durationMs = 2000) {
-      // Start globe POV animation in parallel
+    // Smooth flight + parallel POV; plane can be slower than POV
+    function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, planeDurationMs = 2400, povDurationMs = 1200) {
+      // Start globe POV animation
       const latOffset = getLatDownOffset();
       world.pointOfView({
         lat: parseFloat(lat) + latOffset,
         lng: parseFloat(lng),
         altitude: 0.8
-      }, durationMs);
+      }, povDurationMs);
 
-      // Ensure plane visible and get starting point
+      // Plane setup
       airplane.style.display = 'block';
       let startX = airplane.offsetLeft || 0;
       let startY = airplane.offsetTop || 0;
 
-      // Easing (easeInOutCubic)
       const ease = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
-      const arcHeight = 50; // px
+      const arcHeight = 50;
 
       let startTs = null;
       function step(ts) {
         if (!startTs) startTs = ts;
-        const p = Math.min(1, (ts - startTs) / durationMs);
+        const p = Math.min(1, (ts - startTs) / planeDurationMs);
         const t = ease(p);
 
-        // Current target moves as the globe animates
         const c = world.getScreenCoords(lat, lng);
         if (!c) { requestAnimationFrame(step); return; }
 
@@ -430,7 +428,6 @@
         const yLinear = startY + (targetY - startY) * t;
         const y = yLinear - Math.sin(Math.PI * t) * arcHeight;
 
-        // Face the direction of travel
         const angle = Math.atan2(y - (airplane.offsetTop || 0), x - (airplane.offsetLeft || 0)) * 180 / Math.PI;
 
         airplane.style.left = x + 'px';
@@ -440,7 +437,6 @@
         if (p < 1) {
           requestAnimationFrame(step);
         } else {
-          // Snap exact and level
           airplane.style.left = targetX + 'px';
           airplane.style.top  = targetY + 'px';
           airplane.style.transform = 'rotate(0deg)';
@@ -451,7 +447,7 @@
     }
 
     // Build + run slideshow for the current place
-    function updateCard(index, animationMs = 2000) {
+    function updateCard(index, revealAfterMs = 1200) {
       const place = places[index];
 
       // Build slideshow HTML (2 images) + overlay arrows; controls row has only dots
@@ -463,7 +459,7 @@
         `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
       ).join('');
 
-      // Insert content but keep hidden until after animation finishes
+      // Insert content but keep hidden until after POV finishes
       card.style.display = 'block';
       card.style.visibility = 'hidden';
       card.innerHTML = `
@@ -490,19 +486,14 @@
         imgIdx = (n + slides.length) % slides.length;
         slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
         dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
-        positionCardAbovePin(place); // adjust if height changes
+        positionCardAbovePin(place);
       }
 
-      // prevent clicks inside slideshow from bubbling (avoids weird hides)
       const stop = e => { e.stopPropagation(); };
-
       prev.addEventListener('click', (e) => { stop(e); show(imgIdx - 1); });
       next.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
-
-      // Tap/click anywhere on the slideshow to advance
       slideshowEl.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
 
-      // Swipe (basic)
       let startX = null;
       slideshowEl.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
       slideshowEl.addEventListener('touchend', (e) => {
@@ -513,23 +504,20 @@
         e.stopPropagation();
       }, { passive: true });
 
-      // Dot navigation
       dots.forEach(d => d.addEventListener('click', (e) => { e.stopPropagation(); show(parseInt(d.dataset.idx)); }));
 
-      // Show nav buttons
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // Sizing helpers
       normalizeCardHeightMobile();
       clampCardMaxHeightToTitle();
 
-      // Reveal right after the plane+POV animation
+      // Reveal shortly after POV animation (not after the slower plane)
       setTimeout(() => {
         positionCardAbovePin(place);
         revealCard();
-      }, animationMs + 50);
+      }, revealAfterMs + 50);
     }
 
     // START
@@ -538,17 +526,16 @@
       startBtn.disabled = true;
       currentIndex = 0;
 
-      // Hide card during animation
       card.style.display = 'none';
       card.style.visibility = 'hidden';
 
-      // Smooth parallel flight + POV to Turkey (left of pin)
-      const dur = 3000;
+      const planeDur = 2400; // slower plane
+      const povDur   = 1200; // faster POV so card shows sooner
       flyPlaneTo(places[0].lat, places[0].lng, () => {
-        updateCard(0, dur);
+        updateCard(0, povDur);
         nextBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
-      }, -40, -10, dur);
+      }, -40, -10, planeDur, povDur);
     });
 
     // NEXT
@@ -561,11 +548,12 @@
         card.style.visibility = 'hidden';
 
         const dest = places[currentIndex];
-        const dur = 3000;
+        const planeDur = 2400;
+        const povDur   = 1200;
         flyPlaneTo(dest.lat, dest.lng, () => {
-          updateCard(currentIndex, dur);
+          updateCard(currentIndex, povDur);
           nextBtn.disabled = false;
-        }, -40, -10, dur);
+        }, -40, -10, planeDur, povDur);
       }
     });
 
@@ -579,11 +567,12 @@
         card.style.visibility = 'hidden';
 
         const dest = places[currentIndex];
-        const dur = 3000;
+        const planeDur = 2400;
+        const povDur   = 1200;
         flyPlaneTo(dest.lat, dest.lng, () => {
-          updateCard(currentIndex, dur);
+          updateCard(currentIndex, povDur);
           prevBtn.disabled = false;
-        }, -40, -10, dur);
+        }, -40, -10, planeDur, povDur);
       }
     });
 
