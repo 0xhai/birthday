@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise8<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -384,7 +384,7 @@
     function normalizeCardHeightMobile() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (!isMobile) return;
-      const target = 330; // keep original target; space gained by moving arrows
+      const target = 330; // keep original target; arrows moved onto image give space
       document.documentElement.style.setProperty('--card-target-height', target + 'px');
       const slideshow = card.querySelector('.slideshow');
       if (!slideshow) return;
@@ -394,61 +394,44 @@
       slideshow.style.height = desiredSlideH + 'px';
     }
 
-    // --- NEW: Keep plane stuck near a pin during POV ---
-    let unstick = null;
-    function stickPlaneToPlace(place, offsetX = -40, offsetY = -10, durationMs = 2100) {
-      let start = null;
-      let rafId = null;
-      const step = (ts) => {
-        if (!start) start = ts;
-        const coords = world.getScreenCoords(place.lat, place.lng);
-        if (coords) {
-          airplane.style.left = (coords.x + offsetX) + 'px';
-          airplane.style.top  = (coords.y + offsetY) + 'px';
-          airplane.style.transform = 'rotate(0deg)';
-          airplane.style.display = 'block';
-        }
-        if (ts - start < durationMs) {
-          rafId = requestAnimationFrame(step);
-        }
-      };
-      rafId = requestAnimationFrame(step);
-      return () => { if (rafId) cancelAnimationFrame(rafId); };
-    }
+    // Smooth flight that runs in parallel with POV animation
+    function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, durationMs = 2000) {
+      // Start globe POV animation in parallel
+      const latOffset = getLatDownOffset();
+      world.pointOfView({
+        lat: parseFloat(lat) + latOffset,
+        lng: parseFloat(lng),
+        altitude: 0.8
+      }, durationMs);
 
-    // --- UPDATED: smooth flight to on-screen pin with easing + arc ---
-    function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, durationMs = 900) {
-      const coords = world.getScreenCoords(lat, lng);
-      if (!coords) { if (callback) callback(); return; }
-
-      const targetX = coords.x + offsetX;
-      const targetY = coords.y + offsetY;
-
-      // Initialize start from current position (default 0,0 if first time)
+      // Ensure plane visible and get starting point
+      airplane.style.display = 'block';
       let startX = airplane.offsetLeft || 0;
       let startY = airplane.offsetTop || 0;
 
-      // Ensure plane is visible
-      airplane.style.display = 'block';
-
       // Easing (easeInOutCubic)
       const ease = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
+      const arcHeight = 50; // px
 
-      // Gentle arc for Y (visual niceness)
-      const arcHeight = 50; // px peak offset
       let startTs = null;
-
       function step(ts) {
         if (!startTs) startTs = ts;
         const p = Math.min(1, (ts - startTs) / durationMs);
         const t = ease(p);
+
+        // Current target moves as the globe animates
+        const c = world.getScreenCoords(lat, lng);
+        if (!c) { requestAnimationFrame(step); return; }
+
+        const targetX = c.x + offsetX;
+        const targetY = c.y + offsetY;
 
         const x = startX + (targetX - startX) * t;
         const yLinear = startY + (targetY - startY) * t;
         const y = yLinear - Math.sin(Math.PI * t) * arcHeight;
 
         // Face the direction of travel
-        const angle = Math.atan2((y - (airplane.offsetTop || 0)), (x - (airplane.offsetLeft || 0))) * 180 / Math.PI;
+        const angle = Math.atan2(y - (airplane.offsetTop || 0), x - (airplane.offsetLeft || 0)) * 180 / Math.PI;
 
         airplane.style.left = x + 'px';
         airplane.style.top  = y + 'px';
@@ -457,19 +440,18 @@
         if (p < 1) {
           requestAnimationFrame(step);
         } else {
-          // Snap exact at end
+          // Snap exact and level
           airplane.style.left = targetX + 'px';
           airplane.style.top  = targetY + 'px';
           airplane.style.transform = 'rotate(0deg)';
           if (callback) callback();
         }
       }
-
       requestAnimationFrame(step);
     }
 
     // Build + run slideshow for the current place
-    function updateCard(index) {
+    function updateCard(index, animationMs = 2000) {
       const place = places[index];
 
       // Build slideshow HTML (2 images) + overlay arrows; controls row has only dots
@@ -481,7 +463,7 @@
         `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
       ).join('');
 
-      // Insert content but keep hidden until after POV finishes
+      // Insert content but keep hidden until after animation finishes
       card.style.display = 'block';
       card.style.visibility = 'hidden';
       card.innerHTML = `
@@ -543,89 +525,69 @@
       normalizeCardHeightMobile();
       clampCardMaxHeightToTitle();
 
-      // Move camera first; keep card hidden during the motion
-      const latOffset = getLatDownOffset(place.name);
-      world.pointOfView({
-        lat: parseFloat(place.lat) + latOffset,
-        lng: parseFloat(place.lng),
-        altitude: 0.8
-      }, 2000);
-
-      // After POV animation finishes, position and reveal with NO intermediate flash
+      // Reveal right after the plane+POV animation
       setTimeout(() => {
         positionCardAbovePin(place);
         revealCard();
-      }, 2050);
+      }, animationMs + 50);
     }
 
+    // START
     startBtn.addEventListener('click', () => {
       startBtn.classList.remove('pulsing');
       startBtn.disabled = true;
       currentIndex = 0;
 
-      // Hide card completely during plane animation and initial POV setup
+      // Hide card during animation
       card.style.display = 'none';
       card.style.visibility = 'hidden';
 
-      // cancel any prior stick loop
-      if (unstick) { unstick(); unstick = null; }
-
-      // Smooth flight to left of Turkey's pin (no premature snap)
+      // Smooth parallel flight + POV to Turkey (left of pin)
+      const dur = 2000;
       flyPlaneTo(places[0].lat, places[0].lng, () => {
-        updateCard(0);
-        // keep plane stuck left of pin during POV zoom
-        unstick = stickPlaneToPlace(places[0], -40, -10, 2100);
+        updateCard(0, dur);
         nextBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
-      }, -40, -10, 2000);
+      }, -40, -10, dur);
     });
 
+    // NEXT
     nextBtn.addEventListener('click', () => {
       if (currentIndex < places.length - 1) {
         nextBtn.disabled = true;
         currentIndex++;
 
-        // Hide card until moved and placed
         card.style.display = 'none';
         card.style.visibility = 'hidden';
 
-        // cancel any prior stick loop
-        if (unstick) { unstick(); unstick = null; }
-
         const dest = places[currentIndex];
-
-        // Smooth flight to left of destination pin
+        const dur = 2000;
         flyPlaneTo(dest.lat, dest.lng, () => {
-          updateCard(currentIndex);
-          unstick = stickPlaneToPlace(dest, -40, -10, 2100);
+          updateCard(currentIndex, dur);
           nextBtn.disabled = false;
-        }, -40, -10, 2000);
+        }, -40, -10, dur);
       }
     });
 
+    // PREV
     prevBtn.addEventListener('click', () => {
       if (currentIndex > 0) {
         prevBtn.disabled = true;
         currentIndex--;
 
-        // Hide card until moved and placed
         card.style.display = 'none';
         card.style.visibility = 'hidden';
 
-        // cancel any prior stick loop
-        if (unstick) { unstick(); unstick = null; }
-
         const dest = places[currentIndex];
-
-        // Smooth flight to left of destination pin
+        const dur = 2000;
         flyPlaneTo(dest.lat, dest.lng, () => {
-          updateCard(currentIndex);
-          unstick = stickPlaneToPlace(dest, -40, -10, 2100);
+          updateCard(currentIndex, dur);
           prevBtn.disabled = false;
-        }, -40, -10, 2000);
+        }, -40, -10, dur);
       }
     });
 
+    // END
     endBtn.addEventListener('click', () => {
       if (slideshowTimer) clearInterval(slideshowTimer);
       card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>And through it all, one truth remains — you are my favorite story, my greatest adventure, and my happiest place. Happy 25th birthday, omorfia mou. Here’s to all the journeys still ahead. ❤️</p>";
