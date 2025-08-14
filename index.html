@@ -256,6 +256,39 @@
     .pulsating-vibrating {
       animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear;
     }
+
+    .slider-container {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+    
+    .slider-image {
+      max-height: 160px;
+      object-fit: cover;
+      border-radius: 5px;
+      width: 100%;
+    }
+    
+    .slider-btn {
+      position: absolute;
+      background: rgba(255,255,255,0.8);
+      border: none;
+      font-size: 20px;
+      padding: 6px 10px;
+      cursor: pointer;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+    
+    .left-btn {
+      left: 5px;
+    }
+    
+    .right-btn {
+      right: 5px;
+    }
   </style>
 </head>
 <body>
@@ -331,11 +364,11 @@
     const airplane = document.getElementById('airplane');
 
     const places = [
-      { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", img: "image1.jpg" },
-      { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", img: "image2.jpg" },
-      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", img: "image3.jpg" },
-      { lat: 49.5, lng: 5.0, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", img: "image4.jpg" },
-      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along", img: "image5.jpg" }
+      { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", img: ["image1.jpg", "image1b.jpg"] },
+      { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", img: ["image2.jpg", "image2b.jpg"] },
+      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", img: ["image3.jpg", "image3b.jpg"] },
+      { lat: 49.5, lng: 5.0, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", img: ["image4.jpg", "image4b.jpg"] },
+      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along", img: ["image5.jpg", "image5b.jpg"] }
     ];
 
     let currentIndex = -1;
@@ -353,21 +386,47 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
+    let currentImageIndex = 0;
+
     function updateCard(index) {
       const place = places[index];
+      currentImageIndex = 0;
+    
       card.innerHTML = `
-      <img src="${place.img}" 
-           style="width:100%; border-radius:5px; max-height:160px; object-fit:cover;">
-      <p>${place.message}</p>`;
+        <div class="slider-container">
+          <button class="slider-btn left-btn">⬅</button>
+          <img src="${place.images[currentImageIndex]}" class="slider-image">
+          <button class="slider-btn right-btn">➡</button>
+        </div>
+        <p>${place.message}</p>
+      `;
+    
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
+    
+      // Globe animation
       world.pointOfView({
         lat: parseFloat(place.lat) + 2,
         lng: parseFloat(place.lng),
         altitude: 0.8
       }, 2000);
+    
+      // Slider logic
+      const leftBtn = card.querySelector('.left-btn');
+      const rightBtn = card.querySelector('.right-btn');
+      const imgElement = card.querySelector('.slider-image');
+    
+      leftBtn.addEventListener('click', () => {
+        currentImageIndex = (currentImageIndex - 1 + place.images.length) % place.images.length;
+        imgElement.src = place.images[currentImageIndex];
+      });
+    
+      rightBtn.addEventListener('click', () => {
+        currentImageIndex = (currentImageIndex + 1) % place.images.length;
+        imgElement.src = place.images[currentImageIndex];
+      });
     }
 
     function flyPlaneTo(lat, lng, callback) {
