@@ -110,7 +110,7 @@
       z-index: 5;
     }
 
-    /* UPDATED: remove fixed top; JS will position the card so its bottom sits just above the pin */
+    /* Card is positioned dynamically in JS; start hidden to avoid flicker */
     .card {
       position: absolute;
       left: 50%;
@@ -119,11 +119,12 @@
       padding: 14px 20px;
       border-radius: 10px;
       text-align: center;
-      width: 700px; /* wider to make images bigger on desktop */
+      width: 700px; /* bigger images on desktop */
       max-height: none;
       overflow-y: visible;
       z-index: 5;
       display: none;
+      visibility: hidden; /* prevent top-corner flash */
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.1vw, 24px);
     }
@@ -184,7 +185,7 @@
       .subtitle { font-size: 1rem; }
       #airplane { font-size: 50px; }
       .card {
-        width: min(95vw, 420px); /* more space on mobile */
+        width: min(95vw, 420px);
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
         max-height: 70vh;
@@ -194,7 +195,7 @@
         display: block;
         width: 100%;
         height: auto;
-        max-height: 200px; /* bigger images on mobile */
+        max-height: 200px;
         object-fit: cover;
         border-radius: 5px;
       }
@@ -215,7 +216,7 @@
     }
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    /* UPDATED: taller slideshow -> bigger images */
+    /* Taller slideshow for bigger images */
     .slideshow { position: relative; width: 100%; height: 240px; overflow: hidden; border-radius: 5px; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
@@ -229,7 +230,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseE<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise9<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -322,26 +323,29 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // 🔧 Make desktop behave exactly like mobile for pin placement
-    function getLatDownOffset(/* placeName */) {
-      // This was 8° on mobile previously; now use it everywhere
-      return 8;
-    }
+    // 🔧 Keep same DOWN offset across devices
+    function getLatDownOffset() { return 8; }
 
-    /* NEW: utility to position the card so its BOTTOM edge sits just above the pin */
+    /* Position the card so its BOTTOM edge sits just above the pin (no flicker) */
     function positionCardAbovePin(place, gap = 10) {
       if (!place) return;
       const coords = world.getScreenCoords(place.lat, place.lng);
       if (!coords) return;
-      // Ensure card has layout to measure height
-      const ensureLayout = () => {
-        const h = card.offsetHeight || 0;
-        card.style.left = coords.x + 'px';
-        card.style.top = (coords.y - h - gap) + 'px';
-        card.style.transform = 'translateX(-50%)'; // only horizontal centering
-      };
-      // Run twice to be safe after images/layout settle
-      requestAnimationFrame(() => requestAnimationFrame(ensureLayout));
+
+      // Make sure it's in the layout but invisible while positioning
+      if (card.style.display === 'none') card.style.display = 'block';
+      card.style.visibility = 'hidden';
+
+      // Force a layout read to get height (slideshow has fixed height so it's stable)
+      const h = card.offsetHeight || 0;
+
+      // Set position in the same frame to avoid visible jump
+      card.style.left = coords.x + 'px';
+      card.style.top  = (coords.y - h - gap) + 'px';
+      card.style.transform = 'translateX(-50%)';
+
+      // Reveal now that it's in place
+      card.style.visibility = 'visible';
     }
 
     // Build + run slideshow for the current place
@@ -357,6 +361,9 @@
         `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
       ).join('');
 
+      // Insert content but keep it hidden until positioned
+      card.style.display = 'block';
+      card.style.visibility = 'hidden';
       card.innerHTML = `
         <div class="slideshow" aria-label="${place.name} photos (slideshow)">
           ${slidesHtml}
@@ -381,8 +388,7 @@
         imgIdx = (n + slides.length) % slides.length;
         slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
         dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
-        // Reposition in case height changes slightly
-        positionCardAbovePin(place);
+        positionCardAbovePin(place); // in case height changes slightly
       }
 
       prev.addEventListener('click', () => show(imgIdx - 1));
@@ -402,17 +408,16 @@
 
       // Autoplay every 2.5s (clear any prior timer)
       if (slideshowTimer) clearInterval(slideshowTimer);
-      slideshowTimer = setInterval(() => show(imgIdx + 1), 4000);
+      slideshowTimer = setInterval(() => show(imgIdx + 1), 2500);
       slideshowEl.addEventListener('mouseenter', () => { if (slideshowTimer) clearInterval(slideshowTimer); });
       slideshowEl.addEventListener('mouseleave', () => { slideshowTimer = setInterval(() => show(imgIdx + 1), 2500); });
 
-      // Show card + nav buttons
-      card.style.display = 'block';
+      // Show nav buttons
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // 📍 Use same DOWN offset on all devices so laptop == mobile
+      // Move camera, then position the card immediately without flashing
       const latOffset = getLatDownOffset(place.name);
       world.pointOfView({
         lat: parseFloat(place.lat) + latOffset,
@@ -420,8 +425,10 @@
         altitude: 0.8
       }, 2000);
 
-      // Position the card immediately and after POV transition completes
+      // Position now (hidden), then reveal in-place
       positionCardAbovePin(place);
+
+      // Also re-position once after POV tween likely ends (in case of minor drift)
       setTimeout(() => positionCardAbovePin(place), 2050);
     }
 
@@ -492,7 +499,6 @@
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
-      // Keep card positioned above last pin
       positionCardAbovePin(places[currentIndex]);
     });
 
