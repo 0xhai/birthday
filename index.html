@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise8<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -543,7 +543,7 @@
       card.style.visibility = 'hidden';
 
       // Smooth parallel flight + POV to Turkey (left of pin)
-      const dur = 2000;
+      const dur = 3000;
       flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0, dur);
         nextBtn.style.display = 'inline-block';
@@ -561,7 +561,7 @@
         card.style.visibility = 'hidden';
 
         const dest = places[currentIndex];
-        const dur = 2000;
+        const dur = 3000;
         flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex, dur);
           nextBtn.disabled = false;
@@ -579,7 +579,7 @@
         card.style.visibility = 'hidden';
 
         const dest = places[currentIndex];
-        const dur = 2000;
+        const dur = 3000;
         flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex, dur);
           prevBtn.disabled = false;
