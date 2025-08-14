@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -397,6 +397,28 @@
       slideshow.style.height = desiredSlideH + 'px';
     }
 
+    // --- NEW: Keep plane stuck near a pin during POV ---
+    let unstick = null;
+    function stickPlaneToPlace(place, offsetX = -40, offsetY = -10, durationMs = 2100) {
+      let start = null;
+      let rafId = null;
+      const step = (ts) => {
+        if (!start) start = ts;
+        const coords = world.getScreenCoords(place.lat, place.lng);
+        if (coords) {
+          airplane.style.left = (coords.x + offsetX) + 'px';
+          airplane.style.top  = (coords.y + offsetY) + 'px';
+          airplane.style.transform = 'rotate(0deg)';
+          airplane.style.display = 'block';
+        }
+        if (ts - start < durationMs) {
+          rafId = requestAnimationFrame(step);
+        }
+      };
+      rafId = requestAnimationFrame(step);
+      return () => { if (rafId) cancelAnimationFrame(rafId); };
+    }
+
     // Build + run slideshow for the current place
     function updateCard(index) {
       const place = places[index];
@@ -519,11 +541,19 @@
       startBtn.classList.remove('pulsing');
       startBtn.disabled = true;
       currentIndex = 0;
+
       // Hide card completely during plane animation and initial POV setup
       card.style.display = 'none';
       card.style.visibility = 'hidden';
-      flyPlaneTo(places[0].lat, places[0].lng -5, () => {
+
+      // cancel any prior stick loop
+      if (unstick) { unstick(); unstick = null; }
+
+      // Fly to just left of Turkey's pin
+      flyPlaneTo(places[0].lat, places[0].lng - 5, () => {
         updateCard(0);
+        // keep plane stuck left of pin during POV zoom
+        unstick = stickPlaneToPlace(places[0], -40, -10, 2100);
         nextBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
       });
@@ -533,11 +563,21 @@
       if (currentIndex < places.length - 1) {
         nextBtn.disabled = true;
         currentIndex++;
+
         // Hide card until moved and placed
         card.style.display = 'none';
         card.style.visibility = 'hidden';
-        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
+
+        // cancel any prior stick loop
+        if (unstick) { unstick(); unstick = null; }
+
+        const dest = places[currentIndex];
+
+        // Fly to just left of destination pin
+        flyPlaneTo(dest.lat, dest.lng - 5, () => {
           updateCard(currentIndex);
+          // keep plane stuck left of pin during POV zoom
+          unstick = stickPlaneToPlace(dest, -40, -10, 2100);
           nextBtn.disabled = false;
         });
       }
@@ -547,11 +587,21 @@
       if (currentIndex > 0) {
         prevBtn.disabled = true;
         currentIndex--;
+
         // Hide card until moved and placed
         card.style.display = 'none';
         card.style.visibility = 'hidden';
-        flyPlaneTo(places[currentIndex].lat, places[currentIndex].lng, () => {
+
+        // cancel any prior stick loop
+        if (unstick) { unstick(); unstick = null; }
+
+        const dest = places[currentIndex];
+
+        // Fly to just left of destination pin
+        flyPlaneTo(dest.lat, dest.lng - 5, () => {
           updateCard(currentIndex);
+          // keep plane stuck left of pin during POV zoom
+          unstick = stickPlaneToPlace(dest, -40, -10, 2100);
           prevBtn.disabled = false;
         });
       }
