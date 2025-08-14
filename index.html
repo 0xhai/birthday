@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -522,7 +522,7 @@
       // Hide card completely during plane animation and initial POV setup
       card.style.display = 'none';
       card.style.visibility = 'hidden';
-      flyPlaneTo(places[0].lat, places[0].lng, () => {
+      flyPlaneTo(places[0].lat, places[0].lng -5, () => {
         updateCard(0);
         nextBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
