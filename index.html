@@ -255,7 +255,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -356,20 +356,15 @@
       const coords = world.getScreenCoords(place.lat, place.lng);
       if (!coords) return;
 
-      // Make sure it's in the layout but hidden
+      // Ensure it's in the layout
       if (card.style.display === 'none') card.style.display = 'block';
-      card.style.visibility = 'hidden';
-      card.style.left = '-10000px';
-      card.style.top  = '-10000px';
-      card.style.transform = 'translate(0,0)';
 
-      // Measure after content is in
+      // Measure current height and place centered horizontally at pin.x and just above pin.y
       const h = card.offsetHeight || 0;
-
-      // Place centered horizontally at pin.x and just above pin.y
       card.style.left = coords.x + 'px';
       card.style.top  = (coords.y - h - gap) + 'px';
       card.style.transform = 'translateX(-50%)';
+      // NOTE: Do NOT change card visibility here — avoids accidental hiding on clicks
     }
 
     function revealCard() {
