@@ -232,7 +232,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise7<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -368,7 +368,7 @@
     }
 
     // Make all mobile cards the same (short) height by resizing the slideshow area
-    function () {
+    function normalizeCardHeightMobile() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (!isMobile) return;
 
