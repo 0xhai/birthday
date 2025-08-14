@@ -250,12 +250,25 @@
     .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #ffd1e6; display: inline-block; cursor: pointer; }
     .dot.active { background: #ff69b4; }
+
+    /* Refresh button style (added) */
+    .refresh-btn {
+      padding: clamp(10px, 3vw, 20px) clamp(16px, 4vw, 40px);
+      font-size: clamp(20px, 3vw, 32px);
+      cursor: pointer;
+      border: none;
+      background: #ff69b4;
+      color: white;
+      border-radius: 8px;
+      margin-top: 12px;
+      font-family: 'Pacifico', cursive;
+    }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -520,6 +533,41 @@
       }, revealAfterMs + 50);
     }
 
+    /* ========= ADDED: Reset to initial post-loading state ========= */
+    function resetApp() {
+      // stop any slideshow timers
+      if (slideshowTimer) clearInterval(slideshowTimer);
+
+      // reset index/state
+      currentIndex = -1;
+
+      // reset buttons
+      prevBtn.style.display = 'none';
+      nextBtn.style.display = 'none';
+      endBtn.style.display = 'none';
+      startBtn.style.display = 'inline-block';
+      startBtn.disabled = false;
+      startBtn.classList.add('pulsing');
+
+      // reset card
+      card.style.display = 'none';
+      card.style.visibility = 'hidden';
+      card.innerHTML = '';
+
+      // reset globe POV
+      world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0);
+
+      // reset airplane
+      airplane.style.display = 'block';
+      airplane.style.left = '0px';
+      airplane.style.top = '0px';
+      airplane.style.transform = 'rotate(0deg)';
+
+      // ensure sizing recalculates
+      clampCardMaxHeightToTitle();
+    }
+    /* ============================================================= */
+
     // START
     startBtn.addEventListener('click', () => {
       startBtn.classList.remove('pulsing');
@@ -576,15 +624,23 @@
       }
     });
 
-    // END
+    // END (modified to include Refresh button)
     endBtn.addEventListener('click', () => {
       if (slideshowTimer) clearInterval(slideshowTimer);
-      card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>And through it all, one truth remains — you are my favorite story, my greatest adventure, and my happiest place. Happy 25th birthday, omorfia mou. Here’s to all the journeys still ahead. ❤️</p>";
+      card.innerHTML = `
+        <h2>🎉 Happy Birthday! 🎉</h2>
+        <p>And through it all, one truth remains — you are my favorite story, my greatest adventure, and my happiest place. Happy 25th birthday, omorfia mou. Here’s to all the journeys still ahead. ❤️</p>
+        <button id="refreshLastBtn" class="refresh-btn">Refresh 🔄</button>
+      `;
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
       positionCardAbovePin(places[currentIndex]);
       revealCard();
+
+      // wire up Refresh
+      const refreshLastBtn = document.getElementById('refreshLastBtn');
+      refreshLastBtn.addEventListener('click', resetApp);
     });
 
     // Reposition card and re-apply sizing on window resize
