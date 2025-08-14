@@ -232,7 +232,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise6<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise7<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -368,11 +368,11 @@
     }
 
     // Make all mobile cards the same (short) height by resizing the slideshow area
-    function normalizeCardHeightMobile() {
+    function () {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (!isMobile) return;
 
-      const target = 340;               // unified mobile height (shorter than before)
+      const target = 330;               // unified mobile height (shorter than before)
       document.documentElement.style.setProperty('--card-target-height', target + 'px');
 
       // measure what's around the slideshow to compute its needed height
