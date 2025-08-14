@@ -173,77 +173,43 @@
     }
 
     @keyframes pulse {
-      0% {
-        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7);
-      }
-      70% {
-        box-shadow: 0 0 0 15px rgba(255, 105, 180, 0);
-      }
-      100% {
-        box-shadow: 0 0 0 0 rgba(255, 105, 180, 0);
-      }
+      0% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0.7); }
+      70% { box-shadow: 0 0 0 15px rgba(255, 105, 180, 0); }
+      100% { box-shadow: 0 0 0 0 rgba(255, 105, 180, 0); }
     }
-
-    .pulsing {
-      animation: pulse 2s infinite;
-    }
+    .pulsing { animation: pulse 2s infinite; }
 
     @media screen and (max-width: 600px) {
-      .ml11 {
-        font-size: 1.4rem;
-      }
-      .loading-bar-container {
-        height: 20px;
-        width: 85%;
-      }
-      .loading-percentage {
-        font-size: 18px;
-      }
-      .continue-text {
-        font-size: 18px;
-      }
-      .title {
-        font-size: 1.6rem;
-      }
-      .subtitle {
-        font-size: 1rem;
-      }
-      #airplane {
-        font-size: 50px;
-      }
+      .ml11 { font-size: 1.4rem; }
+      .loading-bar-container { height: 20px; width: 85%; }
+      .loading-percentage { font-size: 18px; }
+      .continue-text { font-size: 18px; }
+      .title { font-size: 1.6rem; }
+      .subtitle { font-size: 1rem; }
+      #airplane { font-size: 50px; }
       .card {
-        /* WIDER but still fits small phones */
         width: min(92vw, 380px);
-        /* SHORTER */
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
-        /* HIGHER on the screen */
         top: 30%;
-        max-height: 65vh;       /* prevents it from taking up most of the screen */
+        max-height: 65vh;
         overflow-y: auto;
       }
-      
       .card img {
         display: block;
         width: 100%;
-        height: auto;          /* keep aspect */
-        max-height: 140px;     /* reduce card height */
-        object-fit: cover;     /* crop if needed */
+        height: auto;
+        max-height: 140px;
+        object-fit: cover;
         border-radius: 5px;
       }
-      
-      /* Trim paragraph spacing to shorten card */
       .card p {
-        margin: 8px 0 0;       /* remove big default margins */
-        line-height: 1.25;     /* tighter lines */
+        margin: 8px 0 0;
+        line-height: 1.25;
       }
     }
 
-    @keyframes pulseFade {
-      0%, 100% { opacity: 0.5; transform: scale(1); }
-      50% { opacity: 1; transform: scale(1.05); }
-    }
-
+    @keyframes pulseFade { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
     @keyframes vibrate {
       0% { transform: translateX(0); }
       20% { transform: translateX(-1px); }
@@ -252,16 +218,64 @@
       80% { transform: translateX(2px); }
       100% { transform: translateX(0); }
     }
+    .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    .pulsating-vibrating {
-      animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear;
+    /* --- minimal styles for the 2-image slideshow --- */
+    .slideshow {
+      position: relative;
+      width: 100%;
+      height: 160px;            /* reserve space so layout doesn't jump */
+      overflow: hidden;
+      border-radius: 5px;
     }
+    .slideshow .slide {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity .5s ease;
+    }
+    .slideshow .slide.active { opacity: 1; }
+    .slide-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 6px;
+    }
+    .slide-controls button {
+      background: #ff69b4;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      cursor: pointer;
+      font-family: 'Pacifico', cursive;
+      font-size: 16px;
+    }
+    .dots {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      justify-content: center;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #ffd1e6;
+      display: inline-block;
+      cursor: pointer;
+    }
+    .dot.active { background: #ff69b4; }
   </style>
 </head>
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprisew<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseR<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -330,15 +344,17 @@
     const startBtn = document.getElementById('startBtn');
     const airplane = document.getElementById('airplane');
 
+    // Each place now uses a 2-image array: [imageX.jpg, imageXb.jpg]
     const places = [
-      { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", img: "image1.jpg" },
-      { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", img: "image2.jpg" },
-      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", img: "image3.jpg" },
-      { lat: 49.5, lng: 5.0, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", img: "image4.jpg" },
-      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along", img: "image5.jpg" }
+      { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
+      { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg"] },
+      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", imgs: ["image3.jpg","image3b.jpg"] },
+      { lat: 49.5, lng: 5.0, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", imgs: ["image4.jpg","image4b.jpg"] },
+      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along", imgs: ["image5.jpg","image5b.jpg"] }
     ];
 
     let currentIndex = -1;
+    let slideshowTimer = null; // <-- ensure we don't stack timers between cards
 
     const world = Globe()(elem)
       .globeImageUrl('earth-cartoon.png')
@@ -353,16 +369,78 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
+    // Build + run slideshow for the current place
     function updateCard(index) {
       const place = places[index];
+
+      // Build slideshow HTML (2 images)
+      const slidesHtml = place.imgs.map((src, i) =>
+        `<img class="slide ${i === 0 ? 'active' : ''}" src="${src}" alt="${place.name} photo ${i+1}">`
+      ).join('');
+
+      const dotsHtml = place.imgs.map((_, i) =>
+        `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
+      ).join('');
+
       card.innerHTML = `
-      <img src="${place.img}" 
-           style="width:100%; border-radius:5px; max-height:160px; object-fit:cover;">
-      <p>${place.message}</p>`;
+        <div class="slideshow" aria-label="${place.name} photos (slideshow)">
+          ${slidesHtml}
+        </div>
+        <div class="slide-controls">
+          <button class="slide-prev" aria-label="Previous image">‹</button>
+          <div class="dots">${dotsHtml}</div>
+          <button class="slide-next" aria-label="Next image">›</button>
+        </div>
+        <p>${place.message}</p>
+      `;
+
+      // Wire up slideshow controls
+      let imgIdx = 0;
+      const slides = card.querySelectorAll('.slide');
+      const dots = card.querySelectorAll('.dot');
+      const prev = card.querySelector('.slide-prev');
+      const next = card.querySelector('.slide-next');
+      const slideshowEl = card.querySelector('.slideshow');
+
+      function show(n) {
+        imgIdx = (n + slides.length) % slides.length;
+        slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
+        dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
+      }
+
+      // Click controls
+      prev.addEventListener('click', () => show(imgIdx - 1));
+      next.addEventListener('click', () => show(imgIdx + 1));
+      dots.forEach(d => d.addEventListener('click', () => show(parseInt(d.dataset.idx))));
+
+      // Tap/Click main image to advance
+      slideshowEl.addEventListener('click', () => show(imgIdx + 1));
+
+      // Swipe (basic)
+      let startX = null;
+      slideshowEl.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
+      slideshowEl.addEventListener('touchend', (e) => {
+        if (startX == null) return;
+        const dx = e.changedTouches[0].clientX - startX;
+        if (Math.abs(dx) > 30) show(imgIdx + (dx < 0 ? 1 : -1));
+        startX = null;
+      }, { passive: true });
+
+      // Autoplay every 2.5s (clear any prior timer)
+      if (slideshowTimer) clearInterval(slideshowTimer);
+      slideshowTimer = setInterval(() => show(imgIdx + 1), 2500);
+
+      // Pause autoplay when hovering (desktop)
+      slideshowEl.addEventListener('mouseenter', () => { if (slideshowTimer) clearInterval(slideshowTimer); });
+      slideshowEl.addEventListener('mouseleave', () => { slideshowTimer = setInterval(() => show(imgIdx + 1), 2500); });
+
+      // Show card + nav buttons
       card.style.display = 'block';
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
+
+      // Fly camera
       world.pointOfView({
         lat: parseFloat(place.lat) + 2,
         lng: parseFloat(place.lng),
@@ -432,6 +510,7 @@
     });
 
     endBtn.addEventListener('click', () => {
+      if (slideshowTimer) clearInterval(slideshowTimer);
       card.innerHTML = "<h2>🎉 Happy Birthday! 🎉</h2><p>And through it all, one truth remains — you are my favorite story, my greatest adventure, and my happiest place. Happy 25th birthday, omorfia mou. Here’s to all the journeys still ahead. ❤️</p>";
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
