@@ -6,10 +6,20 @@
   <title>Happy Birthday name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
+    /* Safe layout lanes + bias (center-of-mass of the card within the safe lane) */
     :root{
-      /* Space reserved for the top title area and the bottom pins/buttons area */
-      --safe-top: 110px;      /* desktop default */
-      --safe-bottom: 160px;   /* desktop default */
+      --safe-top: 120px;                            /* space for title on laptop */
+      --safe-bottom: calc(190px + env(safe-area-inset-bottom, 0px)); /* space for pins/buttons */
+      --card-bias: 0.58;                            /* 0 = top of safe lane, 1 = bottom of safe lane */
+      --slideshow-h: 180px;
+    }
+    @media (max-width: 600px){
+      :root{
+        --safe-top: 90px;                           /* smaller title on mobile */
+        --safe-bottom: calc(190px + env(safe-area-inset-bottom, 0px));
+        --card-bias: 0.60;                          /* a touch lower on mobile */
+        --slideshow-h: 150px;
+      }
     }
 
     html, body { 
@@ -116,24 +126,20 @@
       z-index: 5;
     }
 
+    /* ⬇️ CARD: always between title and pins/buttons, biased lower */
     .card {
-      position: absolute;
-      /* LOWER the card so it sits above the pins */
-      top: 56%;
+      position: fixed;
       left: 50%;
+      /* center of the card within the safe vertical lane */
+      top: calc(var(--safe-top) + (100vh - var(--safe-top) - var(--safe-bottom)) * var(--card-bias));
       transform: translate(-50%, -50%);
       background: rgba(255,255,255,0.95);
       padding: 14px 20px;
       border-radius: 10px;
       text-align: center;
-
-      /* Responsive width: large but not too wide */
-      width: clamp(360px, 60vw, 680px);
-
-      /* Keep card between the title (top safe area) and pins/buttons (bottom safe area) */
+      width: clamp(320px, 60vw, 680px);
       max-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
       overflow-y: auto;
-
       z-index: 5;
       display: none;
       font-family: 'Pacifico', cursive;
@@ -192,44 +198,6 @@
     }
     .pulsing { animation: pulse 2s infinite; }
 
-    /* MOBILE overrides */
-    @media screen and (max-width: 600px) {
-      :root{
-        --safe-top: 90px;     /* mobile title area */
-        --safe-bottom: 170px; /* mobile pins/buttons spacing */
-      }
-
-      .ml11 { font-size: 1.4rem; }
-      .loading-bar-container { height: 20px; width: 85%; }
-      .loading-percentage { font-size: 18px; }
-      .continue-text { font-size: 18px; }
-      .title { font-size: 1.6rem; }
-      .subtitle { font-size: 1rem; }
-      #airplane { font-size: 50px; }
-
-      .card {
-        /* slightly lower on mobile to sit just above pins */
-        top: 58%;
-        width: min(92vw, 430px);
-        padding: 10px 12px;
-        font-size: clamp(14px, 4vw, 18px);
-        max-height: calc(100vh - var(--safe-top) - var(--safe-bottom));
-        overflow-y: auto;
-      }
-      .card img {
-        display: block;
-        width: 100%;
-        height: auto;
-        max-height: 140px;
-        object-fit: cover;
-        border-radius: 5px;
-      }
-      .card p {
-        margin: 8px 0 0;
-        line-height: 1.25;
-      }
-    }
-
     @keyframes pulseFade { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
     @keyframes vibrate {
       0% { transform: translateX(0); }
@@ -242,7 +210,7 @@
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
     /* slideshow */
-    .slideshow { position: relative; width: 100%; height: 160px; overflow: hidden; border-radius: 5px; }
+    .slideshow { position: relative; width: 100%; height: var(--slideshow-h); overflow: hidden; border-radius: 5px; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .5s ease; }
     .slideshow .slide.active { opacity: 1; }
     .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
@@ -255,7 +223,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseQ<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseD<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -348,10 +316,8 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // Same pin placement for all devices (already tuned)
-    function getLatDownOffset() {
-      return 8;
-    }
+    // Keep pins low (same on all devices)
+    function getLatDownOffset() { return 8; }
 
     // Build + run slideshow for the current place
     function updateCard(index) {
