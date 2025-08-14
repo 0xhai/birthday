@@ -128,7 +128,7 @@
       font-size: clamp(18px, 1.1vw, 24px);
     }
 
-    /* ⬇️ Desktop-only: lift the card slightly higher so it won't overlap pins/text */
+    /* Desktop-only: keep slight lift (safe to leave as-is) */
     @media (min-width: 601px) {
       .card { top: 32%; }
     }
@@ -235,7 +235,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseD<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseE<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -328,17 +328,10 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // Helper: figure out device + offset so the pin sits lower (near buttons)
-    function getLatDownOffset(placeName) {
-      const isMobile = window.matchMedia('(max-width: 600px)').matches;
-
-      // Base: push pin further DOWN on both devices
-      const base = isMobile ? 8 : 14; // degrees of latitude to push the camera north of the pin
-
-      // Desktop-only extra nudge for the 3 countries where the card overlapped before
-      const extraDesktopOverlap = (!isMobile && ["Turkey","Azerbaijan","Greece"].includes(placeName)) ? 4 : 0;
-
-      return base + extraDesktopOverlap;
+    // 🔧 Make desktop behave exactly like mobile for pin placement
+    function getLatDownOffset(/* placeName */) {
+      // This was 8° on mobile previously; now use it everywhere
+      return 8;
     }
 
     // Build + run slideshow for the current place
@@ -407,7 +400,7 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // 📍 Make the pin appear LOWER on screen by centering the camera NORTH of the pin
+      // 📍 Use same DOWN offset on all devices so laptop == mobile
       const latOffset = getLatDownOffset(place.name);
       world.pointOfView({
         lat: parseFloat(place.lat) + latOffset,
