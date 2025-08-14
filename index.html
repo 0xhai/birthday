@@ -196,7 +196,7 @@
       }
 
       /* Base slideshow height on mobile – JS fine-tunes per card */
-      .slideshow { height: 180px; }
+      .slideshow { height: 160px; }
       .card img {
         display: block;
         width: 100%;
@@ -232,7 +232,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise4<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise5<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -384,7 +384,7 @@
       const otherHeight = totalNow - slideshow.offsetHeight;
 
       // desired slideshow height so that card hits the exact target
-      const desiredSlideH = Math.max(140, target - otherHeight);
+      const desiredSlideH = Math.max(120, target - otherHeight);
       slideshow.style.height = desiredSlideH + 'px';
     }
 
