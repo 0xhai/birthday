@@ -112,7 +112,7 @@
 
     .card {
       position: absolute;
-      top: 48%; /* base (mobile already overrides below) */
+      top: 48%; /* base (mobile overrides below) */
       left: 50%;
       transform: translate(-50%, -20%);
       background: rgba(255,255,255,0.95);
@@ -199,8 +199,9 @@
         width: min(92vw, 380px);
         padding: 10px 12px;
         font-size: clamp(14px, 4vw, 18px);
-        top: 37%;
-        transform: translate(-50%, -8%);
+        /* Let JS set precise top in px; keep only horizontal centering */
+        transform: translateX(-50%);
+        top: auto;
         max-height: 62vh;
         overflow-y: auto;
       }
@@ -243,7 +244,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surpriseG<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseV<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -336,11 +337,38 @@
       .labelDotRadius(0.65)
       .labelColor(() => 'white');
 
-    // 🔧 Make desktop behave exactly like mobile for pin placement
-    function getLatDownOffset(/* placeName */) {
-      // This was 8° on mobile previously; now use it everywhere
-      return 8;
+    // 🔧 Look-down offset: a bit less on phones so the pin isn't too low
+    function getLatDownOffset() {
+      return window.innerWidth <= 600 ? 4 : 8;
     }
+
+    // === NEW: helpers to position the card just above the pin on mobile ===
+    function getScreenYFromLat(lat) {
+      return window.innerHeight / 2 - (lat / 90) * (window.innerHeight / 2);
+    }
+
+    function placeCardAbovePin(place, margin = 10) {
+      const pinY = getScreenYFromLat(parseFloat(place.lat));
+      const buttons = document.querySelector('.nav-buttons');
+      const buttonsRect = buttons?.getBoundingClientRect();
+
+      // measure current card height
+      const rect = card.getBoundingClientRect();
+
+      // avoid overlapping the nav buttons at the bottom
+      const bottomSafeY = buttonsRect ? buttonsRect.top - 8 : window.innerHeight;
+
+      // bottom of card should be margin px above the pin, but not below bottomSafeY
+      let targetBottom = Math.min(pinY - margin, bottomSafeY - margin);
+      let topPx = Math.max(8, targetBottom - rect.height);
+
+      card.style.top = `${Math.round(topPx)}px`;
+
+      // ensure the card always fits between its top and the safe bottom
+      const available = Math.max(120, bottomSafeY - topPx - margin);
+      card.style.maxHeight = `${Math.floor(available)}px`;
+    }
+    // === END helpers ===
 
     // Build + run slideshow for the current place
     function updateCard(index) {
@@ -379,6 +407,11 @@
         imgIdx = (n + slides.length) % slides.length;
         slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
         dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
+
+        // keep card glued when image size shifts (mobile only)
+        if (window.innerWidth <= 600) {
+          requestAnimationFrame(() => placeCardAbovePin(place, 10));
+        }
       }
 
       prev.addEventListener('click', () => show(imgIdx - 1));
@@ -408,13 +441,18 @@
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
       endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
 
-      // 📍 Use same DOWN offset on all devices so laptop == mobile
-      const latOffset = getLatDownOffset(place.name);
+      // 📍 Use look-down offset (less on phones)
+      const latOffset = getLatDownOffset();
       world.pointOfView({
         lat: parseFloat(place.lat) + latOffset,
         lng: parseFloat(place.lng),
         altitude: 0.8
       }, 2000);
+
+      // After render/layout, snap the card above the pin on mobile
+      if (window.innerWidth <= 600) {
+        requestAnimationFrame(() => placeCardAbovePin(place, 10));
+      }
     }
 
     function flyPlaneTo(lat, lng, callback) {
@@ -484,6 +522,13 @@
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
+    });
+
+    // Keep card glued on rotate/resize (mobile only)
+    window.addEventListener('resize', () => {
+      if (window.innerWidth <= 600 && currentIndex >= 0) {
+        placeCardAbovePin(places[currentIndex], 10);
+      }
     });
   </script>
 </body>
