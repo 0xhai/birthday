@@ -268,7 +268,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
+      <span class="letters">Preparing your surpriseF<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -337,7 +337,7 @@
     const startBtn = document.getElementById('startBtn');
     const airplane = document.getElementById('airplane');
 
-    // IMPORTANT: Keep your original coordinates exactly as provided
+    // Keep your original coordinates exactly:
     const places = [
       { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
       { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg","image2c.jpg","image2d.jpg"] },
@@ -360,9 +360,17 @@
       .labelText(d => d.name)
       .labelSize(1)
       .labelDotRadius(0.65)
-      .labelColor(() => 'white');
+      .labelColor(() => 'white')
+      // start with no arcs; we'll add them progressively
+      .arcsData([])
+      .arcColor(() => ['#2fbf9b', '#ffffff'])
+      .arcAltitude(() => 0.12)
+      .arcStroke(0.6)
+      .arcDashLength(0.5)
+      .arcDashGap(0.01)
+      .arcDashAnimateTime(2000);
 
-    // Explicitly disable any auto-rotation (keeps globe still unless user drags)
+    // Keep globe stationary (no autorotation)
     world.controls().autoRotate = false;
     world.controls().autoRotateSpeed = 0;
 
@@ -410,6 +418,23 @@
       const otherHeight = totalNow - slideshow.offsetHeight;
       const desiredSlideH = Math.max(180, target - otherHeight); // never below 180
       slideshow.style.height = desiredSlideH + 'px';
+    }
+
+    // --- Progressive arcs ---
+    function arcsUpTo(index) {
+      // index refers to current place index; arcs up to index are from 0->1, 1->2, ..., (index-1)->index
+      if (index <= 0) return [];
+      const arcs = [];
+      for (let i = 0; i < index; i++) {
+        arcs.push({
+          startLat: places[i].lat, startLng: places[i].lng,
+          endLat: places[i + 1].lat, endLng: places[i + 1].lng
+        });
+      }
+      return arcs;
+    }
+    function updateArcsForIndex(index) {
+      world.arcsData(arcsUpTo(index));
     }
 
     // Smooth flight + parallel POV; plane can be slower than POV
@@ -468,7 +493,6 @@
     function updateCard(index, revealAfterMs = 1200) {
       const place = places[index];
 
-      // Build slideshow HTML + overlay arrows; controls row has only dots
       const slidesHtml = place.imgs.map((src, i) =>
         `<img class="slide ${i === 0 ? 'active' : ''}" src="${src}" alt="${place.name} photo ${i+1}">`
       ).join('');
@@ -477,7 +501,6 @@
         `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
       ).join('');
 
-      // Insert content but keep hidden until after POV finishes
       card.style.display = 'block';
       card.style.visibility = 'hidden';
       card.innerHTML = `
@@ -531,7 +554,6 @@
       normalizeCardHeightMobile();
       clampCardMaxHeightToTitle();
 
-      // Reveal shortly after POV animation (not after the slower plane)
       setTimeout(() => {
         positionCardAbovePin(place);
         revealCard();
@@ -557,6 +579,8 @@
 
       world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0);
 
+      // clear arcs and plane
+      world.arcsData([]);
       airplane.style.display = 'none';
       airplane.style.left = '0px';
       airplane.style.top = '0px';
@@ -564,7 +588,7 @@
 
       clampCardMaxHeightToTitle();
     }
-    /* ======================================================= */
+    /* ============================================================= */
 
     // START
     startBtn.addEventListener('click', () => {
@@ -579,6 +603,7 @@
       const povDur   = 2000; // faster POV so card shows sooner
       flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0, povDur);
+        updateArcsForIndex(0); // no arcs yet at the first stop
         nextBtn.style.display = 'inline-block';
         startBtn.style.display = 'none';
       }, -40, -10, planeDur, povDur);
@@ -598,6 +623,7 @@
         const povDur   = 1200;
         flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex, povDur);
+          updateArcsForIndex(currentIndex); // cumulatively show arcs up to this point
           nextBtn.disabled = false;
         }, -40, -10, planeDur, povDur);
       }
@@ -617,6 +643,7 @@
         const povDur   = 1200;
         flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex, povDur);
+          updateArcsForIndex(currentIndex); // remove later arcs when going back
           prevBtn.disabled = false;
         }, -40, -10, planeDur, povDur);
       }
@@ -636,6 +663,7 @@
       positionCardAbovePin(places[currentIndex]);
       revealCard();
 
+      // wire up Refresh
       const refreshLastBtn = document.getElementById('refreshLastBtn');
       refreshLastBtn.addEventListener('click', resetApp);
     });
