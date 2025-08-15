@@ -1,73 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  />
   <title>Happy Birthday name 🎉</title>
-  <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
+
+  <!-- Fonts & perf -->
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap"
+    rel="stylesheet"
+  />
+
   <style>
-    html, body { 
-      margin: 0; 
-      height: 100%; 
-      overflow: hidden; 
-      background: linear-gradient(to bottom right, #dff5ee, #a7ded0); 
+    :root {
+      --bg1: #dff5ee;
+      --bg2: #a7ded0;
+      --brand: #2fbf9b;
+      --safe-gap: 20px;
+      --vh: 1vh; /* fallback for iOS pre-dvh */
     }
 
+    html,
+    body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: linear-gradient(to bottom right, var(--bg1), var(--bg2));
+    }
+
+    /* Improve mobile vh correctness on modern browsers */
+    @supports (height: 100dvh) {
+      #globeViz {
+        height: 100dvh;
+      }
+      canvas.confetti-canvas {
+        height: 100dvh !important;
+      }
+    }
+
+    /* Loader */
     #loadingScreen {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(to bottom right, #dff5ee, #a7ded0);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: fixed;
+      inset: 0;
+      background: linear-gradient(to bottom right, var(--bg1), var(--bg2));
+      display: grid;
+      place-content: center;
+      gap: 16px;
       z-index: 10;
       color: #fff;
       font-family: 'Pacifico', cursive;
+      text-align: center;
+      padding: 24px;
     }
 
     .ml11 {
       font-weight: 500;
-      font-size: clamp(2.2rem, 4vw, 3rem);
+      font-size: clamp(2rem, 4vw, 3rem);
       white-space: nowrap;
       overflow: hidden;
     }
 
     .loading-bar-container {
-      width: 350px;
+      width: min(350px, 85vw);
       height: 28px;
       background: #fff;
       border-radius: 10px;
       overflow: hidden;
-      margin-top: 20px;
+      margin: 6px auto 0;
       position: relative;
     }
 
     .loading-bar {
       height: 100%;
       width: 0%;
-      background: #2fbf9b;
-      transition: width 0.2s;
+      background: var(--brand);
+      transition: width 0.2s linear;
     }
 
     .loading-percentage {
-      margin-top: 5px;
-      font-size: 26px;
+      font-size: clamp(20px, 3vw, 26px);
       font-family: 'Pacifico', cursive;
     }
 
     .continue-text {
       opacity: 0;
-      margin-top: 15px;
-      font-size: 26px;
+      margin-top: 6px;
+      font-size: clamp(18px, 3vw, 26px);
       font-family: 'Pacifico', cursive;
       transition: opacity 0.5s;
     }
 
-    #globeViz { 
-      width: 100vw; 
-      height: 100vh; 
+    /* Titles */
+    .title {
+      position: absolute;
+      top: 20px;
+      width: 100%;
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(2.2rem, 5vw, 4rem);
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+      z-index: 5;
+      padding: 0 12px;
+      box-sizing: border-box;
+    }
+
+    .subtitle {
+      position: absolute;
+      bottom: max(20px, env(safe-area-inset-bottom));
+      width: 100%;
+      text-align: center;
+      font-family: 'Pacifico', cursive;
+      font-size: clamp(1.1rem, 3vw, 2.2rem);
+      color: #fff;
+      text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.4);
+      z-index: 5;
+      padding: 0 12px;
+      box-sizing: border-box;
+    }
+
+    #globeViz {
+      width: 100vw;
+      height: calc(var(--vh) * 100);
       position: relative;
       z-index: 1;
     }
@@ -83,50 +141,26 @@
       font-family: 'Pacifico', cursive;
       font-size: 18px;
       display: none;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
     }
 
-    .title {
-      position: absolute;
-      top: 20px;
-      width: 100%;
-      text-align: center;
-      font-family: 'Pacifico', cursive;
-      font-size: clamp(2.8rem, 5vw, 4rem);
-      color: #fff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
-    }
-
-    .subtitle {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      font-family: 'Pacifico', cursive;
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      color: #fff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
-    }
-
-    /* ===== Desktop default ===== */
     .card {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(255,255,255,0.95);
+      background: rgba(255, 255, 255, 0.95);
       padding: 16px 22px;
       border-radius: 12px;
       text-align: center;
-      width: 820px;                  
+      width: 820px;
       max-height: none;
       overflow-y: visible;
       z-index: 5;
-      display: none;                 
-      visibility: hidden;            
+      display: none;
+      visibility: hidden;
       font-family: 'Pacifico', cursive;
       font-size: clamp(18px, 1.15vw, 24px);
+      box-shadow: 0 8px 24px rgba(0,0,0,.15);
     }
 
     .nav-buttons {
@@ -135,105 +169,93 @@
       width: 100%;
       text-align: center;
       z-index: 6;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      flex-wrap: wrap;
+      padding: 0 10px;
+      box-sizing: border-box;
     }
 
     .nav-buttons button {
       padding: clamp(10px, 3vw, 20px) clamp(16px, 4vw, 40px);
-      font-size: clamp(28px, 4vw, 50px);
+      font-size: clamp(22px, 4vw, 36px);
       cursor: pointer;
       border: none;
-      background: #2fbf9b;
+      background: var(--brand);
       color: white;
-      border-radius: 8px;
-      margin: 0 10px;
+      border-radius: 12px;
       font-family: 'Pacifico', cursive;
-      transition: opacity 0.3s;
+      transition: transform 0.06s ease, opacity 0.3s;
+      touch-action: manipulation;
     }
+    .nav-buttons button:active { transform: translateY(1px) scale(.99); }
+    .nav-buttons button:disabled { opacity: .5; cursor: not-allowed; }
 
-    .nav-buttons button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
+    #skipAnimBtn {
+      background: #1c9b7f;
+      font-size: clamp(16px, 3vw, 20px);
+      padding: 8px 16px;
+      border-radius: 999px;
     }
 
     #airplane {
       position: absolute;
-      font-size: 100px;
+      font-size: clamp(50px, 8vw, 100px);
       z-index: 9999;
       transition: transform 1s linear;
-      display: block;
+      display: none;
+      will-change: transform, left, top;
+      user-select: none;
+      pointer-events: none;
     }
 
     canvas.confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
+      position: fixed !important;
+      inset: 0 !important;
       width: 100vw !important;
-      height: 100vh !important;
+      height: calc(var(--vh) * 100) !important;
       z-index: 0 !important;
       pointer-events: none;
     }
 
-    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(47,191,155,.7)} 70%{box-shadow:0 0 0 15px rgba(47,191,155,0)} 100%{box-shadow:0 0 0 0 rgba(47,191,155,0)} }
+    @keyframes pulse {
+      0% { box-shadow: 0 0 0 0 rgba(47,191,155,.7) }
+      70% { box-shadow: 0 0 0 15px rgba(47,191,155,0) }
+      100% { box-shadow: 0 0 0 0 rgba(47,191,155,0) }
+    }
     .pulsing { animation: pulse 2s infinite; }
 
-    @media screen and (max-width: 600px) {
-      .ml11 { font-size: 1.4rem; }
-      .loading-bar-container { height: 20px; width: 85%; }
-      .loading-percentage, .continue-text { font-size: 18px; }
-      .title { font-size: 1.6rem; }
-      .subtitle { font-size: 1rem; }
-      #airplane { font-size: 50px; }
-
-      /* ===== Mobile cards: unified shorter height, no scroll ===== */
-      .card {
-        width: min(95vw, 420px);
-        padding: 10px 12px;
-        font-size: clamp(14px, 4vw, 18px);
-        height: var(--card-target-height, 340px);
-        max-height: var(--card-target-height, 340px);
-        overflow-y: hidden;
-      }
-
-      /* Keep slideshow size (do NOT shrink it) */
-      .slideshow { height: 180px; }
-      .card img {
-        display: block;
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-        border-radius: 5px;
-      }
-      .card p { margin: 8px 0 0; line-height: 1.25; }
+    @keyframes pulseFade {
+      0%,100% { opacity:.5; transform:scale(1) }
+      50% { opacity:1; transform:scale(1.05) }
     }
-
-    @keyframes pulseFade { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
     @keyframes vibrate {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-1px); }
-      40% { transform: translateX(1px); }
-      60% { transform: translateX(-1px); }
-      80% { transform: translateX(2px); }
-      100% { transform: translateX(0); }
+      0% { transform: translateX(0) }
+      20% { transform: translateX(-1px) }
+      40% { transform: translateX(1px) }
+      60% { transform: translateX(-1px) }
+      80% { transform: translateX(2px) }
+      100% { transform: translateX(0) }
     }
     .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
 
-    /* Slideshow base (desktop & mobile) */
-    .slideshow { position: relative; width: 100%; height: 260px; overflow: hidden; border-radius: 6px; }
+    /* Slideshow */
+    .slideshow { position: relative; width: 100%; height: 260px; overflow: hidden; border-radius: 10px; background: #fff; }
     .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; opacity: 0; transition: opacity .5s ease; background: #fff; }
     .slideshow .slide.active { opacity: 1; }
 
-    /* Overlay arrows on the slideshow image (saves vertical space) */
     .arrow-btn {
       position: absolute;
       top: 50%;
       transform: translateY(-50%);
-      background: rgba(47, 191, 155, 0.85);
+      background: rgba(47, 191, 155, 0.9);
       color: #fff;
       border: none;
       border-radius: 999px;
-      width: 34px;
-      height: 34px;
-      line-height: 34px;
+      width: 36px;
+      height: 36px;
+      line-height: 36px;
       text-align: center;
       font-family: 'Pacifico', cursive;
       font-size: 20px;
@@ -244,91 +266,214 @@
     .arrow-left { left: 8px; }
     .arrow-right { right: 8px; }
 
-    /* Controls row now just holds dots; tiny margin to save space */
-    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 2px; }
-    .slide-controls button { background: #2fbf9b; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
+    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 6px; }
     .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #d7f3ea; display: inline-block; cursor: pointer; }
-    .dot.active { background: #2fbf9b; }
+    .dot { width: 9px; height: 9px; border-radius: 50%; background: #d7f3ea; display: inline-block; cursor: pointer; }
+    .dot.active { background: var(--brand); }
 
-    /* Refresh button style (added) */
-    .refresh-btn {
-      padding: clamp(10px, 3vw, 20px) clamp(16px, 4vw, 40px);
-      font-size: clamp(20px, 3vw, 32px);
-      cursor: pointer;
-      border: none;
-      background: #2fbf9b;
-      color: white;
-      border-radius: 8px;
-      margin-top: 12px;
-      font-family: 'Pacifico', cursive;
+    /* Mobile */
+    @media (max-width: 600px) {
+      .ml11 { font-size: 1.4rem; }
+      .loading-bar-container { height: 20px; width: 85%; }
+      .loading-percentage, .continue-text { font-size: 18px; }
+      .title { font-size: 1.6rem; }
+      .subtitle { font-size: 1rem; }
+
+      .card {
+        width: min(95vw, 420px);
+        padding: 10px 12px;
+        font-size: clamp(14px, 4vw, 18px);
+        height: var(--card-target-height, 340px);
+        max-height: var(--card-target-height, 340px);
+        overflow-y: hidden;
+      }
+      .slideshow { height: 180px; }
+      .card img {
+        display: block;
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        border-radius: 6px;
+      }
+      .card p { margin: 8px 0 0; line-height: 1.25; }
+    }
+
+    /* Accessible focus (keep outlines) */
+    button:focus-visible, .arrow-btn:focus-visible, .dot:focus-visible {
+      outline: 3px solid #0e6c57;
+      outline-offset: 2px;
     }
   </style>
 </head>
 <body>
-  <div id="loadingScreen">
+  <div id="loadingScreen" role="dialog" aria-modal="true" aria-live="polite">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise3<span id="dots">...</span></span>
     </div>
-    <div class="loading-bar-container">
+    <div class="loading-bar-container" aria-label="Loading progress">
       <div class="loading-bar" id="loadingBar"></div>
     </div>
-    <div class="loading-percentage" id="loadingPercentage">0%</div>
+    <div class="loading-percentage" id="loadingPercentage" aria-live="polite">0%</div>
     <div class="continue-text" id="continueText">[Press ENTER or Tap to continue]</div>
+    <div>
+      <button id="skipAnimBtn" type="button" aria-pressed="false">Skip animations</button>
+    </div>
   </div>
 
-  <div class="title">🎂 Happy Birthday name 🎂</div>
-  <div id="globeViz"></div>
-  <div id="popup" class="popup"></div>
-  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
+  <div class="title" id="titleText">🎂 Happy Birthday name 🎂</div>
+  <div id="globeViz" aria-label="3D globe visualization"></div>
+  <div id="popup" class="popup" role="status"></div>
+  <div class="subtitle" id="subtitleText">From country1 to country2, to country3... and beyond ❤️</div>
 
-  <div id="airplane">✈️</div>
+  <div id="airplane" aria-hidden="true">✈️</div>
 
-  <div id="infoCard" class="card"></div>
+  <div id="infoCard" class="card" aria-live="polite"></div>
   <div class="nav-buttons">
-    <button id="prevBtn" style="display:none;">⬅ Previous</button>
-    <button id="nextBtn" style="display:none;">Next ➡</button>
-    <button id="endBtn" style="display:none;">End 🎉</button>
-    <button id="startBtn" class="pulsing">Start ✈️</button>
+    <button id="prevBtn" type="button" style="display:none;">⬅ Previous</button>
+    <button id="nextBtn" type="button" style="display:none;">Next ➡</button>
+    <button id="endBtn"  type="button" style="display:none;">End 🎉</button>
+    <button id="startBtn" type="button" class="pulsing">Start ✈️</button>
   </div>
 
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
   <script>
-    // Animated dots
+    // --- Utility: fix mobile 100vh on iOS ---
+    function setVH() {
+      document.documentElement.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
+    }
+    setVH();
+    window.addEventListener('resize', setVH);
+
+    // --- Personalization ---
+    const PERSON_NAME = 'name';
+    const FROM_TO = ['country1', 'country2', 'country3'];
+    document.title = `Happy Birthday ${PERSON_NAME} 🎉`;
+    document.getElementById('titleText').textContent = `🎂 Happy Birthday ${PERSON_NAME} 🎂`;
+    document.getElementById('subtitleText').textContent = `From ${FROM_TO.join(' to ')}, and beyond ❤️`;
+
+    // --- Reduced motion handling (user toggle & media query) ---
+    const reduceMotionMedia = window.matchMedia('(prefers-reduced-motion: reduce)');
+    const storedReduce = localStorage.getItem('hb_reduce_motion');
+    let reduceMotion = storedReduce ? storedReduce === '1' : reduceMotionMedia.matches;
+
+    const skipBtn = document.getElementById('skipAnimBtn');
+    skipBtn.setAttribute('aria-pressed', String(reduceMotion));
+    skipBtn.textContent = reduceMotion ? 'Enable animations' : 'Skip animations';
+    skipBtn.addEventListener('click', () => {
+      reduceMotion = !reduceMotion;
+      localStorage.setItem('hb_reduce_motion', reduceMotion ? '1' : '0');
+      skipBtn.setAttribute('aria-pressed', String(reduceMotion));
+      skipBtn.textContent = reduceMotion ? 'Enable animations' : 'Skip animations';
+    });
+
+    // Animated dots on loader
     setInterval(() => {
       const dots = document.getElementById('dots');
       dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
     }, 500);
 
-    // Simulate loading
-    let load = 0;
+    const loadingScreen = document.getElementById('loadingScreen');
     const bar = document.getElementById('loadingBar');
     const perc = document.getElementById('loadingPercentage');
     const contText = document.getElementById('continueText');
-    const interval = setInterval(() => {
-      if (load < 100) {
-        load++;
-        bar.style.width = load + '%';
-        perc.textContent = load + '%';
-      } else {
-        clearInterval(interval);
+
+    // --- Places (coords corrected for countries) ---
+    const places = [
+      { lat: 39.0, lng: 35.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
+      { lat: 40.3, lng: 47.7, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg","image2c.jpg","image2d.jpg"] },
+      { lat: 38.0, lng: 23.7, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", imgs: ["image3.jpg","image3b.jpg","image3c.jpg","image3d.jpg","image3e.jpg","image3f.jpg","image3g.jpg","image3h.jpg","image3i.jpg"] },
+      { lat: 60.1, lng: 18.6, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", imgs: ["image4.jpg","image4b.jpg"] },
+      { lat: 64.9, lng: -19.0, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along.", imgs: ["image5.jpg","image5b.jpg"] }
+    ];
+
+    // --- Confetti control (pause on hidden tab & if reduced motion) ---
+    let confettiTimer = null;
+    function startConfetti() {
+      if (reduceMotion) return;
+      stopConfetti();
+      confettiTimer = setInterval(() => {
+        confetti({
+          particleCount: 80,
+          spread: 120,
+          origin: { y: Math.random(), x: Math.random() },
+          zIndex: 0
+        });
+      }, 1500);
+    }
+    function stopConfetti() {
+      if (confettiTimer) clearInterval(confettiTimer);
+      confettiTimer = null;
+    }
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) stopConfetti();
+      else startConfetti();
+    });
+
+    // --- Asset Preloading (real progress) ---
+    function unique(list) { return [...new Set(list)]; }
+    const assetList = unique(['earth-cartoon.png', ...places.flatMap(p => p.imgs)]);
+
+    function preloadAssets(urls, onProgress) {
+      let done = 0;
+      const total = urls.length || 1;
+      const loadOne = (u) =>
+        new Promise((res) => {
+          const i = new Image();
+          i.onload = i.onerror = () => {
+            done++;
+            onProgress(Math.round((done / total) * 100));
+            res();
+          };
+          i.decoding = 'async';
+          i.loading = 'eager';
+          i.src = u;
+        });
+      return Promise.all(urls.map(loadOne));
+    }
+
+    let loaderFinished = false;
+    function setProgress(v) {
+      bar.style.width = v + '%';
+      perc.textContent = v + '%';
+    }
+
+    // Allow "skip loader" on repeat visits
+    const HAS_SEEN_KEY = 'hb_has_seen';
+    const hasSeen = localStorage.getItem(HAS_SEEN_KEY) === '1';
+
+    (async function initLoader() {
+      if (!hasSeen) {
+        await preloadAssets(assetList, setProgress);
+        loaderFinished = true;
         contText.style.opacity = 1;
         contText.classList.add('pulsating-vibrating');
+      } else {
+        // Quick show 100% and allow immediate continue
+        setProgress(100);
+        loaderFinished = true;
+        contText.style.opacity = 1;
       }
-    }, 30);
+    })();
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+    function maybeHideLoader() {
+      if (!loaderFinished) return;
+      loadingScreen.style.display = 'none';
+      localStorage.setItem(HAS_SEEN_KEY, '1');
+      startConfetti();
+      // Move focus to Start for keyboard users
+      document.getElementById('startBtn').focus();
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && loaderFinished) maybeHideLoader();
     });
     document.addEventListener('click', () => {
-      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
+      if (loaderFinished) maybeHideLoader();
     });
 
-    setInterval(() => {
-      confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
-    }, 1500);
-
+    // --- Globe setup ---
     const elem = document.getElementById('globeViz');
     const card = document.getElementById('infoCard');
     const nextBtn = document.getElementById('nextBtn');
@@ -336,17 +481,6 @@
     const endBtn = document.getElementById('endBtn');
     const startBtn = document.getElementById('startBtn');
     const airplane = document.getElementById('airplane');
-
-    const places = [
-      { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
-      { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg","image2c.jpg","image2d.jpg"] },
-      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", imgs: ["image3.jpg","image3b.jpg","image3c.jpg","image3d.jpg","image3e.jpg","image3f.jpg","image3g.jpg","image3h.jpg","image3i.jpg"] },
-      { lat: 49.5, lng: 5.0, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", imgs: ["image4.jpg","image4b.jpg"] },
-      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along", imgs: ["image5.jpg","image5b.jpg"] }
-    ];
-
-    let currentIndex = -1;
-    let slideshowTimer = null;
 
     const world = Globe()(elem)
       .globeImageUrl('earth-cartoon.png')
@@ -359,29 +493,33 @@
       .labelText(d => d.name)
       .labelSize(1)
       .labelDotRadius(0.65)
-      .labelColor(() => 'white');
+      .labelColor(() => 'white')
+      .atmosphereColor('#9fe3d2')
+      .atmosphereAltitude(0.18)
+      .enablePointerInteraction(true);
 
-    // 🔧 Use same DOWN offset across devices
-    function getLatDownOffset() { return 8; }
+    // gentle autorotate, pause on interaction
+    world.controls().autoRotate = true;
+    world.controls().autoRotateSpeed = 0.25;
+    world.controls().addEventListener('start', () => { world.controls().autoRotate = false; });
+    world.controls().addEventListener('end', () => { world.controls().autoRotate = true; });
 
-    /* Position the card so its BOTTOM edge sits just above the pin */
-    function positionCardAbovePin(place, gap = 10) {
-      const coords = world.getScreenCoords(place.lat, place.lng);
-      if (!coords) return;
+    // arcs for the journey
+    const arcs = places.slice(0, -1).map((p, i) => ({
+      startLat: p.lat, startLng: p.lng,
+      endLat: places[i + 1].lat, endLng: places[i + 1].lng
+    }));
+    world
+      .arcsData(arcs)
+      .arcColor(() => ['#2fbf9b', '#ffffff'])
+      .arcAltitude(() => 0.12)
+      .arcStroke(0.6)
+      .arcDashLength(0.5)
+      .arcDashGap(0.01)
+      .arcDashInitialGap(2)
+      .arcDashAnimateTime(reduceMotion ? 0 : 2000);
 
-      if (card.style.display === 'none') card.style.display = 'block';
-
-      const h = card.offsetHeight || 0;
-      card.style.left = coords.x + 'px';
-      card.style.top  = (coords.y - h - gap) + 'px';
-      card.style.transform = 'translateX(-50%)';
-    }
-
-    function revealCard() {
-      card.style.visibility = 'visible';
-    }
-
-    // Clamp desktop card height so it doesn't overlap title
+    // --- Sizing helpers ---
     function clampCardMaxHeightToTitle() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (isMobile) return;
@@ -393,42 +531,59 @@
       card.style.overflowY = 'auto';
     }
 
-    // Equalize mobile card height but do NOT shrink slideshow below 180px
     function normalizeCardHeightMobile() {
       const isMobile = window.matchMedia('(max-width: 600px)').matches;
       if (!isMobile) return;
-      const target = 330; // keep original target; arrows moved onto image give space
+      const target = 330;
       document.documentElement.style.setProperty('--card-target-height', target + 'px');
       const slideshow = card.querySelector('.slideshow');
       if (!slideshow) return;
       const totalNow = card.offsetHeight;
       const otherHeight = totalNow - slideshow.offsetHeight;
-      const desiredSlideH = Math.max(180, target - otherHeight); // never below 180
+      const desiredSlideH = Math.max(180, target - otherHeight);
       slideshow.style.height = desiredSlideH + 'px';
     }
 
-    // Smooth flight + parallel POV; plane can be slower than POV
+    function getLatDownOffset() { return 8; }
+
+    // Positioning that retries until coords are ready
+    function positionCardAbovePin(place, gap = 10) {
+      const tryPos = () => {
+        const coords = world.getScreenCoords(place.lat, place.lng);
+        if (!coords) { requestAnimationFrame(tryPos); return; }
+        if (card.style.display === 'none') card.style.display = 'block';
+        const h = card.offsetHeight || 0;
+        card.style.left = coords.x + 'px';
+        card.style.top  = (coords.y - h - gap) + 'px';
+        card.style.transform = 'translateX(-50%)';
+      };
+      tryPos();
+    }
+
+    function revealCard() { card.style.visibility = 'visible'; card.tabIndex = 0; }
+
+    // --- Airplane animation (robust start) ---
+    let planePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, planeDurationMs = 2400, povDurationMs = 1200) {
+      if (reduceMotion) { planeDurationMs = 0; povDurationMs = 0; }
+
       // Start globe POV animation
       const latOffset = getLatDownOffset();
-      world.pointOfView({
-        lat: parseFloat(lat) + latOffset,
-        lng: parseFloat(lng),
-        altitude: 0.8
-      }, povDurationMs);
+      world.pointOfView({ lat: parseFloat(lat) + latOffset, lng: parseFloat(lng), altitude: 0.8 }, povDurationMs);
 
       // Plane setup
-      airplane.style.display = 'block';
-      let startX = airplane.offsetLeft || 0;
-      let startY = airplane.offsetTop || 0;
+      airplane.style.display = reduceMotion ? 'none' : 'block';
 
-      const ease = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
+      let startX = planePos.x;
+      let startY = planePos.y;
+
+      const ease = t => t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
       const arcHeight = 50;
 
       let startTs = null;
       function step(ts) {
         if (!startTs) startTs = ts;
-        const p = Math.min(1, (ts - startTs) / planeDurationMs);
+        const p = planeDurationMs ? Math.min(1, (ts - startTs) / planeDurationMs) : 1;
         const t = ease(p);
 
         const c = world.getScreenCoords(lat, lng);
@@ -441,7 +596,9 @@
         const yLinear = startY + (targetY - startY) * t;
         const y = yLinear - Math.sin(Math.PI * t) * arcHeight;
 
-        const angle = Math.atan2(y - (airplane.offsetTop || 0), x - (airplane.offsetLeft || 0)) * 180 / Math.PI;
+        const dx = x - (parseFloat(airplane.style.left) || startX);
+        const dy = y - (parseFloat(airplane.style.top)  || startY);
+        const angle = Math.atan2(dy, dx) * 180 / Math.PI;
 
         airplane.style.left = x + 'px';
         airplane.style.top  = y + 'px';
@@ -453,33 +610,37 @@
           airplane.style.left = targetX + 'px';
           airplane.style.top  = targetY + 'px';
           airplane.style.transform = 'rotate(0deg)';
+          planePos = { x: targetX, y: targetY };
           if (callback) callback();
         }
       }
       requestAnimationFrame(step);
     }
 
-    // Build + run slideshow for the current place
+    // --- Slideshow / card builder ---
+    let currentIndex = -1;
+    let slideshowTimer = null;
+    function clearSlideTimer(){ if (slideshowTimer) { clearInterval(slideshowTimer); slideshowTimer = null; } }
+
     function updateCard(index, revealAfterMs = 1200) {
       const place = places[index];
 
-      // Build slideshow HTML (2 images) + overlay arrows; controls row has only dots
       const slidesHtml = place.imgs.map((src, i) =>
-        `<img class="slide ${i === 0 ? 'active' : ''}" src="${src}" alt="${place.name} photo ${i+1}">`
+        `<img class="slide ${i === 0 ? 'active' : ''}" src="${src}" alt="${place.name} photo ${i + 1}"
+              loading="${i === 0 ? 'eager' : 'lazy'}" decoding="async">`
       ).join('');
 
       const dotsHtml = place.imgs.map((_, i) =>
-        `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
+        `<span class="dot ${i === 0 ? 'active' : ''}" role="button" tabindex="0" aria-label="Go to image ${i + 1}" data-idx="${i}"></span>`
       ).join('');
 
-      // Insert content but keep hidden until after POV finishes
       card.style.display = 'block';
       card.style.visibility = 'hidden';
       card.innerHTML = `
         <div class="slideshow" aria-label="${place.name} photos (slideshow)">
           ${slidesHtml}
-          <button class="arrow-btn arrow-left" aria-label="Previous image">‹</button>
-          <button class="arrow-btn arrow-right" aria-label="Next image">›</button>
+          <button class="arrow-btn arrow-left" type="button" aria-label="Previous image">‹</button>
+          <button class="arrow-btn arrow-right" type="button" aria-label="Next image">›</button>
         </div>
         <div class="slide-controls">
           <div class="dots">${dotsHtml}</div>
@@ -487,7 +648,6 @@
         <p>${place.message}</p>
       `;
 
-      // Wire up slideshow controls
       let imgIdx = 0;
       const slides = card.querySelectorAll('.slide');
       const dots = card.querySelectorAll('.dot');
@@ -503,10 +663,12 @@
       }
 
       const stop = e => { e.stopPropagation(); };
+
       prev.addEventListener('click', (e) => { stop(e); show(imgIdx - 1); });
       next.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
       slideshowEl.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
 
+      // Swipe on touch
       let startX = null;
       slideshowEl.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
       slideshowEl.addEventListener('touchend', (e) => {
@@ -517,7 +679,19 @@
         e.stopPropagation();
       }, { passive: true });
 
-      dots.forEach(d => d.addEventListener('click', (e) => { e.stopPropagation(); show(parseInt(d.dataset.idx)); }));
+      // Dots (click & keyboard)
+      dots.forEach(d => {
+        d.addEventListener('click', (e) => { e.stopPropagation(); show(parseInt(d.dataset.idx)); });
+        d.addEventListener('keydown', (e) => {
+          if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); show(parseInt(d.dataset.idx)); }
+        });
+      });
+
+      // Keyboard arrows for the whole card
+      card.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft')  { e.preventDefault(); prev.click(); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); next.click(); }
+      });
 
       prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
       nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
@@ -526,22 +700,18 @@
       normalizeCardHeightMobile();
       clampCardMaxHeightToTitle();
 
-      // Reveal shortly after POV animation (not after the slower plane)
+      // Reveal after POV finishes (plane can keep flying)
       setTimeout(() => {
         positionCardAbovePin(place);
         revealCard();
       }, revealAfterMs + 50);
     }
 
-    /* ========= ADDED: Reset to initial post-loading state ========= */
+    // Reset to initial state
     function resetApp() {
-      // stop any slideshow timers
-      if (slideshowTimer) clearInterval(slideshowTimer);
-
-      // reset index/state
+      clearSlideTimer();
       currentIndex = -1;
 
-      // reset buttons
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
@@ -549,24 +719,20 @@
       startBtn.disabled = false;
       startBtn.classList.add('pulsing');
 
-      // reset card
       card.style.display = 'none';
       card.style.visibility = 'hidden';
       card.innerHTML = '';
 
-      // reset globe POV
       world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0);
 
-      // reset airplane
       airplane.style.display = 'none';
       airplane.style.left = '0px';
       airplane.style.top = '0px';
       airplane.style.transform = 'rotate(0deg)';
+      planePos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
 
-      // ensure sizing recalculates
       clampCardMaxHeightToTitle();
     }
-    /* ============================================================= */
 
     // START
     startBtn.addEventListener('click', () => {
@@ -577,8 +743,8 @@
       card.style.display = 'none';
       card.style.visibility = 'hidden';
 
-      const planeDur = 3000; // slower plane
-      const povDur   = 2000; // faster POV so card shows sooner
+      const planeDur = reduceMotion ? 0 : 3000;
+      const povDur   = reduceMotion ? 0 : 2000;
       flyPlaneTo(places[0].lat, places[0].lng, () => {
         updateCard(0, povDur);
         nextBtn.style.display = 'inline-block';
@@ -588,6 +754,7 @@
 
     // NEXT
     nextBtn.addEventListener('click', () => {
+      clearSlideTimer();
       if (currentIndex < places.length - 1) {
         nextBtn.disabled = true;
         currentIndex++;
@@ -596,8 +763,8 @@
         card.style.visibility = 'hidden';
 
         const dest = places[currentIndex];
-        const planeDur = 2400;
-        const povDur   = 1200;
+        const planeDur = reduceMotion ? 0 : 2400;
+        const povDur   = reduceMotion ? 0 : 1200;
         flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex, povDur);
           nextBtn.disabled = false;
@@ -607,6 +774,7 @@
 
     // PREV
     prevBtn.addEventListener('click', () => {
+      clearSlideTimer();
       if (currentIndex > 0) {
         prevBtn.disabled = true;
         currentIndex--;
@@ -615,8 +783,8 @@
         card.style.visibility = 'hidden';
 
         const dest = places[currentIndex];
-        const planeDur = 2400;
-        const povDur   = 1200;
+        const planeDur = reduceMotion ? 0 : 2400;
+        const povDur   = reduceMotion ? 0 : 1200;
         flyPlaneTo(dest.lat, dest.lng, () => {
           updateCard(currentIndex, povDur);
           prevBtn.disabled = false;
@@ -624,23 +792,43 @@
       }
     });
 
-    // END (modified to include Refresh button)
+    // END (adds Share + Refresh)
     endBtn.addEventListener('click', () => {
-      if (slideshowTimer) clearInterval(slideshowTimer);
-      card.innerHTML = `
+      clearSlideTimer();
+      const shareHtml = `
         <h2>🎉 Happy Birthday! 🎉</h2>
         <p>And through it all, one truth remains — you are my favorite story, my greatest adventure, and my happiest place. Happy 25th birthday, omorfia mou. Here’s to all the journeys still ahead. ❤️</p>
-        <button id="refreshLastBtn" class="refresh-btn">Refresh 🔄</button>
+        <div style="display:flex; gap:8px; justify-content:center; flex-wrap:wrap;">
+          <button id="shareBtn" class="refresh-btn" type="button" style="background:#1c9b7f;">Share 📤</button>
+          <button id="refreshLastBtn" class="refresh-btn" type="button">Refresh 🔄</button>
+        </div>
       `;
+      card.innerHTML = shareHtml;
       prevBtn.style.display = 'none';
       nextBtn.style.display = 'none';
       endBtn.style.display = 'none';
       positionCardAbovePin(places[currentIndex]);
+      card.style.display = 'block';
       revealCard();
 
-      // wire up Refresh
-      const refreshLastBtn = document.getElementById('refreshLastBtn');
-      refreshLastBtn.addEventListener('click', resetApp);
+      const shareBtn = document.getElementById('shareBtn');
+      if (navigator.share) {
+        shareBtn.addEventListener('click', async () => {
+          try {
+            await navigator.share({
+              title: document.title,
+              text: `Happy Birthday ${PERSON_NAME}!`,
+              url: location.href
+            });
+          } catch {}
+        });
+      } else {
+        shareBtn.disabled = true;
+        shareBtn.textContent = 'Share (unsupported)';
+        shareBtn.title = 'Web Share API not supported on this device/browser.';
+      }
+
+      document.getElementById('refreshLastBtn').addEventListener('click', resetApp);
     });
 
     // Reposition card and re-apply sizing on window resize
@@ -651,6 +839,13 @@
         positionCardAbovePin(places[currentIndex]);
       }
     });
+
+    // Give Start button focus after DOM settles for a11y if loader was skipped
+    if (hasSeen) {
+      // allow user to skip without clicking
+      setTimeout(() => { loadingScreen.style.display = 'none'; startConfetti(); startBtn.focus(); }, 250);
+    }
+
   </script>
 </body>
 </html>
