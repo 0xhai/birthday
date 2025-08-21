@@ -1,278 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Happy Birthday name 🎉</title>
   <link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
   <style>
-    html, body { 
-      margin: 0; 
-      height: 100%; 
-      overflow: hidden; 
-      background: linear-gradient(to bottom right, #E6F5D6, #8ECF82); 
+    html, body { margin: 0; height: 100%; overflow: hidden; background: linear-gradient(to bottom right, #E6F5D6, #8ECF82); }
+    #loadingScreen{position:absolute;top:0;left:0;width:100%;height:100%;background:linear-gradient(to bottom right,#E6F5D6,#8ECF82);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:10;color:#fff;font-family:'Pacifico',cursive}
+    .ml11{font-weight:500;font-size:clamp(2.2rem,4vw,3rem);white-space:nowrap;overflow:hidden}
+    .loading-bar-container{width:350px;height:28px;background:#fff;border-radius:10px;overflow:hidden;margin-top:20px;position:relative}
+    .loading-bar{height:100%;width:0%;background:#2fbf9b;transition:width .2s}
+    .loading-percentage{margin-top:5px;font-size:26px;font-family:'Pacifico',cursive}
+    .continue-text{opacity:0;margin-top:15px;font-size:26px;font-family:'Pacifico',cursive;transition:opacity .5s}
+    #globeViz{width:100vw;height:100vh;position:relative;z-index:1}
+    .popup{position:absolute;top:20px;left:50%;transform:translateX(-50%);background:rgba(255,255,255,.9);padding:15px 20px;border-radius:10px;font-family:'Pacifico',cursive;font-size:18px;display:none;box-shadow:0 4px 8px rgba(0,0,0,.2)}
+    .title{position:absolute;top:20px;width:100%;text-align:center;font-family:'Pacifico',cursive;font-size:clamp(2.8rem,5vw,4rem);color:#fff;text-shadow:2px 2px 5px rgba(0,0,0,.4);z-index:5}
+    .subtitle{position:absolute;bottom:20px;width:100%;text-align:center;font-family:'Pacifico',cursive;font-size:clamp(1.5rem,3vw,2.5rem);color:#fff;text-shadow:2px 2px 5px rgba(0,0,0,.4);z-index:5}
+    .card{position:absolute;left:50%;transform:translateX(-50%);background:rgba(255,248,240,.9);padding:16px 22px;border-radius:12px;text-align:center;width:820px;max-height:none;overflow-y:visible;z-index:5;display:none;visibility:hidden;font-family:'Pacifico',cursive;font-size:clamp(18px,1.15vw,24px)}
+    .nav-buttons{position:absolute;bottom:80px;width:100%;text-align:center;z-index:6}
+    .nav-buttons button{padding:clamp(10px,3vw,20px) clamp(16px,4vw,40px);font-size:clamp(28px,4vw,50px);cursor:pointer;border:none;background:#2fbf9b;color:#fff;border-radius:8px;margin:0 10px;font-family:'Pacifico',cursive;transition:opacity .3s}
+    .nav-buttons button:disabled{opacity:.5;cursor:not-allowed}
+    #airplane{position:absolute;font-size:100px;z-index:9999;transition:transform 1s linear;display:block}
+    canvas.confetti-canvas{position:fixed;top:0;left:0;width:100vw!important;height:100vh!important;z-index:0!important;pointer-events:none}
+    @keyframes pulse{0%{box-shadow:0 0 0 0 rgba(47,191,155,.7)}70%{box-shadow:0 0 0 15px rgba(47,191,155,0)}100%{box-shadow:0 0 0 0 rgba(47,191,155,0)}}
+    .pulsing{animation:pulse 2s infinite}
+    @media screen and (max-width:600px){
+      .ml11{font-size:1.4rem}
+      .loading-bar-container{height:20px;width:85%}
+      .loading-percentage,.continue-text{font-size:18px}
+      .title{font-size:1.6rem}
+      .subtitle{font-size:1rem}
+      #airplane{font-size:50px}
+      .card{width:min(95vw,420px);padding:10px 12px;font-size:clamp(14px,4vw,18px);height:var(--card-target-height,340px);max-height:var(--card-target-height,340px);overflow-y:hidden}
+      .slideshow{height:180px}
+      .card img{display:block;width:100%;height:auto;object-fit:cover;border-radius:5px}
+      .card p{margin:8px 0 0;line-height:1.25}
     }
-
-    #loadingScreen {
-      position: absolute;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      background: linear-gradient(to bottom right, #E6F5D6, #8ECF82);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-      color: #fff;
-      font-family: 'Pacifico', cursive;
-    }
-
-    .ml11 {
-      font-weight: 500;
-      font-size: clamp(2.2rem, 4vw, 3rem);
-      white-space: nowrap;
-      overflow: hidden;
-    }
-
-    .loading-bar-container {
-      width: 350px;
-      height: 28px;
-      background: #fff;
-      border-radius: 10px;
-      overflow: hidden;
-      margin-top: 20px;
-      position: relative;
-    }
-
-    .loading-bar {
-      height: 100%;
-      width: 0%;
-      background: #2fbf9b;
-      transition: width 0.2s;
-    }
-
-    .loading-percentage {
-      margin-top: 5px;
-      font-size: 26px;
-      font-family: 'Pacifico', cursive;
-    }
-
-    .continue-text {
-      opacity: 0;
-      margin-top: 15px;
-      font-size: 26px;
-      font-family: 'Pacifico', cursive;
-      transition: opacity 0.5s;
-    }
-
-    #globeViz { 
-      width: 100vw; 
-      height: 100vh; 
-      position: relative;
-      z-index: 1;
-    }
-
-    .popup {
-      position: absolute;
-      top: 20px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 255, 255, 0.9);
-      padding: 15px 20px;
-      border-radius: 10px;
-      font-family: 'Pacifico', cursive;
-      font-size: 18px;
-      display: none;
-      box-shadow: 0px 4px 8px rgba(0,0,0,0.2);
-    }
-
-    .title {
-      position: absolute;
-      top: 20px;
-      width: 100%;
-      text-align: center;
-      font-family: 'Pacifico', cursive;
-      font-size: clamp(2.8rem, 5vw, 4rem);
-      color: #fff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
-    }
-
-    .subtitle {
-      position: absolute;
-      bottom: 20px;
-      width: 100%;
-      text-align: center;
-      font-family: 'Pacifico', cursive;
-      font-size: clamp(1.5rem, 3vw, 2.5rem);
-      color: #fff;
-      text-shadow: 2px 2px 5px rgba(0,0,0,0.4);
-      z-index: 5;
-    }
-
-    /* ===== Desktop default ===== */
-    .card {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      background: rgba(255, 248, 240, 0.9);
-      padding: 16px 22px;
-      border-radius: 12px;
-      text-align: center;
-      width: 820px;                  
-      max-height: none;
-      overflow-y: visible;
-      z-index: 5;
-      display: none;                 
-      visibility: hidden;            
-      font-family: 'Pacifico', cursive;
-      font-size: clamp(18px, 1.15vw, 24px);
-    }
-
-    .nav-buttons {
-      position: absolute;
-      bottom: 80px;
-      width: 100%;
-      text-align: center;
-      z-index: 6;
-    }
-
-    .nav-buttons button {
-      padding: clamp(10px, 3vw, 20px) clamp(16px, 4vw, 40px);
-      font-size: clamp(28px, 4vw, 50px);
-      cursor: pointer;
-      border: none;
-      background: #2fbf9b;
-      color: white;
-      border-radius: 8px;
-      margin: 0 10px;
-      font-family: 'Pacifico', cursive;
-      transition: opacity 0.3s;
-    }
-
-    .nav-buttons button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-
-    #airplane {
-      position: absolute;
-      font-size: 100px;
-      z-index: 9999;
-      transition: transform 1s linear;
-      display: block;
-    }
-
-    canvas.confetti-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw !important;
-      height: 100vh !important;
-      z-index: 0 !important;
-      pointer-events: none;
-    }
-
-    @keyframes pulse { 0%{box-shadow:0 0 0 0 rgba(47,191,155,.7)} 70%{box-shadow:0 0 0 15px rgba(47,191,155,0)} 100%{box-shadow:0 0 0 0 rgba(47,191,155,0)} }
-    .pulsing { animation: pulse 2s infinite; }
-
-    @media screen and (max-width: 600px) {
-      .ml11 { font-size: 1.4rem; }
-      .loading-bar-container { height: 20px; width: 85%; }
-      .loading-percentage, .continue-text { font-size: 18px; }
-      .title { font-size: 1.6rem; }
-      .subtitle { font-size: 1rem; }
-      #airplane { font-size: 50px; }
-
-      /* ===== Mobile cards: unified shorter height, no scroll ===== */
-      .card {
-        width: min(95vw, 420px);
-        padding: 10px 12px;
-        font-size: clamp(14px, 4vw, 18px);
-        height: var(--card-target-height, 340px);
-        max-height: var(--card-target-height, 340px);
-        overflow-y: hidden;
-      }
-
-      /* Keep slideshow size (do NOT shrink it) */
-      .slideshow { height: 180px; }
-      .card img {
-        display: block;
-        width: 100%;
-        height: auto;
-        object-fit: cover;
-        border-radius: 5px;
-      }
-      .card p { margin: 8px 0 0; line-height: 1.25; }
-    }
-
-    @keyframes pulseFade { 0%,100%{opacity:.5;transform:scale(1)} 50%{opacity:1;transform:scale(1.05)} }
-    @keyframes vibrate {
-      0% { transform: translateX(0); }
-      20% { transform: translateX(-1px); }
-      40% { transform: translateX(1px); }
-      60% { transform: translateX(-1px); }
-      80% { transform: translateX(2px); }
-      100% { transform: translateX(0); }
-    }
-    .pulsating-vibrating { animation: pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear; }
-
-    /* Slideshow base (desktop & mobile) */
-    .slideshow { position: relative; width: 100%; height: 260px; overflow: hidden; border-radius: 6px; }
-    .slideshow .slide { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; object-position: center; opacity: 0; transition: opacity .5s ease; background: #fff; }
-    .slideshow .slide.active { opacity: 1; }
-
-    /* Overlay arrows on the slideshow image (saves vertical space) */
-    .arrow-btn {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(47, 191, 155, 0.85);
-      color: #fff;
-      border: none;
-      border-radius: 999px;
-      width: 34px;
-      height: 34px;
-      line-height: 34px;
-      text-align: center;
-      font-family: 'Pacifico', cursive;
-      font-size: 20px;
-      cursor: pointer;
-      padding: 0;
-      user-select: none;
-    }
-    .arrow-left { left: 8px; }
-    .arrow-right { right: 8px; }
-
-    /* Controls row now just holds dots; tiny margin to save space */
-    .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 2px; }
-    .slide-controls button { background: #2fbf9b; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
-    .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
-    .dot { width: 8px; height: 8px; border-radius: 50%; background: #d7f3ea; display: inline-block; cursor: pointer; }
-    .dot.active { background: #2fbf9b; }
-
-    /* Refresh button style (added) */
-    .refresh-btn {
-      padding: clamp(10px, 3vw, 20px) clamp(16px, 4vw, 40px);
-      font-size: clamp(20px, 3vw, 32px);
-      cursor: pointer;
-      border: none;
-      background: #2fbf9b;
-      color: white;
-      border-radius: 8px;
-      margin-top: 12px;
-      font-family: 'Pacifico', cursive;
-    }
+    @keyframes pulseFade{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
+    @keyframes vibrate{0%{transform:translateX(0)}20%{transform:translateX(-1px)}40%{transform:translateX(1px)}60%{transform:translateX(-1px)}80%{transform:translateX(2px)}100%{transform:translateX(0)}}
+    .pulsating-vibrating{animation:pulseFade 1.5s infinite ease-in-out, vibrate 1s infinite linear}
+    .slideshow{position:relative;width:100%;height:260px;overflow:hidden;border-radius:6px}
+    .slideshow .slide{position:absolute;inset:0;width:100%;height:100%;object-fit:contain;object-position:center;opacity:0;transition:opacity .5s ease;background:#fff}
+    .slideshow .slide.active{opacity:1}
+    .arrow-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(47,191,155,.85);color:#fff;border:none;border-radius:999px;width:34px;height:34px;line-height:34px;text-align:center;font-family:'Pacifico',cursive;font-size:20px;cursor:pointer;padding:0;user-select:none}
+    .arrow-left{left:8px}
+    .arrow-right{right:8px}
+    .slide-controls{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:2px}
+    .slide-controls button{background:#2fbf9b;color:#fff;border:none;border-radius:6px;padding:4px 10px;cursor:pointer;font-family:'Pacifico',cursive;font-size:16px}
+    .dots{display:flex;gap:6px;align-items:center;justify-content:center}
+    .dot{width:8px;height:8px;border-radius:50%;background:#d7f3ea;display:inline-block;cursor:pointer}
+    .dot.active{background:#2fbf9b}
+    .refresh-btn{padding:clamp(10px,3vw,20px) clamp(16px,4vw,40px);font-size:clamp(20px,3vw,32px);cursor:pointer;border:none;background:#2fbf9b;color:#fff;border-radius:8px;margin-top:12px;font-family:'Pacifico',cursive}
   </style>
 </head>
 <body>
   <div id="loadingScreen">
-    <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
-    </div>
-    <div class="loading-bar-container">
-      <div class="loading-bar" id="loadingBar"></div>
-    </div>
+    <div class="ml11"><span class="letters">Preparing your surprise<span id="dots">...</span></span></div>
+    <div class="loading-bar-container"><div class="loading-bar" id="loadingBar"></div></div>
     <div class="loading-percentage" id="loadingPercentage">0%</div>
     <div class="continue-text" id="continueText">[Press ENTER or Tap to continue]</div>
   </div>
@@ -281,7 +66,6 @@
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
   <div class="subtitle">From Turkey to Azerbaijan, to Greece and beyond ❤️</div>
-
   <div id="airplane">✈️</div>
 
   <div id="infoCard" class="card"></div>
@@ -295,49 +79,87 @@
   <script src="https://unpkg.com/globe.gl"></script>
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script>
-    // Animated dots
-    setInterval(() => {
-      const dots = document.getElementById('dots');
-      dots.textContent = dots.textContent.length >= 3 ? '' : dots.textContent + '.';
-    }, 500);
+    /* =======================
+       1) LOADING / CONFETTI
+       ======================= */
+    setInterval(()=>{const d=document.getElementById('dots');d.textContent=d.textContent.length>=3?'':d.textContent+'.';},500);
+    let load=0;const bar=document.getElementById('loadingBar');const perc=document.getElementById('loadingPercentage');const contText=document.getElementById('continueText');
+    const interval=setInterval(()=>{ if(load<100){ load++; bar.style.width=load+'%'; perc.textContent=load+'%'; } else { clearInterval(interval); contText.style.opacity=1; contText.classList.add('pulsating-vibrating'); } },30);
+    document.addEventListener('keydown',e=>{ if(e.key==='Enter' && load>=100) document.getElementById('loadingScreen').style.display='none';});
+    document.addEventListener('click',()=>{ if(load>=100) document.getElementById('loadingScreen').style.display='none';});
+    setInterval(()=>{confetti({particleCount:80,spread:120,origin:{y:Math.random(),x:Math.random()},zIndex:0});},1500);
 
-    // Simulate loading
-    let load = 0;
-    const bar = document.getElementById('loadingBar');
-    const perc = document.getElementById('loadingPercentage');
-    const contText = document.getElementById('continueText');
-    const interval = setInterval(() => {
-      if (load < 100) {
-        load++;
-        bar.style.width = load + '%';
-        perc.textContent = load + '%';
-      } else {
-        clearInterval(interval);
-        contText.style.opacity = 1;
-        contText.classList.add('pulsating-vibrating');
-      }
-    }, 30);
+    /* =========================================================
+       2) SVG TEXTURE (vector, crisp). Same colors & cartoony look
+       ========================================================= */
+    // A 4096x2048 equirectangular SVG with flat blue ocean, green land, black outline.
+    // (Stylized land masses to match the existing cartoon look.)
+    const worldSVG = `
+<svg xmlns='http://www.w3.org/2000/svg' width='4096' height='2048' viewBox='0 0 4096 2048'>
+  <defs>
+    <style>
+      .ocean{fill:#1e9bd7}
+      .land{fill:#61c03d;stroke:#0c2a2e;stroke-width:10;stroke-linejoin:round}
+    </style>
+  </defs>
+  <rect class='ocean' x='0' y='0' width='4096' height='2048'/>
+  <!-- *** Stylized continents (cartoon shapes) *** -->
+  <!-- North America -->
+  <path class='land' d='M450,620 l200,-120 260,-30 170,90 120,-50 180,70 60,200 -120,180 -260,90 -260,30 -220,-80 -60,-170 30,-210z'/>
+  <!-- Central America + Caribbean -->
+  <path class='land' d='M1120,935 l120,40 60,110 -40,120 -120,40 -110,-70 20,-120 70,-120z'/>
+  <circle class='land' cx='1385' cy='1030' r='20'/>
+  <circle class='land' cx='1420' cy='1065' r='16'/>
+  <!-- South America -->
+  <path class='land' d='M1250,1230 l150,60 140,190 40,210 -40,250 -90,210 -120,160 -110,-120 -40,-200 -30,-220 20,-220 80,-180z'/>
+  <!-- Greenland -->
+  <path class='land' d='M1500,300 l160,-60 160,20 90,90 -20,120 -140,40 -160,-60 -90,-90 0,-60z'/>
+  <!-- Europe -->
+  <path class='land' d='M1980,740 l140,-120 210,-40 200,40 120,90 -20,110 -110,70 -180,10 -130,-30 -140,-120 -90,-10z'/>
+  <circle class='land' cx='2710' cy='890' r='18'/>
+  <!-- North Africa -->
+  <path class='land' d='M1920,980 l220,-40 280,-10 260,40 120,120 -40,120 -160,90 -280,30 -230,-30 -170,-120 0,-200z'/>
+  <!-- West & Central Africa -->
+  <path class='land' d='M2060,1290 l160,60 60,180 -40,210 -110,200 -160,120 -160,-20 -100,-160 -20,-220 70,-180 160,-110 140,20z'/>
+  <!-- East Africa + Horn -->
+  <path class='land' d='M2610,1340 l120,40 120,140 20,160 -60,160 -120,110 -100,-40 -20,-160 40,-170 0,-130 0,-110z'/>
+  <circle class='land' cx='2810' cy='1710' r='22'/> <!-- Madagascar -->
+  <!-- Middle East -->
+  <path class='land' d='M2700,1080 l180,-70 200,40 120,120 -100,130 -200,60 -140,-50 -60,-160z'/>
+  <!-- India -->
+  <path class='land' d='M3140,1240 l160,70 80,190 -60,180 -120,80 -110,-140 20,-170 30,-210z'/>
+  <!-- Southeast Asia -->
+  <path class='land' d='M3340,1280 l160,40 140,140 20,130 -110,110 -160,-40 -80,-120 30,-170z'/>
+  <circle class='land' cx='3600' cy='1560' r='26'/> <!-- Borneo-ish -->
+  <circle class='land' cx='3720' cy='1600' r='20'/>
+  <circle class='land' cx='3520' cy='1600' r='18'/>
+  <!-- China + Mongolia -->
+  <path class='land' d='M3280,980 l220,-80 240,20 160,120 -40,160 -160,80 -230,10 -180,-100 -10,-210z'/>
+  <!-- Japan -->
+  <path class='land' d='M3840,980 l60,60 20,110 -60,90 -80,-40 -10,-100 70,-120z'/>
+  <!-- Korea -->
+  <path class='land' d='M3710,1010 l60,20 30,60 -30,70 -70,-30 10,-120z'/>
+  <!-- Australia -->
+  <path class='land' d='M3480,1720 l240,60 180,120 20,110 -90,110 -200,30 -220,-90 -70,-150 140,-190z'/>
+  <circle class='land' cx='3440' cy='1900' r='16'/> <!-- Tasmania -->
+  <!-- Iceland -->
+  <circle class='land' cx='1820' cy='690' r='20'/>
+  <!-- Scandinavia -->
+  <path class='land' d='M2300,580 l130,-70 120,30 80,100 -40,110 -120,40 -120,-60 -50,-150z'/>
+</svg>`;
+    const globeTextureUrl = 'data:image/svg+xml;utf8,' + encodeURIComponent(worldSVG);
 
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Enter' && load >= 100) document.getElementById('loadingScreen').style.display = 'none';
-    });
-    document.addEventListener('click', () => {
-      if (load >= 100) document.getElementById('loadingScreen').style.display = 'none';
-    });
-
-    setInterval(() => {
-      confetti({ particleCount: 80, spread: 120, origin: { y: Math.random(), x: Math.random() }, zIndex: 0 });
-    }, 1500);
-
+    /* ==========================================
+       3) ORIGINAL APP (unchanged except texture)
+       ========================================== */
     const elem = document.getElementById('globeViz');
     const card = document.getElementById('infoCard');
     const nextBtn = document.getElementById('nextBtn');
     const prevBtn = document.getElementById('prevBtn');
-    const endBtn = document.getElementById('endBtn');
-    const startBtn = document.getElementById('startBtn');
-    const airplane = document.getElementById('airplane');
+    const endBtn  = document.getElementById('endBtn');
+    const startBtn= document.getElementById('startBtn');
+    const airplane= document.getElementById('airplane');
 
-    // Keep your original coordinates exactly:
     const places = [
       { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
       { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg","image2c.jpg","image2d.jpg","image2e.jpg"] },
@@ -350,7 +172,7 @@
     let slideshowTimer = null;
 
     const world = Globe()(elem)
-      .globeImageUrl('earth-cartoon.png')
+      .globeImageUrl(globeTextureUrl)     // <-- SVG texture (vector, crisp)
       .bumpImageUrl(null)
       .backgroundColor('rgba(0,0,0,0)')
       .pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0)
@@ -361,7 +183,6 @@
       .labelSize(1)
       .labelDotRadius(0.65)
       .labelColor(() => 'white')
-      // start with no arcs; we'll add them progressively
       .arcsData([])
       .arcColor(() => ['#2fbf9b', '#ffffff'])
       .arcAltitude(() => 0.12)
@@ -370,311 +191,164 @@
       .arcDashGap(0.01)
       .arcDashAnimateTime(2000);
 
-    // Keep globe stationary (no autorotation)
     world.controls().autoRotate = false;
     world.controls().autoRotateSpeed = 0;
 
-    // 🔧 Use same DOWN offset across devices
-    function getLatDownOffset() { return 8; }
+    function getLatDownOffset(){ return 8; }
 
-    /* Position the card so its BOTTOM edge sits just above the pin */
-    function positionCardAbovePin(place, gap = 10) {
-      const coords = world.getScreenCoords(place.lat, place.lng);
-      if (!coords) return;
-
-      if (card.style.display === 'none') card.style.display = 'block';
-
-      const h = card.offsetHeight || 0;
-      card.style.left = coords.x + 'px';
-      card.style.top  = (coords.y - h - gap) + 'px';
-      card.style.transform = 'translateX(-50%)';
+    function positionCardAbovePin(place, gap=10){
+      const c = world.getScreenCoords(place.lat, place.lng); if(!c) return;
+      if(card.style.display==='none') card.style.display='block';
+      const h = card.offsetHeight||0;
+      card.style.left = c.x + 'px';
+      card.style.top  = (c.y - h - gap) + 'px';
+      card.style.transform='translateX(-50%)';
     }
+    function revealCard(){ card.style.visibility='visible'; }
 
-    function revealCard() {
-      card.style.visibility = 'visible';
-    }
-
-    // Clamp desktop card height so it doesn't overlap title
-    function clampCardMaxHeightToTitle() {
-      const isMobile = window.matchMedia('(max-width: 600px)').matches;
-      if (isMobile) return;
-      const title = document.querySelector('.title');
-      const rect = title.getBoundingClientRect();
-      const safeGap = 20;
+    function clampCardMaxHeightToTitle(){
+      const isMobile = window.matchMedia('(max-width: 600px)').matches; if(isMobile) return;
+      const title = document.querySelector('.title'); const rect = title.getBoundingClientRect(); const safeGap=20;
       const avail = Math.max(160, window.innerHeight - rect.bottom - safeGap);
-      card.style.maxHeight = avail + 'px';
-      card.style.overflowY = 'auto';
+      card.style.maxHeight = avail + 'px'; card.style.overflowY='auto';
     }
-
-    // Equalize mobile card height but do NOT shrink slideshow below 180px
-    function normalizeCardHeightMobile() {
-      const isMobile = window.matchMedia('(max-width: 600px)').matches;
-      if (!isMobile) return;
-      const target = 330; // keep original target; arrows moved onto image give space
-      document.documentElement.style.setProperty('--card-target-height', target + 'px');
-      const slideshow = card.querySelector('.slideshow');
-      if (!slideshow) return;
-      const totalNow = card.offsetHeight;
-      const otherHeight = totalNow - slideshow.offsetHeight;
-      const desiredSlideH = Math.max(180, target - otherHeight); // never below 180
+    function normalizeCardHeightMobile(){
+      const isMobile = window.matchMedia('(max-width: 600px)').matches; if(!isMobile) return;
+      const target = 330; document.documentElement.style.setProperty('--card-target-height', target + 'px');
+      const slideshow = card.querySelector('.slideshow'); if(!slideshow) return;
+      const totalNow = card.offsetHeight; const otherHeight = totalNow - slideshow.offsetHeight;
+      const desiredSlideH = Math.max(180, target - otherHeight);
       slideshow.style.height = desiredSlideH + 'px';
     }
 
-    // --- Progressive arcs ---
-    function arcsUpTo(index) {
-      // index refers to current place index; arcs up to index are from 0->1, 1->2, ..., (index-1)->index
-      if (index <= 0) return [];
-      const arcs = [];
-      for (let i = 0; i < index; i++) {
-        arcs.push({
-          startLat: places[i].lat, startLng: places[i].lng,
-          endLat: places[i + 1].lat, endLng: places[i + 1].lng
-        });
-      }
+    function arcsUpTo(index){
+      if(index<=0) return [];
+      const arcs=[]; for(let i=0;i<index;i++){ arcs.push({ startLat:places[i].lat,startLng:places[i].lng,endLat:places[i+1].lat,endLng:places[i+1].lng }); }
       return arcs;
     }
-    function updateArcsForIndex(index) {
-      world.arcsData(arcsUpTo(index));
-    }
+    function updateArcsForIndex(index){ world.arcsData(arcsUpTo(index)); }
 
-    // Smooth flight + parallel POV; plane can be slower than POV
-    function flyPlaneTo(lat, lng, callback, offsetX = -40, offsetY = -10, planeDurationMs = 2400, povDurationMs = 1200) {
-      // Start globe POV animation
-      const latOffset = getLatDownOffset();
-      world.pointOfView({
-        lat: parseFloat(lat) + latOffset,
-        lng: parseFloat(lng),
-        altitude: 0.8
-      }, povDurationMs);
+    function flyPlaneTo(lat,lng,callback,offsetX=-40,offsetY=-10,planeDurationMs=2400,povDurationMs=1200){
+      const latOffset=getLatDownOffset();
+      world.pointOfView({lat:parseFloat(lat)+latOffset,lng:parseFloat(lng),altitude:0.8},povDurationMs);
 
-      // Plane setup
-      airplane.style.display = 'block';
-      let startX = airplane.offsetLeft || 0;
-      let startY = airplane.offsetTop || 0;
-
-      const ease = t => t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2;
-      const arcHeight = 50;
-
-      let startTs = null;
-      function step(ts) {
-        if (!startTs) startTs = ts;
-        const p = Math.min(1, (ts - startTs) / planeDurationMs);
-        const t = ease(p);
-
-        const c = world.getScreenCoords(lat, lng);
-        if (!c) { requestAnimationFrame(step); return; }
-
-        const targetX = c.x + offsetX;
-        const targetY = c.y + offsetY;
-
-        const x = startX + (targetX - startX) * t;
-        const yLinear = startY + (targetY - startY) * t;
-        const y = yLinear - Math.sin(Math.PI * t) * arcHeight;
-
-        const angle = Math.atan2(y - (airplane.offsetTop || 0), x - (airplane.offsetLeft || 0)) * 180 / Math.PI;
-
-        airplane.style.left = x + 'px';
-        airplane.style.top  = y + 'px';
-        airplane.style.transform = `rotate(${angle}deg)`;
-
-        if (p < 1) {
-          requestAnimationFrame(step);
-        } else {
-          airplane.style.left = targetX + 'px';
-          airplane.style.top  = targetY + 'px';
-          airplane.style.transform = 'rotate(0deg)';
-          if (callback) callback();
-        }
+      airplane.style.display='block';
+      let startX=airplane.offsetLeft||0, startY=airplane.offsetTop||0;
+      const ease=t=>t<.5?4*t*t*t:1-Math.pow(-2*t+2,3)/2; const arcHeight=50;
+      let startTs=null;
+      function step(ts){
+        if(!startTs) startTs=ts; const p=Math.min(1,(ts-startTs)/planeDurationMs); const t=ease(p);
+        const c=world.getScreenCoords(lat,lng); if(!c){requestAnimationFrame(step); return;}
+        const targetX=c.x+offsetX, targetY=c.y+offsetY;
+        const x=startX+(targetX-startX)*t; const yLinear=startY+(targetY-startY)*t; const y=yLinear-Math.sin(Math.PI*t)*arcHeight;
+        const angle=Math.atan2(y-(airplane.offsetTop||0), x-(airplane.offsetLeft||0))*180/Math.PI;
+        airplane.style.left=x+'px'; airplane.style.top=y+'px'; airplane.style.transform=`rotate(${angle}deg)`;
+        if(p<1){ requestAnimationFrame(step); } else { airplane.style.left=targetX+'px'; airplane.style.top=targetY+'px'; airplane.style.transform='rotate(0deg)'; if(callback) callback(); }
       }
       requestAnimationFrame(step);
     }
 
-    // Build + run slideshow for the current place
-    function updateCard(index, revealAfterMs = 1200) {
+    function updateCard(index, revealAfterMs=1200){
       const place = places[index];
+      const slidesHtml = place.imgs.map((src,i)=>`<img class="slide ${i===0?'active':''}" src="${src}" alt="${place.name} photo ${i+1}">`).join('');
+      const dotsHtml   = place.imgs.map((_,i)=>`<span class="dot ${i===0?'active':''}" data-idx="${i}"></span>`).join('');
 
-      const slidesHtml = place.imgs.map((src, i) =>
-        `<img class="slide ${i === 0 ? 'active' : ''}" src="${src}" alt="${place.name} photo ${i+1}">`
-      ).join('');
-
-      const dotsHtml = place.imgs.map((_, i) =>
-        `<span class="dot ${i === 0 ? 'active' : ''}" data-idx="${i}"></span>`
-      ).join('');
-
-      card.style.display = 'block';
-      card.style.visibility = 'hidden';
+      card.style.display='block'; card.style.visibility='hidden';
       card.innerHTML = `
         <div class="slideshow" aria-label="${place.name} photos (slideshow)">
           ${slidesHtml}
           <button class="arrow-btn arrow-left" aria-label="Previous image">‹</button>
           <button class="arrow-btn arrow-right" aria-label="Next image">›</button>
         </div>
-        <div class="slide-controls">
-          <div class="dots">${dotsHtml}</div>
-        </div>
+        <div class="slide-controls"><div class="dots">${dotsHtml}</div></div>
         <p>${place.message}</p>
       `;
 
-      // Wire up slideshow controls
-      let imgIdx = 0;
-      const slides = card.querySelectorAll('.slide');
-      const dots = card.querySelectorAll('.dot');
-      const prev = card.querySelector('.arrow-left');
-      const next = card.querySelector('.arrow-right');
-      const slideshowEl = card.querySelector('.slideshow');
+      let imgIdx=0;
+      const slides=card.querySelectorAll('.slide');
+      const dots=card.querySelectorAll('.dot');
+      const prev=card.querySelector('.arrow-left');
+      const next=card.querySelector('.arrow-right');
+      const slideshowEl=card.querySelector('.slideshow');
 
-      function show(n) {
-        imgIdx = (n + slides.length) % slides.length;
-        slides.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
-        dots.forEach((el, i) => el.classList.toggle('active', i === imgIdx));
-        positionCardAbovePin(place);
-      }
+      function show(n){ imgIdx=(n+slides.length)%slides.length; slides.forEach((el,i)=>el.classList.toggle('active',i===imgIdx)); dots.forEach((el,i)=>el.classList.toggle('active',i===imgIdx)); positionCardAbovePin(place); }
+      const stop=e=>{ e.stopPropagation(); };
+      prev.addEventListener('click',e=>{stop(e);show(imgIdx-1);});
+      next.addEventListener('click',e=>{stop(e);show(imgIdx+1);});
+      slideshowEl.addEventListener('click',e=>{stop(e);show(imgIdx+1);});
+      let startX=null;
+      slideshowEl.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;},{passive:true});
+      slideshowEl.addEventListener('touchend',e=>{ if(startX==null) return; const dx=e.changedTouches[0].clientX-startX; if(Math.abs(dx)>30) show(imgIdx+(dx<0?1:-1)); startX=null; e.stopPropagation(); },{passive:true});
+      dots.forEach(d=>d.addEventListener('click',e=>{e.stopPropagation();show(parseInt(d.dataset.idx));}));
 
-      const stop = e => { e.stopPropagation(); };
-      prev.addEventListener('click', (e) => { stop(e); show(imgIdx - 1); });
-      next.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
-      slideshowEl.addEventListener('click', (e) => { stop(e); show(imgIdx + 1); });
+      prevBtn.style.display = index>0 ? 'inline-block':'none';
+      nextBtn.style.display = index<places.length-1 ? 'inline-block':'none';
+      endBtn.style.display  = index===places.length-1 ? 'inline-block':'none';
 
-      let startX = null;
-      slideshowEl.addEventListener('touchstart', (e) => { startX = e.touches[0].clientX; }, { passive: true });
-      slideshowEl.addEventListener('touchend', (e) => {
-        if (startX == null) return;
-        const dx = e.changedTouches[0].clientX - startX;
-        if (Math.abs(dx) > 30) show(imgIdx + (dx < 0 ? 1 : -1));
-        startX = null;
-        e.stopPropagation();
-      }, { passive: true });
-
-      dots.forEach(d => d.addEventListener('click', (e) => { e.stopPropagation(); show(parseInt(d.dataset.idx)); }));
-
-      prevBtn.style.display = index > 0 ? 'inline-block' : 'none';
-      nextBtn.style.display = index < places.length - 1 ? 'inline-block' : 'none';
-      endBtn.style.display = index === places.length - 1 ? 'inline-block' : 'none';
-
-      normalizeCardHeightMobile();
-      clampCardMaxHeightToTitle();
-
-      setTimeout(() => {
-        positionCardAbovePin(place);
-        revealCard();
-      }, revealAfterMs + 50);
+      normalizeCardHeightMobile(); clampCardMaxHeightToTitle();
+      setTimeout(()=>{ positionCardAbovePin(place); revealCard(); }, revealAfterMs+50);
     }
 
-    /* ========= Reset to initial post-loading state ========= */
-    function resetApp() {
-      if (slideshowTimer) clearInterval(slideshowTimer);
-
-      currentIndex = -1;
-
-      prevBtn.style.display = 'none';
-      nextBtn.style.display = 'none';
-      endBtn.style.display = 'none';
-      startBtn.style.display = 'inline-block';
-      startBtn.disabled = false;
-      startBtn.classList.add('pulsing');
-
-      card.style.display = 'none';
-      card.style.visibility = 'hidden';
-      card.innerHTML = '';
-
-      world.pointOfView({ lat: 20, lng: 0, altitude: 2 }, 0);
-
-      // clear arcs and plane
-      world.arcsData([]);
-      airplane.style.display = 'none';
-      airplane.style.left = '0px';
-      airplane.style.top = '0px';
-      airplane.style.transform = 'rotate(0deg)';
-
+    function resetApp(){
+      if(slideshowTimer) clearInterval(slideshowTimer);
+      currentIndex=-1;
+      prevBtn.style.display='none'; nextBtn.style.display='none'; endBtn.style.display='none';
+      startBtn.style.display='inline-block'; startBtn.disabled=false; startBtn.classList.add('pulsing');
+      card.style.display='none'; card.style.visibility='hidden'; card.innerHTML='';
+      world.pointOfView({lat:20,lng:0,altitude:2},0);
+      world.arcsData([]); airplane.style.display='none'; airplane.style.left='0px'; airplane.style.top='0px'; airplane.style.transform='rotate(0deg)';
       clampCardMaxHeightToTitle();
     }
-    /* ============================================================= */
 
     // START
-    startBtn.addEventListener('click', () => {
-      startBtn.classList.remove('pulsing');
-      startBtn.disabled = true;
-      currentIndex = 0;
-
-      card.style.display = 'none';
-      card.style.visibility = 'hidden';
-
-      const planeDur = 3000; // slower plane
-      const povDur   = 2000; // faster POV so card shows sooner
-      flyPlaneTo(places[0].lat, places[0].lng, () => {
-        updateCard(0, povDur);
-        updateArcsForIndex(0); // no arcs yet at the first stop
-        nextBtn.style.display = 'inline-block';
-        startBtn.style.display = 'none';
+    startBtn.addEventListener('click',()=>{
+      startBtn.classList.remove('pulsing'); startBtn.disabled=true; currentIndex=0;
+      card.style.display='none'; card.style.visibility='hidden';
+      const planeDur=3000, povDur=2000;
+      flyPlaneTo(places[0].lat, places[0].lng, ()=>{
+        updateCard(0, povDur); updateArcsForIndex(0);
+        nextBtn.style.display='inline-block'; startBtn.style.display='none';
       }, -40, -10, planeDur, povDur);
     });
 
     // NEXT
-    nextBtn.addEventListener('click', () => {
-      if (currentIndex < places.length - 1) {
-        nextBtn.disabled = true;
-        currentIndex++;
-
-        card.style.display = 'none';
-        card.style.visibility = 'hidden';
-
-        const dest = places[currentIndex];
-        const planeDur = 2400;
-        const povDur   = 1200;
-        flyPlaneTo(dest.lat, dest.lng, () => {
-          updateCard(currentIndex, povDur);
-          updateArcsForIndex(currentIndex); // cumulatively show arcs up to this point
-          nextBtn.disabled = false;
+    nextBtn.addEventListener('click',()=>{
+      if(currentIndex<places.length-1){
+        nextBtn.disabled=true; currentIndex++;
+        card.style.display='none'; card.style.visibility='hidden';
+        const dest=places[currentIndex]; const planeDur=2400, povDur=1200;
+        flyPlaneTo(dest.lat, dest.lng, ()=>{
+          updateCard(currentIndex, povDur); updateArcsForIndex(currentIndex); nextBtn.disabled=false;
         }, -40, -10, planeDur, povDur);
       }
     });
 
     // PREV
-    prevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        prevBtn.disabled = true;
-        currentIndex--;
-
-        card.style.display = 'none';
-        card.style.visibility = 'hidden';
-
-        const dest = places[currentIndex];
-        const planeDur = 2400;
-        const povDur   = 1200;
-        flyPlaneTo(dest.lat, dest.lng, () => {
-          updateCard(currentIndex, povDur);
-          updateArcsForIndex(currentIndex); // remove later arcs when going back
-          prevBtn.disabled = false;
+    prevBtn.addEventListener('click',()=>{
+      if(currentIndex>0){
+        prevBtn.disabled=true; currentIndex--;
+        card.style.display='none'; card.style.visibility='hidden';
+        const dest=places[currentIndex]; const planeDur=2400, povDur=1200;
+        flyPlaneTo(dest.lat, dest.lng, ()=>{
+          updateCard(currentIndex, povDur); updateArcsForIndex(currentIndex); prevBtn.disabled=false;
         }, -40, -10, planeDur, povDur);
       }
     });
 
-    // END (modified to include Refresh button)
-    endBtn.addEventListener('click', () => {
-      if (slideshowTimer) clearInterval(slideshowTimer);
+    // END
+    endBtn.addEventListener('click',()=>{
+      if(slideshowTimer) clearInterval(slideshowTimer);
       card.innerHTML = `
         <h2>🎉 Happy Birthday! 🎉</h2>
         <p>And through it all, one truth remains — you are my favorite story, my greatest adventure, and my happiest place. Happy 25th birthday, omorfia mou. Here’s to all the journeys still ahead. ❤️</p>
-        <button id="refreshLastBtn" class="refresh-btn">Refresh 🔄</button>
-      `;
-      prevBtn.style.display = 'none';
-      nextBtn.style.display = 'none';
-      endBtn.style.display = 'none';
-      positionCardAbovePin(places[currentIndex]);
-      revealCard();
-
-      // wire up Refresh
-      const refreshLastBtn = document.getElementById('refreshLastBtn');
-      refreshLastBtn.addEventListener('click', resetApp);
+        <button id="refreshLastBtn" class="refresh-btn">Refresh 🔄</button>`;
+      prevBtn.style.display='none'; nextBtn.style.display='none'; endBtn.style.display='none';
+      positionCardAbovePin(places[currentIndex]); revealCard();
+      document.getElementById('refreshLastBtn').addEventListener('click', resetApp);
     });
 
-    // Reposition card and re-apply sizing on window resize
-    window.addEventListener('resize', () => {
-      if (currentIndex >= 0) {
-        normalizeCardHeightMobile();
-        clampCardMaxHeightToTitle();
-        positionCardAbovePin(places[currentIndex]);
-      }
+    window.addEventListener('resize',()=>{
+      if(currentIndex>=0){ normalizeCardHeightMobile(); clampCardMaxHeightToTitle(); positionCardAbovePin(places[currentIndex]); }
     });
   </script>
 </body>
