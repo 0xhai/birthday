@@ -10,14 +10,14 @@
       margin: 0; 
       height: 100%; 
       overflow: hidden; 
-      background: linear-gradient(to bottom right, #90DAA5, #5ADE7F); 
+      background: linear-gradient(to bottom right, #dff5ee, #a7ded0); 
     }
 
     #loadingScreen {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
-      background: linear-gradient(to bottom right, #90DAA5, #5ADE7F);
+      background: linear-gradient(to bottom right, #dff5ee, #a7ded0);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -37,7 +37,7 @@
     .loading-bar-container {
       width: 350px;
       height: 28px;
-      background: #57CBC1;
+      background: #fff;
       border-radius: 10px;
       overflow: hidden;
       margin-top: 20px;
@@ -47,7 +47,7 @@
     .loading-bar {
       height: 100%;
       width: 0%;
-      background: #;
+      background: #2fbf9b;
       transition: width 0.2s;
     }
 
@@ -142,7 +142,7 @@
       font-size: clamp(28px, 4vw, 50px);
       cursor: pointer;
       border: none;
-      background: #57CBC1;
+      background: #2fbf9b;
       color: white;
       border-radius: 8px;
       margin: 0 10px;
@@ -228,7 +228,7 @@
       top: 50%;
       transform: translateY(-50%);
       background: rgba(47, 191, 155, 0.85);
-      color: #57CBC1;
+      color: #fff;
       border: none;
       border-radius: 999px;
       width: 34px;
@@ -246,10 +246,10 @@
 
     /* Controls row now just holds dots; tiny margin to save space */
     .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 2px; }
-    .slide-controls button { background: #57CBC1; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
+    .slide-controls button { background: #2fbf9b; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
     .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #d7f3ea; display: inline-block; cursor: pointer; }
-    .dot.active { background: #57CBC1; }
+    .dot.active { background: #2fbf9b; }
 
     /* Refresh button style (added) */
     .refresh-btn {
@@ -257,7 +257,7 @@
       font-size: clamp(20px, 3vw, 32px);
       cursor: pointer;
       border: none;
-      background: #57CBC1;
+      background: #2fbf9b;
       color: white;
       border-radius: 8px;
       margin-top: 12px;
@@ -268,7 +268,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise2<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -280,7 +280,7 @@
   <div class="title">🎂 Happy Birthday name 🎂</div>
   <div id="globeViz"></div>
   <div id="popup" class="popup"></div>
-  <div class="subtitle">From Turkey to Azerbaijan, to Greece... and beyond ❤️</div>
+  <div class="subtitle">From country1 to country2, to country3... and beyond ❤️</div>
 
   <div id="airplane">✈️</div>
 
@@ -341,9 +341,9 @@
     const places = [
       { lat: 25.0, lng: 19.0, name: "Turkey", message: "We first crossed paths here — two lives meeting in the middle of a busy world. I didn’t know it then, but that moment was the start of something extraordinary.", imgs: ["image1.jpg","image1b.jpg"] },
       { lat: 26.5, lng: 42.2, name: "Azerbaijan", message: "You returned home, and I went my way… but the distance never truly kept us apart. Every day we spoke, every day we laughed, and with every word our connection grew stronger.", imgs: ["image2.jpg","image2b.jpg","image2c.jpg","image2d.jpg","image2e.jpg"] },
-      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. We made a small life in a few days: late walks, salty hair, soft sunsets. Greece felt like home because you were there.", imgs: ["image3.jpg","image3b.jpg","image3c.jpg","image3d.jpg","image3e.jpg","image3f.jpg","image3g.jpg","image3h.jpg","image3i.jpg"] },
+      { lat: 22.5, lng: 14.5, name: "Greece", message: "Then you came to visit, and we turned days into memories. From sunlit streets to quiet moments by the sea, Greece became our playground of joy.", imgs: ["image3.jpg","image3b.jpg","image3c.jpg","image3d.jpg","image3e.jpg","image3f.jpg","image3g.jpg","image3h.jpg","image3i.jpg"] },
       { lat: 49.5, lng: 5.0, name: "Sweden", message: "Now, our eyes are set on a new horizon — a place to start fresh, to dream bigger, and to build a life together one step at a time.", imgs: ["image4.jpg","image4b.jpg"] },
-      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along.", imgs: ["image5.jpg","image5b.jpg"] }
+      { lat: 51.0, lng: -29.5, name: "Iceland", message: "And one day soon, we’ll stand here, surrounded by the colors of the northern sky, living out a dream we’ve carried in our hearts all along", imgs: ["image5.jpg","image5b.jpg"] }
     ];
 
     let currentIndex = -1;
@@ -363,7 +363,7 @@
       .labelColor(() => 'white')
       // start with no arcs; we'll add them progressively
       .arcsData([])
-      .arcColor(() => ['#57CBC1', '#ffffff'])
+      .arcColor(() => ['#2fbf9b', '#ffffff'])
       .arcAltitude(() => 0.12)
       .arcStroke(0.6)
       .arcDashLength(0.5)
