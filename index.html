@@ -47,7 +47,7 @@
     .loading-bar {
       height: 100%;
       width: 0%;
-      background: #2fbf9b;
+      background: #;
       transition: width 0.2s;
     }
 
@@ -142,7 +142,7 @@
       font-size: clamp(28px, 4vw, 50px);
       cursor: pointer;
       border: none;
-      background: #2fbf9b;
+      background: #;
       color: white;
       border-radius: 8px;
       margin: 0 10px;
@@ -246,10 +246,10 @@
 
     /* Controls row now just holds dots; tiny margin to save space */
     .slide-controls { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 2px; }
-    .slide-controls button { background: #2fbf9b; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
+    .slide-controls button { background: #; color: #fff; border: none; border-radius: 6px; padding: 4px 10px; cursor: pointer; font-family: 'Pacifico', cursive; font-size: 16px; }
     .dots { display: flex; gap: 6px; align-items: center; justify-content: center; }
     .dot { width: 8px; height: 8px; border-radius: 50%; background: #d7f3ea; display: inline-block; cursor: pointer; }
-    .dot.active { background: #2fbf9b; }
+    .dot.active { background: #24C96B; }
 
     /* Refresh button style (added) */
     .refresh-btn {
@@ -257,7 +257,7 @@
       font-size: clamp(20px, 3vw, 32px);
       cursor: pointer;
       border: none;
-      background: #2fbf9b;
+      background: #24C96B;
       color: white;
       border-radius: 8px;
       margin-top: 12px;
@@ -268,7 +268,7 @@
 <body>
   <div id="loadingScreen">
     <div class="ml11">
-      <span class="letters">Preparing your surprise<span id="dots">...</span></span>
+      <span class="letters">Preparing your surprise1<span id="dots">...</span></span>
     </div>
     <div class="loading-bar-container">
       <div class="loading-bar" id="loadingBar"></div>
@@ -363,7 +363,7 @@
       .labelColor(() => 'white')
       // start with no arcs; we'll add them progressively
       .arcsData([])
-      .arcColor(() => ['#2fbf9b', '#ffffff'])
+      .arcColor(() => ['#24C96B', '#ffffff'])
       .arcAltitude(() => 0.12)
       .arcStroke(0.6)
       .arcDashLength(0.5)
